@@ -21,38 +21,31 @@ Laravel is a web application framework with expressive, elegant syntax. We belie
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-## Learning Laravel
+# ️‍♀️ StayFit - Plataforma Integral de Gestión Fitness
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+**StayFit** es una solución web escalable diseñada para digitalizar y gestionar el ecosistema fitness de **FigueFit**. El sistema conecta a Administradores, Coaches y Clientes (Individuales e Institucionales) en un entorno dinámico que abarca desde la compra de planes hasta el seguimiento personalizado, operando en modalidades **Virtual** y **Presencial**.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+##  Características Principales
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+*   **Gestión de Modalidades:** Soporte completo para clientes Virtuales (con validación de pago y cupos) y Presenciales (registro directo).
+*   **Nutrición Inteligente (IA):** Chat integrado que analiza fotos de platos de comida para verificar el cumplimiento de macros y estructura nutricional.
+*   **Contenido Virtual Innovador:** Desbloqueo progresivo de videos con validación de postura y repeticiones mediante IA (estilo videollamada).
+*   **Gamificación y Progreso:** Sistema de rachas (🔥) tipo Duolingo, seguimiento biométrico semanal y comparativas visuales.
+*   **Comunicación y Comunidad:** Chats individuales (Cliente-Coach) y grupales por plan u horario.
+*   **E-commerce FigueFit:** Tienda en línea integrada para la venta de productos de marca con envíos locales y nacionales.
+*   **Panel Administrativo y de Coach:** Herramientas robustas para gestión de accesos, asignaciones, agendamiento y reportes en PDF/Excel.
 
-## Agentic Development
+## 🛠️ Stack Tecnológico
+*   **Backend:** Laravel (PHP)
+*   **Frontend:** Blade Templates, Bootstrap 5, HTML5, CSS3
+*   **Autenticación:** Laravel Breeze
+*   **Base de Datos:** MySQL / MariaDB
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## 👥 Actores del Sistema
+1.  **Visitante:** Explora planes, productos y realiza solicitudes de compra.
+2.  **Administrador:** Gestiona usuarios, planes, cupos, validaciones y la tienda.
+3.  **Coach:** Crea planes, da seguimiento, gestiona agenda y se comunica con clientes.
+4.  **Cliente (Virtual/Presencial):** Consume módulos, entrena, registra progreso y compra productos.
 
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
-```
-
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+*Desarrollado por Yina Paola García García - Tecnóloga en Análisis y Desarrollo de Software.*
