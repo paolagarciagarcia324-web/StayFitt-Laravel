@@ -1,0 +1,274 @@
+:root {
+    --pink: #ff2d78;
+    --cyan: #2ef5e6;
+    --bg: #070708;
+    --panel: #101014;
+    --muted: rgba(255, 255, 255, 0.68);
+}
+
+* { box-sizing: border-box; }
+
+body.lg-body {
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    font-family: "Montserrat", system-ui, sans-serif;
+    color: #fff;
+    background:
+        radial-gradient(circle at 10% 20%, rgba(255, 45, 120, 0.18), transparent 35%),
+        radial-gradient(circle at 90% 80%, rgba(46, 245, 230, 0.1), transparent 30%),
+        var(--bg);
+}
+
+.lg-shell {
+    width: min(1080px, 100%);
+    min-height: min(640px, calc(100vh - 48px));
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    overflow: hidden;
+    border-radius: 28px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--panel);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+}
+
+.lg-visual {
+    position: relative;
+    overflow: hidden;
+    min-height: 100%;
+    background: #0a1218;
+}
+
+.lg-visual-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    z-index: 0;
+}
+
+.lg-visual::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+        linear-gradient(180deg, rgba(7, 7, 8, 0.35) 0%, rgba(7, 7, 8, 0.15) 35%, rgba(7, 7, 8, 0.55) 70%, rgba(7, 7, 8, 0.82) 100%),
+        linear-gradient(90deg, rgba(7, 7, 8, 0.25), transparent 55%);
+    pointer-events: none;
+}
+
+.lg-visual-content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    min-height: inherit;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 28px;
+}
+
+.lg-logo {
+    width: fit-content;
+}
+
+.lg-logo img {
+    height: 42px;
+    width: auto;
+    display: block;
+}
+
+.lg-visual-copy {
+    max-width: 420px;
+    margin-top: auto;
+    margin-bottom: 22px;
+}
+
+.lg-visual-copy h1 {
+    margin: 0 0 12px;
+    font-size: clamp(28px, 3.2vw, 40px);
+    line-height: 1.05;
+    text-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.lg-visual-copy h1 span { color: var(--pink); }
+
+.lg-visual-copy p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.88);
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+.lg-secure {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: rgba(10, 10, 14, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(12px);
+}
+
+.lg-secure-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: rgba(46, 245, 230, 0.15);
+    color: var(--cyan);
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+.lg-secure strong {
+    display: block;
+    font-size: 14px;
+}
+
+.lg-secure small {
+    display: block;
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.lg-form-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px 36px;
+    background: #0c0c10;
+}
+
+.lg-form-panel h2 {
+    margin: 0 0 8px;
+    font-size: 34px;
+}
+
+.lg-subtitle {
+    margin: 0 0 28px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.lg-status {
+    margin: 0 0 16px;
+    color: var(--cyan);
+    font-size: 13px;
+}
+
+.lg-form {
+    display: grid;
+    gap: 18px;
+}
+
+.lg-form label span {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.lg-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.lg-label-row span { margin-bottom: 0; }
+
+.lg-label-row a {
+    color: var(--pink);
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.lg-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(0, 0, 0, 0.35);
+}
+
+.lg-input:focus-within {
+    border-color: rgba(255, 45, 120, 0.55);
+    box-shadow: 0 0 0 3px rgba(255, 45, 120, 0.12);
+}
+
+.lg-input-icon {
+    opacity: 0.7;
+    font-size: 14px;
+}
+
+.lg-input input {
+    width: 100%;
+    border: 0;
+    outline: none;
+    background: transparent;
+    color: #fff;
+    font: inherit;
+    padding: 14px 0;
+}
+
+.lg-error {
+    display: block;
+    margin-top: 6px;
+    color: #ff8eb8;
+    font-size: 12px;
+}
+
+.lg-hint {
+    margin: -4px 0 0;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.lg-submit {
+    width: 100%;
+    margin-top: 4px;
+    padding: 15px 18px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--pink);
+    color: #fff;
+    font: inherit;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    box-shadow: 0 0 24px rgba(255, 45, 120, 0.45);
+}
+
+.lg-submit:hover { filter: brightness(1.05); }
+
+.lg-back {
+    display: block;
+    margin-top: 22px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.lg-back:hover { color: var(--cyan); }
+
+@media (max-width: 900px) {
+    .lg-shell { grid-template-columns: 1fr; }
+    .lg-visual { min-height: 360px; }
+    .lg-form-panel { padding: 28px 22px; }
+}
