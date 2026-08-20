@@ -22,6 +22,7 @@ class Cliente extends Model
     protected $fillable = [
         'id_user',
         'id_coach',
+        'id_coach_asignado',
         'id_institucion',
         'id_horario',
         'modalidad',
@@ -68,6 +69,16 @@ class Cliente extends Model
     public function horario(): BelongsTo
     {
         return $this->belongsTo(HorarioPresencial::class, 'id_horario', 'id_horario');
+    }
+
+    public function coach(): BelongsTo
+    {
+        return $this->belongsTo(Coach::class, 'id_coach', 'id_coach');
+    }
+
+    public function accesos(): HasMany
+    {
+        return $this->hasMany(AccesoClienteModulo::class, 'id_cliente', 'id_cliente');
     }
 
     public function planActivo(): ?PlanCliente

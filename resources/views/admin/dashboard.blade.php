@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Dashboard')
-@section('subtitle', 'Operación diaria de FigueFit')
+@section('subtitle', 'Operación diaria')
 
 @php
     $virtuales = (int) ($metricas->clientes_virtuales ?? 0);

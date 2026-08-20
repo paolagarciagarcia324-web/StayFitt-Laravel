@@ -7,6 +7,7 @@ use App\Http\Requests\AdminUsuarioPresencialRequest;
 use App\Models\HorarioPresencial;
 use App\Models\Pago;
 use App\Models\Plan;
+use App\Models\Rol;
 use App\Models\SolicitudCompra;
 use App\Models\User;
 use App\Services\SolicitudAprobacionService;
@@ -39,8 +40,9 @@ class UsuarioController extends Controller
 
         $horarios = HorarioPresencial::activos()->get();
         $plan = $this->planPresencial();
+        $roles = Rol::query()->orderBy('id_rol')->get();
 
-        return view('admin.usuarios.index', compact('usuarios', 'horarios', 'plan', 'q'));
+        return view('admin.usuarios.index', compact('usuarios', 'horarios', 'plan', 'q', 'roles'));
     }
 
     public function store(AdminUsuarioPresencialRequest $request): RedirectResponse
@@ -144,6 +146,28 @@ class UsuarioController extends Controller
         return redirect()
             ->route('admin.usuarios.index')
             ->with('success', 'Usuario presencial creado. Acceso inicial: correo + documento.');
+    }
+
+    public function update(Request $request, int $id): RedirectResponse
+    {
+        $usuario = User::query()->findOrFail($id);
+
+        $data = $request->validate([
+            'estado' => ['required', 'in:PENDIENTE,ACTIVO,INACTIVO,BLOQUEADO'],
+            'roles' => ['nullable', 'array'],
+            'roles.*' => ['integer', 'exists:roles,id_rol'],
+        ]);
+
+        $usuario->update([
+            'estado' => $data['estado'],
+            'estado_cuenta' => $data['estado'],
+        ]);
+
+        if ($request->has('roles')) {
+            $usuario->roles()->sync($data['roles'] ?? []);
+        }
+
+        return back()->with('success', 'Usuario actualizado.');
     }
 
     private function planPresencial(): ?Plan

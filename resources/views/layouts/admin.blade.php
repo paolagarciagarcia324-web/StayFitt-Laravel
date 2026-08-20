@@ -47,33 +47,21 @@
         </div>
 
         <nav class="ad-nav">
+            <span class="ad-nav-label">Operación</span>
             <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'is-active' : '' }}">
                 <span class="ad-nav-orb is-pink">@include('partials.admin-icon', ['icon' => 'dashboard'])</span>
                 Dashboard
             </a>
-            <a href="{{ route('admin.usuarios.index') }}" class="{{ request()->routeIs('admin.usuarios.*') ? 'is-active' : '' }}">
-                <span class="ad-nav-orb is-cyan">@include('partials.admin-icon', ['icon' => 'usuarios'])</span>
-                Usuarios
+            <a href="{{ route('admin.solicitudes.index') }}" class="{{ request()->routeIs('admin.solicitudes.*') ? 'is-active' : '' }}">
+                <span class="ad-nav-orb is-cyan">@include('partials.admin-icon', ['icon' => 'pagos'])</span>
+                Solicitudes
+                @if (($navSolicitudesPendientes ?? 0) > 0)
+                    <span class="ad-nav-badge">{{ $navSolicitudesPendientes }}</span>
+                @endif
             </a>
-            <a href="{{ route('admin.clientes.virtuales') }}" class="{{ request()->routeIs('admin.clientes.virtuales') ? 'is-active' : '' }}">
-                <span class="ad-nav-orb is-pink">@include('partials.admin-icon', ['icon' => 'clientes-virtual'])</span>
-                Clientes virtuales
-            </a>
-            <a href="{{ route('admin.clientes.presenciales') }}" class="{{ request()->routeIs('admin.clientes.presenciales') ? 'is-active' : '' }}">
-                <span class="ad-nav-orb is-cyan">@include('partials.admin-icon', ['icon' => 'clientes-presencial'])</span>
-                Clientes presenciales
-            </a>
-            <a href="{{ route('admin.instituciones.index') }}" class="{{ request()->routeIs('admin.instituciones.*') ? 'is-active' : '' }}">
-                <span class="ad-nav-orb is-pink">@include('partials.admin-icon', ['icon' => 'instituciones'])</span>
-                Instituciones
-            </a>
-            <a href="{{ route('admin.coaches.index') }}" class="{{ request()->routeIs('admin.coaches.*') ? 'is-active' : '' }}">
-                <span class="ad-nav-orb is-cyan">@include('partials.admin-icon', ['icon' => 'coaches'])</span>
-                Coaches
-            </a>
-            <a href="{{ route('admin.planes.index') }}" class="{{ request()->routeIs('admin.planes.*') ? 'is-active' : '' }}">
-                <span class="ad-nav-orb is-pink">@include('partials.admin-icon', ['icon' => 'planes'])</span>
-                Planes
+            <a href="{{ route('admin.pagos.index') }}" class="{{ request()->routeIs('admin.pagos.*') ? 'is-active' : '' }}">
+                <span class="ad-nav-orb is-pink">@include('partials.admin-icon', ['icon' => 'pagos'])</span>
+                Pagos
             </a>
             <a href="{{ route('admin.horarios.index') }}" class="{{ request()->routeIs('admin.horarios.*') ? 'is-active' : '' }}">
                 <span class="ad-nav-orb is-cyan">@include('partials.admin-icon', ['icon' => 'horarios'])</span>
@@ -83,22 +71,62 @@
                 <span class="ad-nav-orb is-pink">@include('partials.admin-icon', ['icon' => 'eventos'])</span>
                 Eventos
             </a>
-            <a href="{{ route('admin.pagos.index') }}" class="{{ request()->routeIs('admin.pagos.*') ? 'is-active' : '' }}">
-                <span class="ad-nav-orb is-cyan">@include('partials.admin-icon', ['icon' => 'pagos'])</span>
-                Pagos
-            </a>
-            <a href="{{ route('admin.tienda.index') }}" class="{{ request()->routeIs('admin.tienda.*') ? 'is-active' : '' }}">
-                <span class="ad-nav-orb is-pink">@include('partials.admin-icon', ['icon' => 'tienda'])</span>
-                Tienda
-            </a>
             <a href="{{ route('admin.calendario.index') }}" class="{{ request()->routeIs('admin.calendario.*') ? 'is-active' : '' }}">
                 <span class="ad-nav-orb is-cyan">@include('partials.admin-icon', ['icon' => 'calendario'])</span>
                 Calendario
+            </a>
+
+            <span class="ad-nav-label">Personas</span>
+            <a href="{{ route('admin.usuarios.index') }}" class="{{ request()->routeIs('admin.usuarios.*') ? 'is-active' : '' }}">
+                <span class="ad-nav-orb is-pink">@include('partials.admin-icon', ['icon' => 'usuarios'])</span>
+                Usuarios
+            </a>
+            <a href="{{ route('admin.clientes.virtuales') }}" class="{{ request()->routeIs('admin.clientes.virtuales') ? 'is-active' : '' }}">
+                <span class="ad-nav-orb is-cyan">@include('partials.admin-icon', ['icon' => 'clientes-virtual'])</span>
+                Clientes virtuales
+            </a>
+            <a href="{{ route('admin.clientes.presenciales') }}" class="{{ request()->routeIs('admin.clientes.presenciales') ? 'is-active' : '' }}">
+                <span class="ad-nav-orb is-pink">@include('partials.admin-icon', ['icon' => 'clientes-presencial'])</span>
+                Clientes presenciales
+            </a>
+            <a href="{{ route('admin.instituciones.index') }}" class="{{ request()->routeIs('admin.instituciones.*') ? 'is-active' : '' }}">
+                <span class="ad-nav-orb is-cyan">@include('partials.admin-icon', ['icon' => 'instituciones'])</span>
+                Instituciones
+            </a>
+            <a href="{{ route('admin.coaches.index') }}" class="{{ request()->routeIs('admin.coaches.*') ? 'is-active' : '' }}">
+                <span class="ad-nav-orb is-pink">@include('partials.admin-icon', ['icon' => 'coaches'])</span>
+                Coaches
+            </a>
+
+            <span class="ad-nav-label">Comercial</span>
+            <a href="{{ route('admin.planes.index') }}" class="{{ request()->routeIs('admin.planes.*') ? 'is-active' : '' }}">
+                <span class="ad-nav-orb is-cyan">@include('partials.admin-icon', ['icon' => 'planes'])</span>
+                Planes
+            </a>
+            <a href="{{ route('admin.cupones.index') }}" class="{{ request()->routeIs('admin.cupones.*') ? 'is-active' : '' }}">
+                <span class="ad-nav-orb is-pink">@include('partials.admin-icon', ['icon' => 'planes'])</span>
+                Cupones
+            </a>
+            <a href="{{ route('admin.tienda.index') }}" class="{{ request()->routeIs('admin.tienda.*') ? 'is-active' : '' }}">
+                <span class="ad-nav-orb is-cyan">@include('partials.admin-icon', ['icon' => 'tienda'])</span>
+                Tienda
+            </a>
+            <a href="{{ route('admin.pasarelas.index') }}" class="{{ request()->routeIs('admin.pasarelas.*') ? 'is-active' : '' }}">
+                <span class="ad-nav-orb is-pink">@include('partials.admin-icon', ['icon' => 'pasarelas'])</span>
+                Pasarelas
+            </a>
+
+            <span class="ad-nav-label">Comunicación</span>
+            <a href="{{ route('admin.whatsapp.index') }}" class="{{ request()->routeIs('admin.whatsapp.*') ? 'is-active' : '' }}">
+                <span class="ad-nav-orb is-cyan">@include('partials.admin-icon', ['icon' => 'comunidad'])</span>
+                WhatsApp
             </a>
             <a href="{{ route('admin.comunidad.index') }}" class="{{ request()->routeIs('admin.comunidad.*') ? 'is-active' : '' }}">
                 <span class="ad-nav-orb is-pink">@include('partials.admin-icon', ['icon' => 'comunidad'])</span>
                 Comunidad
             </a>
+
+            <span class="ad-nav-label">Análisis</span>
             <a href="{{ route('admin.estadisticas.index') }}" class="{{ request()->routeIs('admin.estadisticas.*') ? 'is-active' : '' }}">
                 <span class="ad-nav-orb is-cyan">@include('partials.admin-icon', ['icon' => 'estadisticas'])</span>
                 Estadísticas
@@ -106,10 +134,6 @@
             <a href="{{ route('admin.reportes.index') }}" class="{{ request()->routeIs('admin.reportes.*') ? 'is-active' : '' }}">
                 <span class="ad-nav-orb is-pink">@include('partials.admin-icon', ['icon' => 'reportes'])</span>
                 Reportes
-            </a>
-            <a href="{{ route('admin.pasarelas.index') }}" class="{{ request()->routeIs('admin.pasarelas.*') ? 'is-active' : '' }}">
-                <span class="ad-nav-orb is-cyan">@include('partials.admin-icon', ['icon' => 'pasarelas'])</span>
-                Pasarelas
             </a>
         </nav>
 
@@ -136,6 +160,9 @@
                     @hasSection('subtitle')
                         <p>@yield('subtitle')</p>
                     @endif
+                </div>
+                <div class="ad-top-actions">
+                    @yield('actions')
                 </div>
             </header>
 

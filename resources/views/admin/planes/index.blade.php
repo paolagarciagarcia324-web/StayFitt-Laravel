@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Planes')
-@section('subtitle', 'Catálogo comercial y cupos')
+@section('subtitle', 'Catálogo y cupos')
 
 @section('content')
     <section class="ad-card ad-users">

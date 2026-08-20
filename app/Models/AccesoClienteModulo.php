@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AccesoClienteModulo extends Model
 {
@@ -24,4 +25,19 @@ class AccesoClienteModulo extends Model
         'fecha_fin',
         'estado_acceso',
     ];
+
+    public function plan(): BelongsTo
+    {
+        return $this->belongsTo(Plan::class, 'id_plan', 'id_plan');
+    }
+
+    public function modulo(): BelongsTo
+    {
+        return $this->belongsTo(ModuloServicio::class, 'id_modulo', 'id_modulo');
+    }
+
+    public function cliente(): BelongsTo
+    {
+        return $this->belongsTo(Cliente::class, 'id_cliente', 'id_cliente');
+    }
 }

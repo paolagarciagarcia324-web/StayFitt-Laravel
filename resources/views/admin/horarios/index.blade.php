@@ -1,11 +1,10 @@
 @extends('layouts.admin')
 
 @section('title', 'Horarios')
-@section('subtitle', 'Cupos y grupos de WhatsApp de la sala presencial')
+@section('subtitle', 'Sala presencial')
 
 @section('content')
     <section class="ad-card ad-users">
-        <p class="ad-empty" style="margin-bottom:16px">Estos horarios alimentan el registro presencial. El plan de sala se asigna automático; aquí controlas cupo, enlace y disponibilidad.</p>
         <table class="ad-table ad-users-table">
             <thead>
                 <tr>
@@ -52,7 +51,14 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="6" class="ad-empty">No hay horarios. Ejecuta las migraciones de sala presencial.</td></tr>
+                    <tr>
+                        <td colspan="6">
+                            <div class="ad-empty-hero">
+                                <span class="ad-empty-orb">@include('partials.admin-icon', ['icon' => 'horarios'])</span>
+                                <strong>Sin horarios</strong>
+                            </div>
+                        </td>
+                    </tr>
                 @endforelse
             </tbody>
         </table>
@@ -63,7 +69,6 @@
             <header class="ad-modal-head">
                 <div>
                     <h2 data-horario-title>Editar horario</h2>
-                    <p>Cupo, enlace de WhatsApp y disponibilidad.</p>
                 </div>
                 <button type="button" class="ad-modal-close" data-close-horario aria-label="Cerrar">×</button>
             </header>
@@ -74,7 +79,7 @@
                 <label><span>Cupo máximo</span><input type="number" name="cupo_maximo" data-field="cupo" min="1" max="80" required></label>
                 <label style="display:flex;gap:8px;align-items:center;margin:12px 0">
                     <input type="checkbox" name="activo" value="1" data-field="activo">
-                    <span style="margin:0">Horario activo en registro</span>
+                    <span style="margin:0">Horario activo</span>
                 </label>
                 <div class="ad-modal-actions">
                     <button class="ad-btn ad-btn-ghost" type="button" data-close-horario>Cancelar</button>

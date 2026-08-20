@@ -48,6 +48,7 @@
                     @elseif (! $compact && $variant === 'presencial' && $c->ciudad)
                         <em class="ad-user-mail">{{ $c->ciudad }}</em>
                     @endif
+                    <a class="ad-link" href="{{ route('admin.clientes.show', $c->id_cliente) }}" style="display:inline-block;margin-top:4px;font-size:11px">Ver detalle</a>
                 </td>
                 @unless ($compact)
                     @if ($variant === 'virtual')

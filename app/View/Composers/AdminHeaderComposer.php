@@ -3,6 +3,7 @@
 namespace App\View\Composers;
 
 use App\Models\PlanCliente;
+use App\Models\SolicitudCompra;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -60,12 +61,17 @@ class AdminHeaderComposer
             ->limit(8)
             ->get();
 
+        $navSolicitudesPendientes = SolicitudCompra::query()
+            ->where('estado_solicitud', 'PENDIENTE')
+            ->count();
+
         $view->with([
             'headerEntraron' => $entraron,
             'headerActivos' => $activos,
             'headerInactivos' => $inactivos,
             'headerTopProductos' => $topProductos,
             'headerAlertas' => $alertas,
+            'navSolicitudesPendientes' => $navSolicitudesPendientes,
         ]);
     }
 }

@@ -66,4 +66,30 @@ class CoachController extends Controller
             ->route('admin.coaches.index')
             ->with('success', 'Coach creado. Acceso: correo + documento.');
     }
+
+    public function update(Request $request, int $id): RedirectResponse
+    {
+        $coach = Coach::query()->with('usuario')->findOrFail($id);
+
+        $data = $request->validate([
+            'especialidad' => ['required', 'string', 'max:120'],
+            'biografia' => ['nullable', 'string', 'max:2000'],
+            'certificaciones' => ['nullable', 'string', 'max:500'],
+            'estado_coach' => ['required', 'in:ACTIVO,INACTIVO,VACACIONES,SUSPENDIDO'],
+            'telefono' => ['nullable', 'string', 'max:30'],
+        ]);
+
+        $coach->update([
+            'especialidad' => $data['especialidad'],
+            'biografia' => $data['biografia'] ?? null,
+            'certificaciones' => $data['certificaciones'] ?? null,
+            'estado_coach' => $data['estado_coach'],
+        ]);
+
+        if ($coach->usuario) {
+            $coach->usuario->update(['telefono' => $data['telefono'] ?? $coach->usuario->telefono]);
+        }
+
+        return back()->with('success', 'Coach actualizado.');
+    }
 }

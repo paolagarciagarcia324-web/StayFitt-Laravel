@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Pagos')
-@section('subtitle', 'Registro de pagos del sistema')
+@section('subtitle', 'Registro de pagos')
 
 @section('content')
     <section class="ad-card ad-users">
@@ -26,15 +26,28 @@
             </thead>
             <tbody>
                 @forelse ($pagos as $p)
+                    @php
+                        $metodo = $p->metodo_pago ?: $p->metodo ?: '—';
+                        $esPasarela = filled($p->pasarela) || str_contains(strtoupper((string) $metodo), 'PASARELA');
+                    @endphp
                     <tr>
                         <td>
                             <strong>{{ $p->referencia ?: $p->referencia_pago ?: '—' }}</strong>
                             <em class="ad-user-mail">#{{ $p->id_pago }}</em>
                         </td>
-                        <td>{{ $p->solicitud?->codigo_solicitud ?: '—' }}</td>
+                        <td>
+                            @if ($p->id_solicitud)
+                                <a class="ad-link" href="{{ route('admin.solicitudes.show', $p->id_solicitud) }}">{{ $p->solicitud?->codigo_solicitud ?: '#'.$p->id_solicitud }}</a>
+                            @else
+                                —
+                            @endif
+                        </td>
                         <td>{{ $p->solicitud?->correo ?: '—' }}</td>
                         <td>${{ number_format((float) $p->monto, 0, ',', '.') }} {{ $p->moneda }}</td>
-                        <td>{{ $p->metodo_pago ?: $p->metodo ?: '—' }}</td>
+                        <td>
+                            <span class="ad-badge {{ $esPasarela ? 'ad-badge-ok' : 'ad-badge-pendiente' }}">{{ $esPasarela ? 'Pasarela' : 'Comprobante' }}</span>
+                            <em class="ad-user-mail">{{ $metodo }}</em>
+                        </td>
                         <td>
                             <span class="ad-badge {{ $p->estado_pago === 'VALIDADO' ? 'ad-badge-ok' : ($p->estado_pago === 'PENDIENTE' ? 'ad-badge-pendiente' : 'ad-badge-bad') }}">
                                 {{ $p->estado_pago }}

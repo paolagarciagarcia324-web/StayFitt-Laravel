@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Evento;
 use App\Models\HorarioPresencial;
 use App\Models\OrdenTienda;
+use App\Models\Pago;
 use App\Models\PlanCliente;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -15,8 +16,8 @@ class DashboardController extends Controller
 {
     public function index(): View
     {
-        $metricas = DB::table('vw_dashboard_metricas')->first();
         $mesInicio = Carbon::now()->startOfMonth();
+        $metricas = $this->metricas($mesInicio);
 
         $planesVendidos = PlanCliente::query()
             ->where('creado_en', '>=', $mesInicio)
@@ -57,6 +58,36 @@ class DashboardController extends Controller
             'planesVendidos',
             'productosVendidos',
         ));
+    }
+
+    private function metricas(Carbon $mesInicio): object
+    {
+        try {
+            $row = DB::table('vw_dashboard_metricas')->first();
+            if ($row) {
+                $ingresoMes = (float) Pago::query()
+                    ->where('estado_pago', 'VALIDADO')
+                    ->where('creado_en', '>=', $mesInicio)
+                    ->sum('monto');
+
+                $row->ingreso_mes_actual = $ingresoMes;
+
+                return $row;
+            }
+        } catch (\Throwable) {
+            // fallback below
+        }
+
+        return (object) [
+            'total_clientes_activos' => DB::table('clientes')->whereIn('estado_cliente', ['ACTIVO', 'ACTIVA'])->count(),
+            'clientes_virtuales' => DB::table('clientes')->where('modalidad', 'VIRTUAL')->count(),
+            'clientes_presenciales' => DB::table('clientes')->where('modalidad', 'PRESENCIAL')->count(),
+            'solicitudes_pendientes' => DB::table('solicitudes_compra')->where('estado_solicitud', 'PENDIENTE')->count(),
+            'ingreso_mes_actual' => (float) Pago::query()
+                ->where('estado_pago', 'VALIDADO')
+                ->where('creado_en', '>=', $mesInicio)
+                ->sum('monto'),
+        ];
     }
 
     /**

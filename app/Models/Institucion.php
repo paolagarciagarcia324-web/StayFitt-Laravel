@@ -46,4 +46,9 @@ class Institucion extends Model
     {
         return $this->hasMany(Cliente::class, 'id_institucion', 'id_institucion');
     }
+
+    public function enlaces(): HasMany
+    {
+        return $this->hasMany(EnlaceRegistroInstitucional::class, 'id_institucion', 'id_institucion');
+    }
 }

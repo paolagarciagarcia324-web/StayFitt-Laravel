@@ -13,45 +13,34 @@ Panel de administración para operar el negocio sobre la BD real (`usuarios`, `p
 3. Redirección automática a `/admin`
 4. Solo rol `ADMIN` puede ver el panel (403 para otros)
 
-## Cómo se construyó
-1. Roles (`ADMIN`, `COACH`, `CLIENTE`, `CLIENTE_INSTITUCIONAL`) y vistas (`vw_dashboard_metricas`, `vw_solicitudes_pendientes`).
-2. Menú Admin según el flujo: validar compras → usuarios/clientes → planes → instituciones.
-3. Middleware `role:ADMIN` y redirección post-login.
-4. Aprobación de solicitudes crea en BD: `usuarios` + rol `CLIENTE` + `clientes` + `planes_cliente` + `acceso_cliente_modulo` + pago `VALIDADO`.
+## Módulos del panel (alineados a doc v4.0)
 
-## Módulos del panel
-
-| Módulo | Ruta | Tablas / vistas |
-|--------|------|-----------------|
-| Dashboard | `/admin` | `vw_dashboard_metricas` |
-| Pagos | `/admin/pagos` | `pagos` |
-| Tienda | `/admin/tienda` | `productos_tienda`, `ordenes_tienda`, `categorias_producto` |
-| Planes | `/admin/planes` | `planes`, `plan_modulos`, `modulos_servicio` |
-| Usuarios | `/admin/usuarios` | `usuarios`, `user_roles`, `roles` |
-| Clientes | `/admin/clientes` | `clientes`, `usuarios` |
-| Coaches | `/admin/coaches` | `coaches`, `usuarios` |
-| Instituciones | `/admin/instituciones` | `instituciones` |
-| Horarios | `/admin/horarios` | `horarios_presenciales` |
-| Pasarelas | `/admin/pasarelas` | `configuracion_pasarelas` |
+| Módulo | Ruta | Capacidad |
+|--------|------|-----------|
+| Dashboard | `/admin` | KPIs y métricas |
+| Solicitudes | `/admin/solicitudes` | Validar/rechazar comprobantes (RF-029) |
+| Pagos | `/admin/pagos` | Listado + enlace a solicitud |
+| Usuarios | `/admin/usuarios` | Alta presencial + editar estado/roles (RF-006) |
+| Clientes virtuales/presenciales | `/admin/clientes/*` | Listados + detalle, asignar coach, accesos (RF-002, RF-009, RF-031) |
+| Instituciones | `/admin/instituciones` | CRUD, vincular cliente, enlaces token (RF-054/055) |
+| Coaches | `/admin/coaches` | Crear + editar perfil/estado (RF-003) |
+| Planes | `/admin/planes` | Catálogo + cupos (RF-034) |
+| Cupones | `/admin/cupones` | Descuentos comerciales |
+| Horarios | `/admin/horarios` | Cupos sala presencial |
+| Eventos | `/admin/eventos` | CRUD talleres/retos (RF-043) |
+| Tienda | `/admin/tienda` | Catálogo + pedidos (RF-051) |
+| WhatsApp | `/admin/whatsapp` | Config + grupos (RF-052) |
+| Pasarelas | `/admin/pasarelas` | Sandbox/LIVE y activa (RF-050) |
+| Calendario | `/admin/calendario` | Eventos + sesiones |
+| Estadísticas | `/admin/estadisticas` | KPIs y cupos (RF-049) |
+| Reportes | `/admin/reportes` | Export CSV pagos/clientes/cupos (RF-047/048) |
+| Comunidad | `/admin/comunidad` | Supervisión chats (lectura) |
 
 ## Flujo crítico: aprobar solicitud
 1. Visitante elige plan → pre-registro (`solicitudes_compra` + `pagos` en `PENDIENTE`).
-2. Admin revisa solicitud y comprobante.
-3. **Aprobar** (`SolicitudAprobacionService`):
-   - Crea/activa `usuarios` (password inicial = documento)
-   - Asigna rol `CLIENTE`
-   - Crea/activa `clientes`
-   - Marca `pagos` como `VALIDADO`
-   - Crea `planes_cliente` con estado activo
-   - Genera `acceso_cliente_modulo` según módulos del plan
-   - Solicitud → `VALIDADA`
-4. **Rechazar**: solicitud `RECHAZADA`, pago `RECHAZADO` (libera cupo).
-
-## Base de datos y migraciones
-- Conexión: MySQL · BD `stayfit` (`.env`: `DB_DATABASE=stayfit`)
-- Esquema v4.0: migraciones `database/migrations/2026_08_16_*.php`
-- Migraciones antiguas `2026_03_01_*` están deshabilitadas (no-op)
-- Seeds: roles, módulos, pasarelas, planes ejemplo, admin Paola
+2. Admin revisa solicitud y comprobante desde **Solicitudes**.
+3. **Aprobar** (`SolicitudAprobacionService`): usuario + rol CLIENTE + cliente + plan_cliente + accesos + pago VALIDADO.
+4. **Rechazar**: libera cupo.
 
 ## Archivos principales
 - Middleware: `app/Http/Middleware/EnsureRole.php`
@@ -61,11 +50,10 @@ Panel de administración para operar el negocio sobre la BD real (`usuarios`, `p
 - Layout/CSS: `resources/views/layouts/admin.blade.php`, `public/css/admin.css`
 - Vistas: `resources/views/admin/**`
 
-## Pendiente (siguientes iteraciones)
-- Alta completa de coaches desde Admin
-- Facturas / reportes exportables
-- Router de dashboards Coach y Cliente
-- WhatsApp presencial desde UI
-- Enlaces institucionales / cupones
+## Pendiente (fuera de Admin o siguiente iteración)
+- Webhooks reales de pasarelas / activación APPROVED automática
+- Factura PDF fiscal
+- Dashboards Coach/Cliente
+- Chat en tiempo real (solo supervisión lectura en Admin)
 
-Trazabilidad de negocio y priorización: [`ANALISIS_DOCUMENTAL_STAYFIT_V4.md`](ANALISIS_DOCUMENTAL_STAYFIT_V4.md).
+Trazabilidad de negocio: [`ANALISIS_DOCUMENTAL_STAYFIT_V4.md`](ANALISIS_DOCUMENTAL_STAYFIT_V4.md).

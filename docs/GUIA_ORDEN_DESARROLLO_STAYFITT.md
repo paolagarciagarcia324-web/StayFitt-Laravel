@@ -147,8 +147,10 @@ Diamante de roles completo. **Parcial (solo Admin cerrado).**
 - [x] CRUD planes + módulos
 - [x] Listados usuarios, clientes, coaches, instituciones
 - [x] Seeds: 3 planes ejemplo + módulos + pasarelas config
-- [ ] Alta completa de coach (usuario + perfil) desde UI rica
-- [ ] CRUD cupones / enlaces institucionales
+- [x] Alta completa de coach (usuario + perfil) desde UI
+- [x] Edición usuarios/coaches/instituciones/clientes + asignar coach
+- [x] CRUD cupones / enlaces institucionales
+- [x] WhatsApp config Admin + reportes/estadísticas/eventos/comunidad
 
 Detalle: [`docs/ADMIN_DASHBOARD.md`](ADMIN_DASHBOARD.md)
 
@@ -248,11 +250,13 @@ Cliente de prueba “compra” y queda con módulos. **Flujo manual cumplido; pa
 ## FASE 10 — Admin avanzado
 
 - [ ] Facturas / devoluciones  
-- [ ] Reportes (`reportes_generados` + `vw_*`)  
+- [x] Reportes (`reportes_generados` + export CSV)  
 - [ ] Bitácora (`bitacora_sistema`)  
 - [ ] Renovaciones  
-- [ ] Enlaces institucionales  
-- [ ] Config pasarelas / WhatsApp desde UI  
+- [x] Enlaces institucionales  
+- [x] Config pasarelas / WhatsApp desde UI  
+- [x] Cupones comerciales  
+- [x] Eventos / calendario / estadísticas / comunidad (supervisión)  
 
 ---
 
@@ -349,7 +353,7 @@ docs/
 - [ ] Fase 7 — Cliente Virtual  
 - [ ] Fase 8 — Cliente Presencial  
 - [ ] Fase 9 — Coach  
-- [ ] Fase 10 — Admin avanzado  
+- [x] Fase 10 — Admin avanzado (parcial: reportes CSV, WhatsApp, cupones, eventos; faltan facturas/bitácora)  
 - [ ] Fase 11 — Chat / notificaciones / tienda  
 - [ ] Fase 12 — Integraciones  
 

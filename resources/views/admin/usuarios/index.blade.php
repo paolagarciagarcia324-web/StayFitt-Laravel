@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Usuarios')
-@section('subtitle', 'Cuentas del sistema, plan y modalidad')
+@section('subtitle', 'Cuentas del sistema')
 
 @section('content')
     <section class="ad-card ad-users">
@@ -23,6 +23,7 @@
                     <th>Plan</th>
                     <th>Días restantes</th>
                     <th>Nacimiento</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -74,9 +75,16 @@
                                 —
                             @endif
                         </td>
+                        <td>
+                            <button class="ad-btn ad-btn-ghost" type="button"
+                                data-open-user-edit
+                                data-id="{{ $u->id_user }}"
+                                data-estado="{{ $u->estado ?: $u->estado_cuenta ?: 'ACTIVO' }}"
+                                data-roles="{{ $u->roles->pluck('id_rol')->implode(',') }}">Editar</button>
+                        </td>
                     </tr>
                 @empty
-                    <tr><td colspan="7" class="ad-empty">No hay usuarios con ese nombre.</td></tr>
+                    <tr><td colspan="8" class="ad-empty">No hay usuarios con ese nombre.</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -194,6 +202,44 @@
         </div>
     </div>
 
+    <div class="ad-modal" data-user-edit-modal hidden>
+        <div class="ad-modal-card">
+            <header class="ad-modal-head">
+                <div>
+                    <h2>Editar usuario</h2>
+                    <p>Estado de cuenta y roles.</p>
+                </div>
+                <button type="button" class="ad-modal-close" data-close-user-edit aria-label="Cerrar">×</button>
+            </header>
+            <form class="ad-form" method="POST" data-user-edit-form>
+                @csrf
+                @method('PUT')
+                <label><span>Estado *</span>
+                    <select name="estado" data-field="estado" required>
+                        @foreach (['PENDIENTE','ACTIVO','INACTIVO','BLOQUEADO'] as $e)
+                            <option value="{{ $e }}">{{ $e }}</option>
+                        @endforeach
+                    </select>
+                </label>
+                <div>
+                    <span class="ad-form-label">Roles</span>
+                    <div class="ad-checks">
+                        @foreach ($roles as $rol)
+                            <label>
+                                <input type="checkbox" name="roles[]" value="{{ $rol->id_rol }}" data-role-id="{{ $rol->id_rol }}">
+                                {{ $rol->codigo_rol ?? $rol->codigo ?? $rol->nombre_rol ?? ('Rol #'.$rol->id_rol) }}
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+                <div class="ad-modal-actions">
+                    <button class="ad-btn ad-btn-ghost" type="button" data-close-user-edit>Cancelar</button>
+                    <button class="ad-btn" type="submit">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         (function () {
             var modal = document.querySelector('[data-user-modal]');
@@ -207,6 +253,32 @@
             modal?.addEventListener('click', function (event) {
                 if (event.target === modal) close();
             });
+
+            var editModal = document.querySelector('[data-user-edit-modal]');
+            var editForm = document.querySelector('[data-user-edit-form]');
+            function openEdit(btn) {
+                if (!editModal || !editForm) return;
+                editForm.action = '{{ url('admin/usuarios') }}/' + btn.getAttribute('data-id');
+                editForm.querySelector('[data-field="estado"]').value = btn.getAttribute('data-estado') || 'ACTIVO';
+                var roles = (btn.getAttribute('data-roles') || '').split(',').filter(Boolean);
+                editForm.querySelectorAll('[data-role-id]').forEach(function (cb) {
+                    cb.checked = roles.indexOf(cb.getAttribute('data-role-id')) !== -1;
+                });
+                editModal.hidden = false;
+                editModal.classList.add('is-open');
+            }
+            function closeEdit() {
+                if (!editModal) return;
+                editModal.hidden = true;
+                editModal.classList.remove('is-open');
+            }
+            document.querySelectorAll('[data-open-user-edit]').forEach(function (b) {
+                b.addEventListener('click', function () { openEdit(b); });
+            });
+            document.querySelectorAll('[data-close-user-edit]').forEach(function (b) {
+                b.addEventListener('click', closeEdit);
+            });
+            editModal?.addEventListener('click', function (e) { if (e.target === editModal) closeEdit(); });
         })();
     </script>
 @endsection

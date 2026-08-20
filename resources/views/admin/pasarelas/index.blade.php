@@ -1,12 +1,10 @@
 @extends('layouts.admin')
 
 @section('title', 'Pasarelas')
-@section('subtitle', 'Canales de cobro disponibles en registro y pre-registro')
+@section('subtitle', 'Canales de cobro')
 
 @section('content')
     <section class="ad-card ad-users">
-        <p class="ad-empty" style="margin-bottom:16px">Simulación: el cobro intenta Bold, si falla pasa a ePayco y luego a Mercado Pago. El cliente no ve esta cadena.</p>
-
         <div class="ad-pas-grid">
             @forelse ($pasarelas as $pasarela)
                 <article class="ad-pas-card">
@@ -35,7 +33,10 @@
                     </form>
                 </article>
             @empty
-                <p class="ad-empty">No hay pasarelas configuradas.</p>
+                <div class="ad-empty-hero">
+                    <span class="ad-empty-orb">@include('partials.admin-icon', ['icon' => 'pasarelas'])</span>
+                    <strong>Sin pasarelas</strong>
+                </div>
             @endforelse
         </div>
     </section>
