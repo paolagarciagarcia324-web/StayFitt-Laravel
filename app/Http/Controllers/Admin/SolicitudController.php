@@ -7,7 +7,6 @@ use App\Models\SolicitudCompra;
 use App\Services\SolicitudAprobacionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class SolicitudController extends Controller
@@ -18,7 +17,10 @@ class SolicitudController extends Controller
 
     public function index(): View
     {
-        $pendientes = DB::table('vw_solicitudes_pendientes')->orderByDesc('creado_en')->get();
+        $pendientes = SolicitudCompra::with(['plan', 'pago'])
+            ->where('estado_solicitud', 'PENDIENTE')
+            ->orderByDesc('creado_en')
+            ->get();
         $historial = SolicitudCompra::with('plan')
             ->whereIn('estado_solicitud', ['VALIDADA', 'RECHAZADA', 'CANCELADA'])
             ->orderByDesc('fecha_revision')

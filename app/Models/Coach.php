@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Coach extends Model
 {
@@ -21,11 +22,19 @@ class Coach extends Model
         'id_user',
         'codigo_coach',
         'especialidad',
+        'biografia',
+        'certificaciones',
+        'foto_url',
         'estado_coach',
     ];
 
     public function usuario(): BelongsTo
     {
         return $this->belongsTo(User::class, 'id_user', 'id_user');
+    }
+
+    public function clientes(): HasMany
+    {
+        return $this->hasMany(Cliente::class, 'id_coach', 'id_coach');
     }
 }

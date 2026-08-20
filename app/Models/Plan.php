@@ -24,23 +24,36 @@ class Plan extends Model
         'popular' => 'boolean',
         'destacado' => 'boolean',
         'renovacion_automatica' => 'boolean',
+        'renovacion_permitida' => 'boolean',
     ];
 
     protected $fillable = [
+        'codigo',
         'nombre',
         'slug',
         'descripcion',
+        'inclusiones',
+        'beneficios',
         'caracteristicas_json',
         'precio',
         'moneda',
         'duracion_dias',
         'modalidad',
         'tipo_cliente',
+        'cupos_totales',
+        'cupos_reservados',
+        'cupos_ocupados',
         'cupo_maximo',
+        'dias_gracia',
+        'requiere_coach',
+        'renovacion_permitida',
+        'renovacion_automatica',
         'orden',
         'popular',
+        'destacado',
         'etiqueta',
         'estado_plan',
+        'creado_por',
     ];
 
     public function modulos(): BelongsToMany

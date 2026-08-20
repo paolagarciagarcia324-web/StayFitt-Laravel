@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -32,12 +33,13 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        $ok = Auth::attempt([
-            'correo' => $this->string('email')->toString(),
-            'password' => $this->string('password')->toString(),
-        ]);
+        $email = $this->string('email')->toString();
+        $password = $this->string('password')->toString();
 
-        if (! $ok) {
+        /** @var User|null $user */
+        $user = User::query()->where('correo', $email)->first();
+
+        if (! $user || ! $user->validatePassword($password)) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -45,19 +47,23 @@ class LoginRequest extends FormRequest
             ]);
         }
 
-        $user = Auth::user();
+        $estado = $user->estado ?: $user->estado_cuenta;
 
-        if ($user && $user->estado === 'BLOQUEADO') {
-            Auth::logout();
-
+        if ($estado === 'BLOQUEADO') {
             throw ValidationException::withMessages([
                 'email' => 'Tu cuenta está bloqueada. Contacta al administrador.',
             ]);
         }
 
-        if ($user) {
-            $user->forceFill(['ultimo_acceso_en' => now()])->save();
+        if ($estado === 'INACTIVO') {
+            throw ValidationException::withMessages([
+                'email' => 'Tu cuenta está inactiva.',
+            ]);
         }
+
+        Auth::login($user);
+
+        $user->forceFill(['ultimo_acceso_en' => now()])->save();
 
         RateLimiter::clear($this->throttleKey());
     }

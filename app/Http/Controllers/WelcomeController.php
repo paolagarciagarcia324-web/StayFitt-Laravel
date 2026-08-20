@@ -9,7 +9,10 @@ class WelcomeController extends Controller
 {
     public function index(): View
     {
-        $planes = Plan::activos()->with('modulos')->get();
+        $planes = Plan::activos()
+            ->where('modalidad', 'VIRTUAL')
+            ->with('modulos')
+            ->get();
 
         return view('welcome', compact('planes'));
     }

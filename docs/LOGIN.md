@@ -1,42 +1,64 @@
 # Login — explicación y trazabilidad
 
+**Versión:** StayFit v4.0 · Base de datos `stayfit`
+
 ## Qué hace
-Permite autenticar usuarios existentes de la tabla `usuarios` y abrir sesión Laravel. **No crea cuentas**: el alta de clientes ocurre por compra de plan (pre-registro).
+Autentica usuarios de la tabla `usuarios` y abre sesión Laravel.
+La fuente de verdad es `correo` + `password_hash` en MySQL (`stayfit`).
+
+## Credencial admin de desarrollo
+Tras `php artisan migrate` (seed `2026_08_16_100012_seed_admin_paola`):
+
+| Campo | Valor |
+|-------|--------|
+| Correo | `paola@correo.com` |
+| Contraseña | `paola12345` |
+| Rol | `ADMIN` → redirige a `/admin` |
 
 ## Flujo
 1. Welcome → **Iniciar sesión** (`GET /login`)
 2. Usuario envía correo + contraseña (`POST /login`)
-3. `LoginRequest` valida y autentica contra BD
-4. Si OK → regenera sesión → `dashboard`
-5. Si falla → mensaje de error en el formulario
+3. `LoginRequest` busca en `usuarios` por **`correo`** (coincidencia exacta)
+4. Valida contraseña contra `password_hash`
+5. Si OK → `Auth::login` → `ADMIN` a `/admin`, resto a `/dashboard`
+6. Si falla → *Credenciales incorrectas o usuario no encontrado*
 
 ## Trazabilidad técnica
 
 | Capa | Archivo / tabla | Rol |
 |------|-----------------|-----|
-| Vista | `resources/views/auth/login.blade.php` | UI (tarjeta split + `login.png`) |
-| CSS | `public/css/login.css` | Estilos del login |
+| Vista | `resources/views/auth/login.blade.php` | UI login FigueFit |
+| CSS | `public/css/login.css` | Estilos |
 | Rutas | `routes/auth.php` | `login` GET/POST, `logout` |
-| Controller | `AuthenticatedSessionController` | Muestra form, autentica, cierra sesión |
-| Request | `LoginRequest` | Validación + `Auth::attempt` |
-| Modelo | `app/Models/User.php` | Tabla `usuarios` |
-| BD | `usuarios.correo` + `usuarios.password_hash` | Credenciales |
+| Request | `app/Http/Requests/Auth/LoginRequest.php` | Validación + autenticación |
+| Modelo | `app/Models/User.php` | Tabla `usuarios`, PK `id_user` |
+| Roles | `user_roles` + `roles` | Decide a qué panel entra |
+| BD | `stayfit.usuarios` | Fuente de verdad |
 
-## Mapeo con StayFit BD
-- Formulario `email` → columna `correo`
-- Formulario `password` → se compara con `password_hash` (bcrypt)
-- PK de sesión: `id_user`
-- Si `estado = BLOQUEADO` → no deja entrar
+## Mapeo de campos
+
+| Formulario / Laravel | Columna BD | Notas |
+|----------------------|------------|--------|
+| `email` | `correo` | Campo de negocio para login |
+| `email` (alias) | `email` | Compatibilidad Breeze; debe ser igual a `correo` |
+| `password` | `password_hash` | bcrypt (o texto plano legacy migrado al primer login) |
+| sesión | `id_user` | PK |
+
+## Reglas de acceso
+- `BLOQUEADO` / `INACTIVO` no pueden entrar
+- `PENDIENTE` y `ACTIVO` sí pueden autenticarse
 - Al entrar se actualiza `ultimo_acceso_en`
+- Sin rol `ADMIN` no hay acceso al panel `/admin`
 
-## Usuario de prueba (seed)
-Migración `2026_03_01_000071_seed_admin_login.php`:
+## Contraseñas
+- Altas/ediciones desde Admin se guardan con **bcrypt**
+- Si en BD queda texto plano (dato viejo), el login lo acepta **una vez** y lo migra a bcrypt
+- Seed admin actualiza el hash con `Hash::make`
 
-- Correo: `admin@figuefit.com`
-- Contraseña: `Admin123!`
-- Rol: `ADMIN`
+## Alta / edición desde plataforma
+- Admin → Usuarios: escribe `usuarios` y sincroniza `user_roles`
+- Aprobar solicitud: crea/activa usuario + rol `CLIENTE` + `clientes` + plan/accesos
 
-## Qué no incluye (a propósito)
-- Botón “Crear cuenta” (registro solo vía plan)
-- Middleware `verified` en dashboard (aún no hay flujo de verificación obligatorio)
-- Panel por rol (siguiente fase: router Admin/Coach/Cliente)
+## Qué no incluye
+- Botón “Crear cuenta” público (el alta de cliente va por compra/pre-registro de plan)
+- Auth contra la tabla genérica `users` de Breeze (no se usa)

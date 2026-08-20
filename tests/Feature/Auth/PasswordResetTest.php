@@ -1,7 +1,9 @@
 <?php
 
+use App\Models\TokenRecuperacion;
 use App\Models\User;
-use Illuminate\Auth\Notifications\ResetPassword;
+use App\Notifications\RecuperarContrasenaNotification;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 
 test('reset password link screen can be rendered', function () {
@@ -15,9 +17,11 @@ test('reset password link can be requested', function () {
 
     $user = User::factory()->create();
 
-    $this->post('/forgot-password', ['email' => $user->email]);
+    $this->post('/forgot-password', ['email' => $user->email])
+        ->assertRedirect(route('login'));
 
-    Notification::assertSentTo($user, ResetPassword::class);
+    Notification::assertSentTo($user, RecuperarContrasenaNotification::class);
+    expect(TokenRecuperacion::query()->where('id_user', $user->id_user)->exists())->toBeTrue();
 });
 
 test('reset password screen can be rendered', function () {
@@ -27,7 +31,7 @@ test('reset password screen can be rendered', function () {
 
     $this->post('/forgot-password', ['email' => $user->email]);
 
-    Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
+    Notification::assertSentTo($user, RecuperarContrasenaNotification::class, function ($notification) {
         $response = $this->get('/reset-password/'.$notification->token);
 
         $response->assertStatus(200);
@@ -43,7 +47,7 @@ test('password can be reset with valid token', function () {
 
     $this->post('/forgot-password', ['email' => $user->email]);
 
-    Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
+    Notification::assertSentTo($user, RecuperarContrasenaNotification::class, function ($notification) use ($user) {
         $response = $this->post('/reset-password', [
             'token' => $notification->token,
             'email' => $user->email,
@@ -54,6 +58,10 @@ test('password can be reset with valid token', function () {
         $response
             ->assertSessionHasNoErrors()
             ->assertRedirect(route('login'));
+
+        $user->refresh();
+        expect(Hash::check('password', $user->password_hash))->toBeTrue();
+        expect(TokenRecuperacion::query()->where('id_user', $user->id_user)->whereNotNull('usado_en')->exists())->toBeTrue();
 
         return true;
     });

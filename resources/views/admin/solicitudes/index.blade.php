@@ -15,7 +15,7 @@
                         <th>Código</th>
                         <th>Cliente</th>
                         <th>Plan</th>
-                        <th>Días</th>
+                        <th>Alta</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -23,9 +23,9 @@
                     @foreach ($pendientes as $s)
                         <tr>
                             <td>{{ $s->codigo_solicitud }}</td>
-                            <td>{{ $s->nombre_solicitante }}<br><small style="color:var(--muted)">{{ $s->correo }}</small></td>
-                            <td>{{ $s->plan_solicitado }} · ${{ number_format((float)$s->precio,0,',','.') }}</td>
-                            <td>{{ $s->dias_en_espera }}</td>
+                            <td>{{ $s->nombres }} {{ $s->apellidos }}<br><small style="color:var(--muted)">{{ $s->correo }}</small></td>
+                            <td>{{ $s->plan?->nombre ?: 'Servicio presencial' }} · ${{ number_format((float) ($s->total ?? $s->pago?->monto), 0, ',', '.') }}</td>
+                            <td>{{ $s->creado_en ? \Illuminate\Support\Carbon::parse($s->creado_en)->format('d/m/Y') : '—' }}</td>
                             <td><a class="ad-btn" href="{{ route('admin.solicitudes.show', $s->id_solicitud) }}">Validar</a></td>
                         </tr>
                     @endforeach

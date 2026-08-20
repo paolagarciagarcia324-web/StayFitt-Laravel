@@ -1,25 +1,33 @@
-<x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
-    </div>
+<x-auth-layout title="Recuperar contraseña | FigueFit">
+    <p class="lg-kicker">Acceso FigueFit</p>
+    <h2>Recupera tu cuenta</h2>
+    <p class="lg-subtitle">Ingresa el correo de tu usuario. Te enviaremos un enlace seguro para definir una nueva contraseña y volver a entrenar.</p>
 
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+    @if (session('status'))
+        <p class="lg-status">{{ session('status') }}</p>
+    @endif
 
-    <form method="POST" action="{{ route('password.email') }}">
+    <form method="POST" action="{{ route('password.email') }}" class="lg-form">
         @csrf
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+        <label>
+            <span>Correo electrónico</span>
+            <div class="lg-input">
+                <span class="lg-input-icon" aria-hidden="true">✉</span>
+                <input id="email" type="email" name="email" value="{{ old('email') }}" placeholder="nombre@correo.com" required autofocus autocomplete="username">
+            </div>
+            @error('email')
+                <small class="lg-error">{{ $message }}</small>
+            @enderror
+        </label>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Email Password Reset Link') }}
-            </x-primary-button>
-        </div>
+        <p class="lg-hint">El enlace vence en 60 minutos. Si no pediste este cambio, puedes volver al inicio de sesión.</p>
+
+        <button type="submit" class="lg-submit">Enviar enlace de recuperación →</button>
     </form>
-</x-guest-layout>
+
+    <a class="lg-back" href="{{ route('login') }}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M15.4 5.3a1 1 0 0 1 .05 1.4L11.16 12l4.29 5.3a1 1 0 1 1-1.55 1.26l-4.8-5.93a1 1 0 0 1 0-1.26l4.8-5.93a1 1 0 0 1 1.5-.14Z"/></svg>
+        Volver al inicio de sesión
+    </a>
+</x-auth-layout>

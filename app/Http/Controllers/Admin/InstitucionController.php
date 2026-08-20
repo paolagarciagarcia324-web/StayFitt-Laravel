@@ -10,26 +10,50 @@ use Illuminate\View\View;
 
 class InstitucionController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $instituciones = Institucion::orderBy('nombre')->get();
+        $q = trim((string) $request->get('q', ''));
 
-        return view('admin.instituciones.index', compact('instituciones'));
+        $instituciones = Institucion::query()
+            ->with([
+                'clientes.usuario',
+                'clientes.planesCliente.plan',
+                'clientes.rachas',
+            ])
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($inner) use ($q) {
+                    $inner->where('nombre', 'like', "%{$q}%")
+                        ->orWhereHas('clientes.usuario', function ($u) use ($q) {
+                            $u->where('nombres', 'like', "%{$q}%")
+                                ->orWhere('apellidos', 'like', "%{$q}%");
+                        });
+                });
+            })
+            ->orderBy('nombre')
+            ->get();
+
+        return view('admin.instituciones.index', compact('instituciones', 'q'));
     }
 
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
             'nombre' => ['required', 'string', 'max:150'],
-            'codigo_institucion' => ['nullable', 'string', 'max:20'],
-            'nit' => ['nullable', 'string', 'max:50'],
-            'correo_contacto' => ['nullable', 'email', 'max:150'],
-            'telefono_contacto' => ['nullable', 'string', 'max:30'],
-            'ciudad' => ['nullable', 'string', 'max:100'],
+            'nit' => ['nullable', 'string', 'max:30', 'unique:instituciones,nit'],
+            'contacto_nombre' => ['nullable', 'string', 'max:120'],
+            'correo' => ['nullable', 'email', 'max:150'],
+            'telefono' => ['nullable', 'string', 'max:30'],
+            'ciudad' => ['nullable', 'string', 'max:80'],
+            'cupos_totales' => ['nullable', 'integer', 'min:0'],
+            'convenio' => ['nullable', 'string', 'max:200'],
         ]);
 
-        $data['estado'] = 'ACTIVA';
-        Institucion::create($data);
+        Institucion::create([
+            ...$data,
+            'estado' => 'ACTIVA',
+            'cupos_totales' => $data['cupos_totales'] ?? 0,
+            'cupos_usados' => 0,
+        ]);
 
         return back()->with('success', 'Institución creada.');
     }
