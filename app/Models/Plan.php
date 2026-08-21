@@ -32,6 +32,7 @@ class Plan extends Model
         'nombre',
         'slug',
         'descripcion',
+        'imagen_url',
         'inclusiones',
         'beneficios',
         'caracteristicas_json',
@@ -76,6 +77,24 @@ class Plan extends Model
     public function precioFormateado(): string
     {
         return '$'.number_format((float) $this->precio, 0, ',', '.').' '.$this->moneda;
+    }
+
+    public function imagenSrc(): string
+    {
+        return $this->mediaSrc($this->imagen_url);
+    }
+
+    private function mediaSrc(?string $path): string
+    {
+        $path = trim((string) $path);
+        if ($path === '') {
+            return '';
+        }
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, '/')) {
+            return $path;
+        }
+
+        return asset('storage/'.$path);
     }
 
     public function getRouteKeyName(): string

@@ -80,7 +80,12 @@ class User extends Authenticatable
     public function avatarUrl(): ?string
     {
         if (! empty($this->foto_perfil_url)) {
-            return $this->foto_perfil_url;
+            $path = trim((string) $this->foto_perfil_url);
+            if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, '/')) {
+                return $path;
+            }
+
+            return asset('storage/'.$path);
         }
 
         $email = strtolower(trim($this->getEmailForPasswordReset()));

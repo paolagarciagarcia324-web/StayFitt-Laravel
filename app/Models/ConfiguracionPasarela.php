@@ -19,6 +19,7 @@ class ConfiguracionPasarela extends Model
     protected $fillable = [
         'codigo_pasarela',
         'nombre',
+        'logo_url',
         'modo',
         'activa',
         'actualizado_en',
@@ -27,5 +28,18 @@ class ConfiguracionPasarela extends Model
     public function scopeActivas($query)
     {
         return $query->where('activa', true)->orderBy('nombre');
+    }
+
+    public function logoSrc(): string
+    {
+        $path = trim((string) $this->logo_url);
+        if ($path === '') {
+            return '';
+        }
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, '/')) {
+            return $path;
+        }
+
+        return asset('storage/'.$path);
     }
 }

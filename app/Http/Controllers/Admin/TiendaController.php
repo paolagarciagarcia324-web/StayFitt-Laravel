@@ -12,10 +12,16 @@ use Illuminate\View\View;
 
 class TiendaController extends Controller
 {
+    use \App\Support\ResolvesAdminMedia;
+
     public function index(): View
     {
         $categorias = $this->categorias();
-        $productos = ProductoTienda::query()->with('categoria')->orderByDesc('creado_en')->paginate(12, ['*'], 'productos');
+        $productos = ProductoTienda::query()
+            ->with('categoria')
+            ->withSum('detallesOrden as unidades_vendidas', 'cantidad')
+            ->orderByDesc('creado_en')
+            ->paginate(12, ['*'], 'productos');
         $ordenes = OrdenTienda::query()->with('cliente.usuario')->orderByDesc('creado_en')->paginate(12, ['*'], 'ordenes');
 
         return view('admin.tienda.index', compact('categorias', 'productos', 'ordenes'));
@@ -28,9 +34,14 @@ class TiendaController extends Controller
             'sku' => ['required', 'string', 'max:40', 'unique:productos_tienda,sku'],
             'precio' => ['required', 'numeric', 'min:0'],
             'stock_total' => ['required', 'integer', 'min:0'],
+            'calificacion' => ['nullable', 'numeric', 'min:0', 'max:5'],
             'id_categoria_producto' => ['nullable', 'integer'],
             'descripcion' => ['nullable', 'string', 'max:1000'],
+            'imagen_url' => ['nullable', 'string', 'max:500'],
+            'imagen' => ['nullable', 'image', 'max:4096'],
         ]);
+
+        $imagenUrl = $this->resolveImagen($request, $data['imagen_url'] ?? null);
 
         ProductoTienda::query()->create([
             'id_categoria_producto' => $data['id_categoria_producto'] ?: $this->categoriaDefault()->id_categoria_producto,
@@ -38,6 +49,8 @@ class TiendaController extends Controller
             'nombre' => $data['nombre'],
             'descripcion' => $data['descripcion'] ?? null,
             'precio' => $data['precio'],
+            'calificacion' => $data['calificacion'] ?? 0,
+            'imagen_url' => $imagenUrl,
             'stock_total' => $data['stock_total'],
             'stock_minimo' => 2,
             'exclusivo_presencial' => true,
@@ -53,12 +66,32 @@ class TiendaController extends Controller
         $producto = ProductoTienda::query()->findOrFail($id);
 
         $data = $request->validate([
+            'nombre' => ['required', 'string', 'max:150'],
+            'sku' => ['required', 'string', 'max:40', 'unique:productos_tienda,sku,'.$producto->id_producto.',id_producto'],
             'precio' => ['required', 'numeric', 'min:0'],
             'stock_total' => ['required', 'integer', 'min:0'],
+            'calificacion' => ['nullable', 'numeric', 'min:0', 'max:5'],
+            'id_categoria_producto' => ['nullable', 'integer'],
+            'descripcion' => ['nullable', 'string', 'max:1000'],
+            'imagen_url' => ['nullable', 'string', 'max:500'],
+            'imagen' => ['nullable', 'image', 'max:4096'],
             'estado' => ['required', 'in:ACTIVO,INACTIVO'],
         ]);
 
-        $producto->update($data + ['actualizado_en' => now()]);
+        $imagenUrl = $this->resolveImagen($request, $data['imagen_url'] ?? null, $producto->imagen_url);
+
+        $producto->update([
+            'id_categoria_producto' => $data['id_categoria_producto'] ?: $producto->id_categoria_producto,
+            'sku' => strtoupper($data['sku']),
+            'nombre' => $data['nombre'],
+            'descripcion' => $data['descripcion'] ?? null,
+            'precio' => $data['precio'],
+            'calificacion' => $data['calificacion'] ?? $producto->calificacion,
+            'imagen_url' => $imagenUrl,
+            'stock_total' => $data['stock_total'],
+            'estado' => $data['estado'],
+            'actualizado_en' => now(),
+        ]);
 
         return back()->with('success', 'Producto actualizado.');
     }
@@ -69,11 +102,30 @@ class TiendaController extends Controller
 
         $data = $request->validate([
             'estado_orden' => ['required', 'in:PENDIENTE_PAGO,PAGADA,PREPARADA,ENVIADA,ENTREGADA,CANCELADA'],
+            'comprobante_url' => ['nullable', 'string', 'max:500'],
+            'comprobante' => ['nullable', 'image', 'max:4096'],
         ]);
 
-        $orden->update($data + ['actualizado_en' => now()]);
+        $orden->update([
+            'estado_orden' => $data['estado_orden'],
+            'comprobante_url' => $this->resolveMedia($request, 'comprobante', 'comprobantes', 'comprobante_url', $orden->comprobante_url),
+            'actualizado_en' => now(),
+        ]);
 
         return back()->with('success', 'Pedido actualizado.');
+    }
+
+    private function resolveImagen(Request $request, ?string $url, ?string $fallback = null): ?string
+    {
+        if ($request->hasFile('imagen')) {
+            $path = $request->file('imagen')->store('tienda', 'public');
+
+            return $path;
+        }
+
+        $url = trim((string) $url);
+
+        return $url !== '' ? $url : $fallback;
     }
 
     private function categorias()

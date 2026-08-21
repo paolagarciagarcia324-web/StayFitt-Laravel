@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Evento;
+use App\Support\ResolvesAdminMedia;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,6 +12,8 @@ use Illuminate\View\View;
 
 class EventoController extends Controller
 {
+    use ResolvesAdminMedia;
+
     public function index(): View
     {
         $eventos = Evento::query()->orderByDesc('fecha_inicio')->paginate(20);
@@ -29,10 +32,13 @@ class EventoController extends Controller
             'modalidad' => ['required', 'in:VIRTUAL,PRESENCIAL,MIXTO'],
             'cupo_maximo' => ['nullable', 'integer', 'min:1'],
             'estado' => ['required', 'in:BORRADOR,PUBLICADO,CERRADO,CANCELADO'],
+            'imagen_url' => ['nullable', 'string', 'max:500'],
+            'imagen' => ['nullable', 'image', 'max:4096'],
         ]);
 
         Evento::create([
-            ...$data,
+            ...collect($data)->except(['imagen'])->all(),
+            'imagen_url' => $this->resolveMedia($request, 'imagen', 'eventos', 'imagen_url'),
             'id_admin' => Auth::id(),
             'cupo_inscritos' => 0,
         ]);
@@ -53,9 +59,14 @@ class EventoController extends Controller
             'modalidad' => ['required', 'in:VIRTUAL,PRESENCIAL,MIXTO'],
             'cupo_maximo' => ['nullable', 'integer', 'min:1'],
             'estado' => ['required', 'in:BORRADOR,PUBLICADO,CERRADO,CANCELADO'],
+            'imagen_url' => ['nullable', 'string', 'max:500'],
+            'imagen' => ['nullable', 'image', 'max:4096'],
         ]);
 
-        $evento->update($data);
+        $evento->update([
+            ...collect($data)->except(['imagen'])->all(),
+            'imagen_url' => $this->resolveMedia($request, 'imagen', 'eventos', 'imagen_url', $evento->imagen_url),
+        ]);
 
         return back()->with('success', 'Evento actualizado.');
     }

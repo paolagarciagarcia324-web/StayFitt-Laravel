@@ -43,6 +43,8 @@ class AdminUsuarioPresencialRequest extends FormRequest
                 Rule::exists('horarios_presenciales', 'id_horario')->where('activo', 1),
             ],
             'observacion_usuario' => ['nullable', 'string', 'max:1000'],
+            'foto_perfil_url' => ['nullable', 'string', 'max:500'],
+            'foto' => ['nullable', 'image', 'max:4096'],
         ];
     }
 

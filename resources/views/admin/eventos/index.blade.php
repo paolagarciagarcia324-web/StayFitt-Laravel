@@ -12,6 +12,7 @@
         <table class="ad-table ad-users-table">
             <thead>
                 <tr>
+                    <th></th>
                     <th>Evento</th>
                     <th>Tipo</th>
                     <th>Fechas</th>
@@ -24,6 +25,7 @@
             <tbody>
                 @forelse ($eventos as $evento)
                     <tr>
+                        <td>@include('partials.admin-media-thumb', ['src' => $evento->imagenSrc(), 'alt' => $evento->nombre, 'icon' => 'eventos'])</td>
                         <td>
                             <strong>{{ $evento->nombre }}</strong>
                             <em class="ad-user-mail">{{ \Illuminate\Support\Str::limit($evento->descripcion, 60) }}</em>
@@ -44,12 +46,14 @@
                                 data-fin="{{ optional($evento->fecha_fin)->format('Y-m-d\\TH:i') }}"
                                 data-modalidad="{{ $evento->modalidad }}"
                                 data-cupo="{{ $evento->cupo_maximo }}"
-                                data-estado="{{ $evento->estado }}">Editar</button>
+                                data-estado="{{ $evento->estado }}"
+                                data-imagen_url="{{ $evento->imagen_url }}"
+                                data-imagen_src="{{ $evento->imagenSrc() }}">Editar</button>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7">
+                        <td colspan="8">
                             <div class="ad-empty-hero">
                                 <span class="ad-empty-orb">@include('partials.admin-icon', ['icon' => 'eventos'])</span>
                                 <strong>Sin eventos</strong>
@@ -64,12 +68,12 @@
     </section>
 
     <div class="ad-modal" data-evento-modal hidden>
-        <div class="ad-modal-card">
+        <div class="ad-modal-card ad-ml-modal">
             <header class="ad-modal-head">
                 <div><h2>Nuevo evento</h2></div>
                 <button type="button" class="ad-modal-close" data-close-evento-form aria-label="Cerrar">×</button>
             </header>
-            <form class="ad-form" method="POST" action="{{ route('admin.eventos.store') }}">
+            <form class="ad-form" method="POST" action="{{ route('admin.eventos.store') }}" enctype="multipart/form-data">
                 @csrf
                 @include('admin.eventos._fields', ['evento' => null])
                 <div class="ad-modal-actions">
@@ -81,12 +85,12 @@
     </div>
 
     <div class="ad-modal" data-evento-edit-modal hidden>
-        <div class="ad-modal-card">
+        <div class="ad-modal-card ad-ml-modal">
             <header class="ad-modal-head">
                 <div><h2>Editar evento</h2></div>
                 <button type="button" class="ad-modal-close" data-close-evento-edit aria-label="Cerrar">×</button>
             </header>
-            <form class="ad-form" method="POST" data-evento-edit-form>
+            <form class="ad-form" method="POST" data-evento-edit-form enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 @include('admin.eventos._fields', ['evento' => null, 'withDataFields' => true])
@@ -100,22 +104,52 @@
 
     <script>
         (function () {
-            var modal = document.querySelector('[data-evento-modal]');
-            function open() { if (modal) { modal.hidden = false; modal.classList.add('is-open'); } }
-            function close() { if (modal) { modal.hidden = true; modal.classList.remove('is-open'); } }
-            document.querySelector('[data-open-evento-form]')?.addEventListener('click', open);
+            function wirePreview(root) {
+                if (!root) return;
+                var file = root.querySelector('[data-field-preview-file]');
+                var url = root.querySelector('[data-field-preview-url]');
+                var img = root.querySelector('[data-field-preview-img]');
+                var empty = root.querySelector('[data-field-preview-empty]');
+                function show(src) {
+                    if (!img) return;
+                    if (src) { img.src = src; img.hidden = false; if (empty) empty.hidden = true; }
+                    else { img.hidden = true; if (empty) empty.hidden = false; }
+                }
+                file?.addEventListener('change', function () {
+                    var f = file.files && file.files[0];
+                    if (!f) return;
+                    var reader = new FileReader();
+                    reader.onload = function (e) { show(e.target.result); };
+                    reader.readAsDataURL(f);
+                });
+                url?.addEventListener('input', function () {
+                    if (file && file.files && file.files.length) return;
+                    show(url.value.trim());
+                });
+                return show;
+            }
+
+            var createModal = document.querySelector('[data-evento-modal]');
+            var createShow = wirePreview(createModal);
+            function open() { if (createModal) { createModal.hidden = false; createModal.classList.add('is-open'); } }
+            function close() { if (createModal) { createModal.hidden = true; createModal.classList.remove('is-open'); } }
+            document.querySelectorAll('[data-open-evento-form]').forEach(function (b) { b.addEventListener('click', open); });
             document.querySelectorAll('[data-close-evento-form]').forEach(function (b) { b.addEventListener('click', close); });
-            modal?.addEventListener('click', function (e) { if (e.target === modal) close(); });
+            createModal?.addEventListener('click', function (e) { if (e.target === createModal) close(); });
 
             var editModal = document.querySelector('[data-evento-edit-modal]');
             var editForm = document.querySelector('[data-evento-edit-form]');
+            var editShow = wirePreview(editModal);
             function openEdit(btn) {
                 if (!editModal || !editForm) return;
                 editForm.action = '{{ url('admin/eventos') }}/' + btn.getAttribute('data-id');
-                ['nombre','descripcion','tipo','inicio','fin','modalidad','cupo','estado'].forEach(function (f) {
+                ['nombre','descripcion','tipo','inicio','fin','modalidad','cupo','estado','imagen_url'].forEach(function (f) {
                     var el = editForm.querySelector('[data-field="'+f+'"]');
                     if (el) el.value = btn.getAttribute('data-'+f) || '';
                 });
+                if (editShow) editShow(btn.getAttribute('data-imagen_src') || '');
+                var file = editForm.querySelector('[data-field-preview-file]');
+                if (file) file.value = '';
                 editModal.hidden = false;
                 editModal.classList.add('is-open');
             }

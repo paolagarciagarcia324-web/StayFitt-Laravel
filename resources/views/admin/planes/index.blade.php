@@ -16,6 +16,7 @@
         <table class="ad-table ad-users-table">
             <thead>
                 <tr>
+                    <th></th>
                     <th>Plan</th>
                     <th>Precio</th>
                     <th>Modalidad</th>
@@ -28,6 +29,7 @@
             <tbody>
                 @forelse ($planes as $plan)
                     <tr>
+                        <td>@include('partials.admin-media-thumb', ['src' => $plan->imagenSrc(), 'alt' => $plan->nombre, 'icon' => 'planes'])</td>
                         <td>
                             <strong>{{ $plan->nombre }}</strong>
                             <em class="ad-user-mail">{{ $plan->codigo ?: $plan->slug }}</em>
@@ -47,7 +49,7 @@
                         <td><a class="ad-btn ad-btn-ghost" href="{{ route('admin.planes.edit', $plan) }}">Editar</a></td>
                     </tr>
                 @empty
-                    <tr><td colspan="7" class="ad-empty">No hay planes en el catálogo.</td></tr>
+                    <tr><td colspan="8" class="ad-empty">No hay planes en el catálogo.</td></tr>
                 @endforelse
             </tbody>
         </table>

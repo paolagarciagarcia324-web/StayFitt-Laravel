@@ -30,6 +30,7 @@ class OrdenTienda extends Model
         'ciudad_entrega',
         'estado_orden',
         'observacion_admin',
+        'comprobante_url',
         'actualizado_en',
     ];
 
@@ -41,5 +42,18 @@ class OrdenTienda extends Model
     public function detalles(): HasMany
     {
         return $this->hasMany(OrdenDetalle::class, 'id_orden', 'id_orden');
+    }
+
+    public function comprobanteSrc(): string
+    {
+        $path = trim((string) $this->comprobante_url);
+        if ($path === '') {
+            return '';
+        }
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, '/')) {
+            return $path;
+        }
+
+        return asset('storage/'.$path);
     }
 }

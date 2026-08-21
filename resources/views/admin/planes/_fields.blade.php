@@ -2,6 +2,31 @@
     <label><span>Código</span><input type="text" name="codigo" value="{{ old('codigo', $plan->codigo) }}"></label>
     <label><span>Nombre *</span><input type="text" name="nombre" value="{{ old('nombre', $plan->nombre) }}" required></label>
 </div>
+<div class="ad-media-upload-block">
+    <div class="ad-ml-preview" data-plan-preview>
+        @if ($plan->imagenSrc())
+            <img src="{{ $plan->imagenSrc() }}" alt="{{ $plan->nombre }}" data-plan-preview-img>
+        @else
+            <img data-plan-preview-img hidden alt="Preview">
+            <span class="ad-ml-placeholder" data-plan-preview-empty>@include('partials.admin-icon', ['icon' => 'planes'])</span>
+        @endif
+    </div>
+    <div>
+        <label class="ad-ml-upload"><span>Subir foto del plan</span><input type="file" name="imagen" accept="image/*" data-plan-preview-file></label>
+        <label><span>O URL</span><input type="url" name="imagen_url" value="{{ old('imagen_url', $plan->imagen_url) }}" placeholder="https://..." data-plan-preview-url></label>
+    </div>
+</div>
+<script>
+(function(){
+    var file=document.querySelector('[data-plan-preview-file]');
+    var url=document.querySelector('[data-plan-preview-url]');
+    var img=document.querySelector('[data-plan-preview-img]');
+    var empty=document.querySelector('[data-plan-preview-empty]');
+    function show(src){ if(!img)return; if(src){img.src=src;img.hidden=false; if(empty)empty.hidden=true;} else {img.hidden=true; if(empty)empty.hidden=false;} }
+    file?.addEventListener('change',function(){ var f=file.files&&file.files[0]; if(!f)return; var r=new FileReader(); r.onload=function(e){show(e.target.result)}; r.readAsDataURL(f); });
+    url?.addEventListener('input',function(){ if(file&&file.files&&file.files.length)return; show(url.value.trim()); });
+})();
+</script>
 <div class="ad-form-row">
     <label><span>Precio *</span><input type="number" step="0.01" name="precio" value="{{ old('precio', $plan->precio ?? 0) }}" required></label>
     <label><span>Moneda *</span><input type="text" name="moneda" value="{{ old('moneda', $plan->moneda ?? 'COP') }}" required></label>

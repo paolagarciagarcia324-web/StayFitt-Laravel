@@ -7,7 +7,15 @@
     <section class="ad-card ad-users">
         <div class="ad-pas-grid">
             @forelse ($pasarelas as $pasarela)
+                @php $logo = $pasarela->logoSrc(); @endphp
                 <article class="ad-pas-card">
+                    <div class="ad-pas-logo">
+                        @if ($logo)
+                            <img src="{{ $logo }}" alt="{{ $pasarela->nombre }}">
+                        @else
+                            <span class="ad-ml-placeholder">@include('partials.admin-icon', ['icon' => 'pasarelas'])</span>
+                        @endif
+                    </div>
                     <h3>{{ $pasarela->nombre }}</h3>
                     <small>{{ $pasarela->codigo_pasarela }}</small>
                     <p style="margin:10px 0 0">
@@ -16,9 +24,11 @@
                         </span>
                         <span class="ad-pill-days" style="margin-left:6px">{{ $pasarela->modo }}</span>
                     </p>
-                    <form class="ad-form" method="POST" action="{{ route('admin.pasarelas.update', $pasarela->id_config_pasarela) }}">
+                    <form class="ad-form" method="POST" action="{{ route('admin.pasarelas.update', $pasarela->id_config_pasarela) }}" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
+                        <label class="ad-ml-upload"><span>Cambiar logo</span><input type="file" name="logo" accept="image/*"></label>
+                        <label><span>O URL del logo</span><input type="url" name="logo_url" value="{{ $pasarela->logo_url }}" placeholder="https://..."></label>
                         <label><span>Modo</span>
                             <select name="modo">
                                 <option value="SANDBOX" @selected($pasarela->modo === 'SANDBOX')>SANDBOX</option>

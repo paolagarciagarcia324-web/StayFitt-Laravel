@@ -5,7 +5,7 @@
 
 @section('content')
     <section class="ad-card">
-        <form class="ad-form" method="POST" action="{{ $plan->exists ? route('admin.planes.update', $plan) : route('admin.planes.store') }}">
+        <form class="ad-form" method="POST" action="{{ $plan->exists ? route('admin.planes.update', $plan) : route('admin.planes.store') }}" enctype="multipart/form-data">
             @csrf
             @if ($plan->exists) @method('PUT') @endif
 

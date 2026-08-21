@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ProductoTienda extends Model
 {
@@ -23,6 +24,7 @@ class ProductoTienda extends Model
         'nombre',
         'descripcion',
         'precio',
+        'calificacion',
         'imagen_url',
         'stock_total',
         'stock_minimo',
@@ -36,6 +38,7 @@ class ProductoTienda extends Model
     {
         return [
             'precio' => 'decimal:2',
+            'calificacion' => 'decimal:1',
             'exclusivo_presencial' => 'boolean',
         ];
     }
@@ -43,5 +46,24 @@ class ProductoTienda extends Model
     public function categoria(): BelongsTo
     {
         return $this->belongsTo(CategoriaProducto::class, 'id_categoria_producto', 'id_categoria_producto');
+    }
+
+    public function detallesOrden(): HasMany
+    {
+        return $this->hasMany(OrdenDetalle::class, 'id_producto', 'id_producto');
+    }
+
+    public function imagenSrc(): string
+    {
+        $url = trim((string) $this->imagen_url);
+        if ($url === '') {
+            return '';
+        }
+
+        if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://') || str_starts_with($url, '/')) {
+            return $url;
+        }
+
+        return asset('storage/'.$url);
     }
 }

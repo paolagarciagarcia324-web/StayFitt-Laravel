@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ModuloServicio;
 use App\Models\Plan;
+use App\Support\ResolvesAdminMedia;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +14,7 @@ use Illuminate\View\View;
 
 class PlanController extends Controller
 {
+    use ResolvesAdminMedia;
     public function index(Request $request): View
     {
         $q = trim((string) $request->get('q', ''));
@@ -43,6 +45,7 @@ class PlanController extends Controller
         $data['creado_por'] = Auth::id();
         $data['cupos_reservados'] = 0;
         $data['cupos_ocupados'] = 0;
+        $data['imagen_url'] = $this->resolveMedia($request, 'imagen', 'planes', 'imagen_url');
 
         $plan = Plan::create($data);
         $plan->modulos()->sync($this->modulosSync($request->input('modulos', [])));
@@ -62,6 +65,7 @@ class PlanController extends Controller
     {
         $data = $this->validated($request);
         $data['caracteristicas_json'] = $this->parseFeatures($request->input('caracteristicas'));
+        $data['imagen_url'] = $this->resolveMedia($request, 'imagen', 'planes', 'imagen_url', $plan->imagen_url);
         $plan->update($data);
         $plan->modulos()->sync($this->modulosSync($request->input('modulos', [])));
 
@@ -74,6 +78,8 @@ class PlanController extends Controller
             'codigo' => ['nullable', 'string', 'max:40'],
             'nombre' => ['required', 'string', 'max:150'],
             'descripcion' => ['nullable', 'string'],
+            'imagen_url' => ['nullable', 'string', 'max:500'],
+            'imagen' => ['nullable', 'image', 'max:4096'],
             'inclusiones' => ['nullable', 'string'],
             'beneficios' => ['nullable', 'string'],
             'precio' => ['required', 'numeric', 'min:0'],

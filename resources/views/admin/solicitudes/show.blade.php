@@ -31,8 +31,12 @@
             <tr>
                 <th>Comprobante</th>
                 <td>
-                    @if ($solicitud->pago?->comprobante_url)
-                        <a class="ad-link" href="{{ $solicitud->pago->comprobante_url }}" target="_blank" rel="noopener">Ver archivo</a>
+                    @php $comp = $solicitud->pago?->comprobanteSrc(); @endphp
+                    @if ($comp)
+                        <div style="display:flex;gap:12px;align-items:center">
+                            @include('partials.admin-media-thumb', ['src' => $comp, 'alt' => 'Comprobante', 'icon' => 'pagos'])
+                            <a class="ad-link" href="{{ $comp }}" target="_blank" rel="noopener">Ver comprobante</a>
+                        </div>
                     @else
                         —
                     @endif

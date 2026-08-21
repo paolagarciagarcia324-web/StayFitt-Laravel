@@ -49,4 +49,17 @@ class Pago extends Model
     {
         return $this->belongsTo(SolicitudCompra::class, 'id_solicitud', 'id_solicitud');
     }
+
+    public function comprobanteSrc(): string
+    {
+        $path = trim((string) $this->comprobante_url);
+        if ($path === '') {
+            return '';
+        }
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, '/')) {
+            return $path;
+        }
+
+        return asset('storage/'.$path);
+    }
 }

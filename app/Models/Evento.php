@@ -22,6 +22,7 @@ class Evento extends Model
         'id_admin',
         'nombre',
         'descripcion',
+        'imagen_url',
         'tipo',
         'fecha_inicio',
         'fecha_fin',
@@ -37,6 +38,19 @@ class Evento extends Model
             'fecha_inicio' => 'datetime',
             'fecha_fin' => 'datetime',
         ];
+    }
+
+    public function imagenSrc(): string
+    {
+        $path = trim((string) $this->imagen_url);
+        if ($path === '') {
+            return '';
+        }
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, '/')) {
+            return $path;
+        }
+
+        return asset('storage/'.$path);
     }
 
     public function admin(): BelongsTo

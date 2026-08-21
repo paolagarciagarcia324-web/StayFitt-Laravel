@@ -14,7 +14,7 @@
         @if ($errors->any() && ! $isEdit)
             <div class="ad-alert ad-alert-error"><ul>@foreach ($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul></div>
         @endif
-        <form class="ad-form" method="POST" action="{{ route('admin.planes.store') }}">
+        <form class="ad-form" method="POST" action="{{ route('admin.planes.store') }}" enctype="multipart/form-data">
             @csrf
             @include('admin.planes._fields', ['plan' => $plan, 'modulos' => $modulos, 'selected' => $selected, 'readonlyCupos' => false])
             <div class="ad-modal-actions">

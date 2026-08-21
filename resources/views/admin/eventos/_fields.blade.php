@@ -1,4 +1,14 @@
 @php $df = ! empty($withDataFields); @endphp
+<div class="ad-media-upload-block">
+    <div class="ad-ml-preview" data-evento-preview>
+        <img data-field-preview-img {{ $df ? 'data-field=imagen_src' : '' }} hidden alt="Preview">
+        <span class="ad-ml-placeholder" data-field-preview-empty>@include('partials.admin-icon', ['icon' => 'eventos'])</span>
+    </div>
+    <div>
+        <label class="ad-ml-upload"><span>Subir foto</span><input type="file" name="imagen" accept="image/*" data-field-preview-file></label>
+        <label><span>O URL</span><input type="url" name="imagen_url" {{ $df ? 'data-field=imagen_url' : '' }} placeholder="https://..." data-field-preview-url></label>
+    </div>
+</div>
 <label><span>Nombre *</span><input type="text" name="nombre" {{ $df ? 'data-field=nombre' : '' }} required></label>
 <label><span>Descripción</span><textarea name="descripcion" rows="2" {{ $df ? 'data-field=descripcion' : '' }}></textarea></label>
 <div class="ad-form-row">

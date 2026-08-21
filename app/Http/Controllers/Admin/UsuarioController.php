@@ -11,6 +11,7 @@ use App\Models\Rol;
 use App\Models\SolicitudCompra;
 use App\Models\User;
 use App\Services\SolicitudAprobacionService;
+use App\Support\ResolvesAdminMedia;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -19,6 +20,8 @@ use Illuminate\View\View;
 
 class UsuarioController extends Controller
 {
+    use ResolvesAdminMedia;
+
     public function __construct(private SolicitudAprobacionService $activacion) {}
 
     public function index(Request $request): View
@@ -141,6 +144,11 @@ class UsuarioController extends Controller
             ]);
 
             $this->activacion->aprobar($solicitud->fresh(['plan.modulos', 'pago']), 'Alta presencial desde Admin.');
+
+            $foto = $this->resolveMedia($request, 'foto', 'avatars', 'foto_perfil_url');
+            if ($foto) {
+                User::query()->where('correo', $request->correo)->update(['foto_perfil_url' => $foto]);
+            }
         });
 
         return redirect()
@@ -156,11 +164,14 @@ class UsuarioController extends Controller
             'estado' => ['required', 'in:PENDIENTE,ACTIVO,INACTIVO,BLOQUEADO'],
             'roles' => ['nullable', 'array'],
             'roles.*' => ['integer', 'exists:roles,id_rol'],
+            'foto_perfil_url' => ['nullable', 'string', 'max:500'],
+            'foto' => ['nullable', 'image', 'max:4096'],
         ]);
 
         $usuario->update([
             'estado' => $data['estado'],
             'estado_cuenta' => $data['estado'],
+            'foto_perfil_url' => $this->resolveMedia($request, 'foto', 'avatars', 'foto_perfil_url', $usuario->foto_perfil_url),
         ]);
 
         if ($request->has('roles')) {

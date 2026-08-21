@@ -36,13 +36,14 @@
                             ->first();
                         $fin = $planActivo?->fecha_fin;
                         $dias = $fin ? (int) now()->startOfDay()->diffInDays($fin, false) : null;
-                        $foto = $u->foto_perfil_url;
+                        $foto = $u->avatarUrl();
                     @endphp
                     <tr>
                         <td>{{ $usuarios->firstItem() + $index }}</td>
                         <td>
                             @if ($foto)
-                                <img class="ad-user-avatar" src="{{ $foto }}" alt="{{ $u->nombres }}">
+                                <img class="ad-user-avatar" src="{{ $foto }}" alt="{{ $u->nombres }}" onerror="this.style.display='none';this.nextElementSibling.hidden=false;">
+                                <span class="ad-user-avatar is-initials" hidden>{{ $u->iniciales() }}</span>
                             @else
                                 <span class="ad-user-avatar is-initials">{{ $u->iniciales() }}</span>
                             @endif
@@ -80,7 +81,9 @@
                                 data-open-user-edit
                                 data-id="{{ $u->id_user }}"
                                 data-estado="{{ $u->estado ?: $u->estado_cuenta ?: 'ACTIVO' }}"
-                                data-roles="{{ $u->roles->pluck('id_rol')->implode(',') }}">Editar</button>
+                                data-roles="{{ $u->roles->pluck('id_rol')->implode(',') }}"
+                                data-foto="{{ $u->avatarUrl() }}"
+                                data-foto-url="{{ $u->foto_perfil_url }}">Editar</button>
                         </td>
                     </tr>
                 @empty
@@ -111,8 +114,21 @@
                 </div>
             @endif
 
-            <form class="ad-form" method="POST" action="{{ route('admin.usuarios.store') }}">
+            <form class="ad-form" method="POST" action="{{ route('admin.usuarios.store') }}" enctype="multipart/form-data">
                 @csrf
+                <div class="ad-form-block">
+                    <h3>00 Foto de perfil</h3>
+                    <div class="ad-media-upload-block">
+                        <div class="ad-ml-preview is-avatar" data-user-create-preview>
+                            <img data-user-create-img hidden alt="Preview">
+                            <span class="ad-ml-placeholder" data-user-create-empty>@include('partials.admin-icon', ['icon' => 'usuarios'])</span>
+                        </div>
+                        <div>
+                            <label class="ad-ml-upload"><span>Subir foto</span><input type="file" name="foto" accept="image/*" data-user-create-file></label>
+                            <label><span>O URL</span><input type="url" name="foto_perfil_url" value="{{ old('foto_perfil_url') }}" placeholder="https://..." data-user-create-url></label>
+                        </div>
+                    </div>
+                </div>
                 <div class="ad-form-block">
                     <h3>01 Datos personales</h3>
                     <div class="ad-form-row">
@@ -211,9 +227,19 @@
                 </div>
                 <button type="button" class="ad-modal-close" data-close-user-edit aria-label="Cerrar">×</button>
             </header>
-            <form class="ad-form" method="POST" data-user-edit-form>
+            <form class="ad-form" method="POST" data-user-edit-form enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
+                <div class="ad-media-upload-block">
+                    <div class="ad-ml-preview is-avatar" data-user-edit-preview>
+                        <img data-user-edit-img hidden alt="Preview">
+                        <span class="ad-ml-placeholder" data-user-edit-empty>@include('partials.admin-icon', ['icon' => 'usuarios'])</span>
+                    </div>
+                    <div>
+                        <label class="ad-ml-upload"><span>Cambiar foto</span><input type="file" name="foto" accept="image/*" data-user-edit-file></label>
+                        <label><span>O URL</span><input type="url" name="foto_perfil_url" data-field="foto_url" placeholder="https://..." data-user-edit-url></label>
+                    </div>
+                </div>
                 <label><span>Estado *</span>
                     <select name="estado" data-field="estado" required>
                         @foreach (['PENDIENTE','ACTIVO','INACTIVO','BLOQUEADO'] as $e)
@@ -242,6 +268,33 @@
 
     <script>
         (function () {
+            function wirePreview(fileSel, urlSel, imgSel, emptySel) {
+                var file = document.querySelector(fileSel);
+                var url = document.querySelector(urlSel);
+                var img = document.querySelector(imgSel);
+                var empty = document.querySelector(emptySel);
+                function show(src) {
+                    if (!img) return;
+                    if (src) { img.src = src; img.hidden = false; if (empty) empty.hidden = true; }
+                    else { img.hidden = true; if (empty) empty.hidden = false; }
+                }
+                file?.addEventListener('change', function () {
+                    var f = file.files && file.files[0];
+                    if (!f) return;
+                    var reader = new FileReader();
+                    reader.onload = function (e) { show(e.target.result); };
+                    reader.readAsDataURL(f);
+                });
+                url?.addEventListener('input', function () {
+                    if (file && file.files && file.files.length) return;
+                    show(url.value.trim());
+                });
+                return show;
+            }
+
+            wirePreview('[data-user-create-file]', '[data-user-create-url]', '[data-user-create-img]', '[data-user-create-empty]');
+            var showEditFoto = wirePreview('[data-user-edit-file]', '[data-user-edit-url]', '[data-user-edit-img]', '[data-user-edit-empty]');
+
             var modal = document.querySelector('[data-user-modal]');
             var openBtn = document.querySelector('[data-open-user-form]');
             function open() { if (!modal) return; modal.hidden = false; modal.classList.add('is-open'); }
@@ -260,6 +313,9 @@
                 if (!editModal || !editForm) return;
                 editForm.action = '{{ url('admin/usuarios') }}/' + btn.getAttribute('data-id');
                 editForm.querySelector('[data-field="estado"]').value = btn.getAttribute('data-estado') || 'ACTIVO';
+                var fotoUrlField = editForm.querySelector('[data-field="foto_url"]');
+                if (fotoUrlField) fotoUrlField.value = btn.getAttribute('data-foto-url') || '';
+                if (showEditFoto) showEditFoto(btn.getAttribute('data-foto') || '');
                 var roles = (btn.getAttribute('data-roles') || '').split(',').filter(Boolean);
                 editForm.querySelectorAll('[data-role-id]').forEach(function (cb) {
                     cb.checked = roles.indexOf(cb.getAttribute('data-role-id')) !== -1;

@@ -20,6 +20,7 @@
                     <th>Correo</th>
                     <th>Monto</th>
                     <th>Método</th>
+                    <th>Comprobante</th>
                     <th>Estado</th>
                     <th>Fecha</th>
                 </tr>
@@ -29,6 +30,7 @@
                     @php
                         $metodo = $p->metodo_pago ?: $p->metodo ?: '—';
                         $esPasarela = filled($p->pasarela) || str_contains(strtoupper((string) $metodo), 'PASARELA');
+                        $comp = $p->comprobanteSrc();
                     @endphp
                     <tr>
                         <td>
@@ -49,6 +51,13 @@
                             <em class="ad-user-mail">{{ $metodo }}</em>
                         </td>
                         <td>
+                            @if ($comp)
+                                @include('partials.admin-media-thumb', ['src' => $comp, 'alt' => 'Comprobante', 'size' => 'sm', 'icon' => 'pagos'])
+                            @else
+                                <span class="ad-user-mail">Sin comprobante</span>
+                            @endif
+                        </td>
+                        <td>
                             <span class="ad-badge {{ $p->estado_pago === 'VALIDADO' ? 'ad-badge-ok' : ($p->estado_pago === 'PENDIENTE' ? 'ad-badge-pendiente' : 'ad-badge-bad') }}">
                                 {{ $p->estado_pago }}
                             </span>
@@ -56,7 +65,7 @@
                         <td>{{ optional($p->creado_en)->format('d/m/Y H:i') ?? '—' }}</td>
                     </tr>
                 @empty
-                    <tr><td colspan="7" class="ad-empty">No hay pagos registrados.</td></tr>
+                    <tr><td colspan="8" class="ad-empty">No hay pagos registrados.</td></tr>
                 @endforelse
             </tbody>
         </table>
