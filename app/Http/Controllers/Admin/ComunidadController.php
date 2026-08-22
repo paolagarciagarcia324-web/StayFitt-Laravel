@@ -15,7 +15,8 @@ class ComunidadController extends Controller
             ->with(['coach.usuario', 'plan'])
             ->withCount('mensajes')
             ->orderByDesc('creado_en')
-            ->paginate(20);
+            ->paginate(10)
+            ->withQueryString();
 
         return view('admin.comunidad.index', compact('chats'));
     }

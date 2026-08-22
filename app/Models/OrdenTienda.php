@@ -53,6 +53,9 @@ class OrdenTienda extends Model
         if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, '/')) {
             return $path;
         }
+        if (str_starts_with($path, 'images/')) {
+            return asset($path);
+        }
 
         return asset('storage/'.$path);
     }

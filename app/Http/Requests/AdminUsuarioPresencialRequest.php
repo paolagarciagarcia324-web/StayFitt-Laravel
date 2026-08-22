@@ -23,7 +23,7 @@ class AdminUsuarioPresencialRequest extends FormRequest
             'telefono' => ['required', 'string', 'max:30'],
             'ciudad' => ['required', 'string', 'max:80'],
             'fecha_nacimiento' => ['required', 'date', 'before:today'],
-            'genero' => ['required', Rule::in(['FEMENINO', 'MASCULINO', 'OTRO', 'NO_INFORMA'])],
+            'genero' => ['required', Rule::in(['FEMENINO'])],
             'objetivo_principal' => ['required', 'string', 'max:80'],
             'peso_kg' => ['required', 'numeric', 'min:30', 'max:300'],
             'estatura_cm' => ['required', 'numeric', 'min:100', 'max:250'],
@@ -53,6 +53,7 @@ class AdminUsuarioPresencialRequest extends FormRequest
         return [
             'id_horario.required' => 'Debes seleccionar el horario al que quieres pertenecer.',
             'id_horario.exists' => 'El horario seleccionado no está disponible.',
+            'genero.in' => 'En modalidad presencial solo se admite género femenino.',
         ];
     }
 }

@@ -22,6 +22,7 @@ class SolicitudCompra extends Model
         'acepto_terminos' => 'boolean',
         'fecha_aceptacion_terminos' => 'datetime',
         'fecha_revision' => 'datetime',
+        'revisada_en' => 'datetime',
         'datos_extra_json' => 'array',
         'precio_lista' => 'decimal:2',
         'descuento' => 'decimal:2',
@@ -68,5 +69,46 @@ class SolicitudCompra extends Model
     public function pago(): HasOne
     {
         return $this->hasOne(Pago::class, 'id_solicitud', 'id_solicitud');
+    }
+
+    /** Fecha unificada de revisión (fecha_revision o revisada_en). */
+    public function fechaRevision(): ?\Carbon\CarbonInterface
+    {
+        return $this->fecha_revision ?? $this->revisada_en;
+    }
+
+    /**
+     * Serial secuencial único: Fit001, Fit002, …
+     */
+    public static function generarCodigo(string $modalidad = '', string $nombres = '', string $apellidos = ''): string
+    {
+        $max = 0;
+        static::query()
+            ->where('codigo_solicitud', 'like', 'Fit%')
+            ->pluck('codigo_solicitud')
+            ->each(function (string $codigo) use (&$max) {
+                if (preg_match('/^Fit(\d+)$/i', $codigo, $m)) {
+                    $max = max($max, (int) $m[1]);
+                }
+            });
+
+        for ($n = $max + 1; $n < $max + 10000; $n++) {
+            $codigo = 'Fit'.str_pad((string) $n, 3, '0', STR_PAD_LEFT);
+            if (! static::query()->where('codigo_solicitud', $codigo)->exists()) {
+                return $codigo;
+            }
+        }
+
+        return 'Fit'.str_pad((string) (time() % 100000), 5, '0', STR_PAD_LEFT);
+    }
+
+    /** @return array{0: string, 1: string}|null [Fit, 001] */
+    public function codigoPartes(): ?array
+    {
+        if (preg_match('/^(Fit)(\d+)$/i', (string) $this->codigo_solicitud, $m)) {
+            return ['Fit', $m[2]];
+        }
+
+        return null;
     }
 }

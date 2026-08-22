@@ -59,7 +59,7 @@ class RegistroPresencialController extends Controller
             return back()->withErrors(['id_horario' => 'Ese horario ya no tiene cupo.'])->withInput();
         }
 
-        $codigo = 'SF-P-'.now()->format('Ymd').'-'.strtoupper(Str::random(6));
+        $codigo = SolicitudCompra::generarCodigo('PRESENCIAL', $request->nombres, $request->apellidos);
         $referencia = 'REF-'.$codigo;
 
         $datosExtra = [
@@ -75,9 +75,9 @@ class RegistroPresencialController extends Controller
                 'codigo' => $horario->codigo,
                 'nombre' => $horario->nombre,
                 'dias' => $horario->dias,
-                'hora_inicio' => substr((string) $horario->hora_inicio, 0, 5),
-                'hora_fin' => substr((string) $horario->hora_fin, 0, 5),
-                'link_whatsapp' => $horario->link_whatsapp,
+                'hora_inicio' => HorarioPresencial::formatoHora12((string) $horario->hora_inicio),
+                'hora_fin' => HorarioPresencial::formatoHora12((string) $horario->hora_fin),
+                'link_whatsapp' => $horario->nombreGrupoWhatsapp(),
             ],
             'medidas' => [
                 'peso_kg' => (float) $request->peso_kg,

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
 class Cliente extends Model
@@ -79,6 +80,36 @@ class Cliente extends Model
     public function accesos(): HasMany
     {
         return $this->hasMany(AccesoClienteModulo::class, 'id_cliente', 'id_cliente');
+    }
+
+    public function preferencias(): HasOne
+    {
+        return $this->hasOne(PreferenciaCliente::class, 'id_cliente', 'id_cliente');
+    }
+
+    public function historialEstados(): HasMany
+    {
+        return $this->hasMany(HistorialEstadoCliente::class, 'id_cliente', 'id_cliente');
+    }
+
+    public function progresoVideos(): HasMany
+    {
+        return $this->hasMany(ProgresoVideo::class, 'id_cliente', 'id_cliente');
+    }
+
+    public function registrosProgreso(): HasMany
+    {
+        return $this->hasMany(RegistroProgreso::class, 'id_cliente', 'id_cliente');
+    }
+
+    public function metas(): HasMany
+    {
+        return $this->hasMany(MetaCliente::class, 'id_cliente', 'id_cliente');
+    }
+
+    public function asistencias(): HasMany
+    {
+        return $this->hasMany(Asistencia::class, 'id_cliente', 'id_cliente');
     }
 
     public function planActivo(): ?PlanCliente

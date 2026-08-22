@@ -9,6 +9,12 @@
     @case('usuarios')
         <circle cx="9" cy="8" r="3"/><path d="M3.8 19.2c.8-3.1 3-4.8 5.2-4.8s4.4 1.7 5.2 4.8"/><circle cx="17.2" cy="8.2" r="2.2"/><path d="M16.2 13.2h2v2M17.2 12.2v4"/>
         @break
+    @case('personas')
+        <circle cx="9" cy="7.5" r="2.8"/>
+        <path d="M3.5 19c.75-3 2.9-4.7 5.5-4.7S13.75 16 14.5 19"/>
+        <circle cx="16.5" cy="8.2" r="2.3"/>
+        <path d="M14.2 14.2c1.7-.35 3.5.15 4.7 1.45.7.75 1.15 1.7 1.35 2.7"/>
+        @break
     @case('clientes')
         <circle cx="12" cy="8" r="3.2"/><path d="M5.4 19.2c.8-3.2 3.4-5 6.6-5s5.8 1.8 6.6 5"/>
         @break
@@ -68,6 +74,45 @@
         @break
     @case('pasarelas')
         <path d="M4 8h16M7 5h10M6 12h5M6 16h8"/>
+        @break
+    @case('edit')
+        <path d="M12 20h9"/>
+        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+        @break
+    @case('upload')
+        <path d="M12 16V5"/>
+        <path d="M8 8.5 12 4.5 16 8.5"/>
+        <path d="M5 19h14"/>
+        @break
+    @case('clock')
+        <circle cx="12" cy="12" r="8"/>
+        <path d="M12 8v4.2l2.6 1.6"/>
+        @break
+    @case('cupo')
+        <circle cx="9" cy="8.5" r="2.6"/>
+        <path d="M4 18.5c.7-2.6 2.4-4 5-4s4.3 1.4 5 4"/>
+        <circle cx="16.5" cy="9.5" r="2.1"/>
+        <path d="M13.5 18.5c.5-2 1.8-3.2 3-3.2s2.5 1.2 3 3.2"/>
+        @break
+    @case('fecha')
+        <rect x="4" y="5" width="16" height="15" rx="2"/>
+        <path d="M8 3.5v3M16 3.5v3M4 10h16"/>
+        @break
+    @case('search')
+        <circle cx="11" cy="11" r="6.5"/>
+        <path d="M16.2 16.2 20.5 20.5"/>
+        @break
+    @case('close')
+        <path d="M6.5 6.5 17.5 17.5M17.5 6.5 6.5 17.5"/>
+        @break
+    @case('chevron-down')
+        <path d="M6 9.5 12 15.5 18 9.5"/>
+        @break
+    @case('trash')
+        <path d="M3 6h18"/>
+        <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+        <path d="M10 11v6M14 11v6"/>
         @break
     @default
         <circle cx="12" cy="12" r="3"/>

@@ -14,7 +14,7 @@ class CuponController extends Controller
 {
     public function index(): View
     {
-        $cupones = DescuentoCupon::query()->with('plan')->orderByDesc('creado_en')->paginate(20);
+        $cupones = DescuentoCupon::query()->with('plan')->orderByDesc('creado_en')->paginate(10)->withQueryString();
         $planes = Plan::query()->orderBy('nombre')->get(['id_plan', 'nombre']);
 
         return view('admin.cupones.index', compact('cupones', 'planes'));

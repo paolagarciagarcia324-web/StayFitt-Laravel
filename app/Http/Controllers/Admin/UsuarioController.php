@@ -30,6 +30,10 @@ class UsuarioController extends Controller
 
         $usuarios = User::query()
             ->with(['roles', 'cliente.planesCliente.plan'])
+            ->whereHas('cliente')
+            ->whereDoesntHave('roles', function ($query) {
+                $query->where('codigo', 'ADMIN')->orWhere('codigo_rol', 'ADMIN');
+            })
             ->when($q !== '', function ($query) use ($q) {
                 $query->where(function ($inner) use ($q) {
                     $inner->where('nombres', 'like', "%{$q}%")
@@ -38,7 +42,7 @@ class UsuarioController extends Controller
                 });
             })
             ->orderByDesc('creado_en')
-            ->paginate(20)
+            ->paginate(10)
             ->withQueryString();
 
         $horarios = HorarioPresencial::activos()->get();
@@ -63,7 +67,7 @@ class UsuarioController extends Controller
             return back()->withErrors(['id_horario' => 'Ese horario ya no tiene cupo.'])->withInput();
         }
 
-        $codigo = 'SF-A-'.now()->format('Ymd').'-'.strtoupper(Str::random(6));
+        $codigo = SolicitudCompra::generarCodigo('PRESENCIAL', $request->nombres, $request->apellidos);
 
         DB::transaction(function () use ($request, $plan, $horario, $codigo) {
             $datosExtra = [

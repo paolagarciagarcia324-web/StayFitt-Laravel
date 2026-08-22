@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class PreRegisterRequest extends FormRequest
 {
@@ -29,6 +30,7 @@ class PreRegisterRequest extends FormRequest
             'correo' => ['required', 'email', 'max:150'],
             'telefono' => ['required', 'string', 'max:30'],
             'ciudad' => ['required', 'string', 'max:100'],
+            'genero' => ['required', Rule::in(['FEMENINO', 'MASCULINO'])],
             'peso_kg' => ['required', 'numeric', 'min:30', 'max:300'],
             'estatura_cm' => ['required', 'numeric', 'min:100', 'max:250'],
             'cintura_cm' => ['required', 'numeric', 'min:40', 'max:200'],
@@ -50,6 +52,7 @@ class PreRegisterRequest extends FormRequest
     {
         return array_merge([
             'acepto_terminos.accepted' => 'Debes aceptar los términos y condiciones.',
+            'genero.in' => 'En modalidad virtual el género debe ser femenino o masculino.',
         ], $this->mensajesPagoSimulado());
     }
 }

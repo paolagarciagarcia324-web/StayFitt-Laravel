@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Cliente;
 use App\Models\Evento;
 use App\Models\HorarioPresencial;
+use App\Models\OrdenDetalle;
 use App\Models\OrdenTienda;
 use App\Models\Pago;
 use App\Models\PlanCliente;
+use App\Models\SolicitudCompra;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -23,10 +26,9 @@ class DashboardController extends Controller
             ->where('creado_en', '>=', $mesInicio)
             ->count();
 
-        $productosVendidos = (int) DB::table('orden_detalle as d')
-            ->join('ordenes_tienda as o', 'o.id_orden', '=', 'd.id_orden')
-            ->where('o.creado_en', '>=', $mesInicio)
-            ->sum('d.cantidad');
+        $productosVendidos = (int) OrdenDetalle::query()
+            ->whereHas('orden', fn ($q) => $q->where('creado_en', '>=', $mesInicio))
+            ->sum('cantidad');
 
         $ordenes = OrdenTienda::query()
             ->with('cliente.usuario')
@@ -79,10 +81,10 @@ class DashboardController extends Controller
         }
 
         return (object) [
-            'total_clientes_activos' => DB::table('clientes')->whereIn('estado_cliente', ['ACTIVO', 'ACTIVA'])->count(),
-            'clientes_virtuales' => DB::table('clientes')->where('modalidad', 'VIRTUAL')->count(),
-            'clientes_presenciales' => DB::table('clientes')->where('modalidad', 'PRESENCIAL')->count(),
-            'solicitudes_pendientes' => DB::table('solicitudes_compra')->where('estado_solicitud', 'PENDIENTE')->count(),
+            'total_clientes_activos' => Cliente::query()->whereIn('estado_cliente', ['ACTIVO', 'ACTIVA'])->count(),
+            'clientes_virtuales' => Cliente::query()->where('modalidad', 'VIRTUAL')->count(),
+            'clientes_presenciales' => Cliente::query()->where('modalidad', 'PRESENCIAL')->count(),
+            'solicitudes_pendientes' => SolicitudCompra::query()->where('estado_solicitud', 'PENDIENTE')->count(),
             'ingreso_mes_actual' => (float) Pago::query()
                 ->where('estado_pago', 'VALIDADO')
                 ->where('creado_en', '>=', $mesInicio)
@@ -118,9 +120,9 @@ class DashboardController extends Controller
         $desde = Carbon::now()->subDays(6)->startOfDay();
 
         try {
-            $filas = DB::table('orden_detalle as d')
-                ->join('ordenes_tienda as o', 'o.id_orden', '=', 'd.id_orden')
-                ->selectRaw('DATE(o.creado_en) as dia, SUM(d.cantidad) as valor')
+            $filas = OrdenDetalle::query()
+                ->join('ordenes_tienda as o', 'o.id_orden', '=', 'orden_detalle.id_orden')
+                ->selectRaw('DATE(o.creado_en) as dia, SUM(orden_detalle.cantidad) as valor')
                 ->where('o.creado_en', '>=', $desde)
                 ->groupBy('dia')
                 ->pluck('valor', 'dia');

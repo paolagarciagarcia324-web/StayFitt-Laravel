@@ -1,15 +1,21 @@
 @extends('layouts.admin')
 
 @section('title', 'Pagos')
-@section('subtitle', 'Registro de pagos')
+@section('subtitle')
+    <span class="ad-page-intro">
+        <span class="ad-page-intro-lead">Registro de pagos y vencimientos del club.</span>
+        <span class="ad-page-intro-note">Consulta referencias, comprobantes y estados de cobro en un solo lugar.</span>
+    </span>
+@endsection
 
 @section('content')
     <section class="ad-card ad-users">
         <div class="ad-users-bar">
-            <form class="ad-users-search" method="GET" action="{{ route('admin.pagos.index') }}">
-                <span>⌕</span>
-                <input type="search" name="q" value="{{ $q }}" placeholder="Referencia o correo">
-            </form>
+            @include('partials.admin-search', [
+                'action' => route('admin.pagos.index'),
+                'value' => $q,
+                'placeholder' => 'Referencia o correo',
+            ])
         </div>
 
         <table class="ad-table ad-users-table">
@@ -22,15 +28,20 @@
                     <th>Método</th>
                     <th>Comprobante</th>
                     <th>Estado</th>
-                    <th>Fecha</th>
+                    <th>Fecha pago</th>
+                    <th>Vence</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse ($pagos as $p)
                     @php
                         $metodo = $p->metodo_pago ?: $p->metodo ?: '—';
-                        $esPasarela = filled($p->pasarela) || str_contains(strtoupper((string) $metodo), 'PASARELA');
+                        $pas = strtoupper((string) ($p->pasarela ?: ''));
+                        $esPasarela = ($pas !== '' && ! in_array($pas, ['NINGUNA', 'PENDIENTE'], true))
+                            || str_contains(strtoupper((string) $metodo), 'PASARELA');
                         $comp = $p->comprobanteSrc();
+                        $fechaPago = $p->fechaPagoEfectiva();
+                        $fechaVence = $p->fechaVencimiento();
                     @endphp
                     <tr>
                         <td>
@@ -39,7 +50,9 @@
                         </td>
                         <td>
                             @if ($p->id_solicitud)
-                                <a class="ad-link" href="{{ route('admin.solicitudes.show', $p->id_solicitud) }}">{{ $p->solicitud?->codigo_solicitud ?: '#'.$p->id_solicitud }}</a>
+                                <a class="ad-link" href="{{ route('admin.solicitudes.show', $p->id_solicitud) }}">
+                                    {{ $p->solicitud?->codigo_solicitud ?: '#'.$p->id_solicitud }}
+                                </a>
                             @else
                                 —
                             @endif
@@ -62,10 +75,11 @@
                                 {{ $p->estado_pago }}
                             </span>
                         </td>
-                        <td>{{ optional($p->creado_en)->format('d/m/Y H:i') ?? '—' }}</td>
+                        <td>{{ $fechaPago ? $fechaPago->format('d/m/Y H:i') : '—' }}</td>
+                        <td>{{ $fechaVence ? $fechaVence->format('d/m/Y') : '—' }}</td>
                     </tr>
                 @empty
-                    <tr><td colspan="8" class="ad-empty">No hay pagos registrados.</td></tr>
+                    <tr><td colspan="9" class="ad-empty">No hay pagos registrados.</td></tr>
                 @endforelse
             </tbody>
         </table>

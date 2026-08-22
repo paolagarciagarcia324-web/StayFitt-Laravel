@@ -38,7 +38,7 @@ class PreRegisterController extends Controller
             return redirect()->route('welcome')->with('error', 'Este plan virtual no está disponible.');
         }
 
-        $codigo = 'SF-'.now()->format('Ymd').'-'.strtoupper(Str::random(6));
+        $codigo = SolicitudCompra::generarCodigo('VIRTUAL', $request->nombres, $request->apellidos);
         $referencia = 'REF-'.$codigo;
 
         try {
@@ -65,6 +65,7 @@ class PreRegisterController extends Controller
                     'observacion_usuario' => $request->observacion_usuario,
                     'datos_extra_json' => [
                         'objetivo_principal' => $request->objetivo_principal,
+                        'genero' => $request->genero,
                         'medidas' => [
                             'peso_kg' => (float) $request->peso_kg,
                             'estatura_cm' => (float) $request->estatura_cm,

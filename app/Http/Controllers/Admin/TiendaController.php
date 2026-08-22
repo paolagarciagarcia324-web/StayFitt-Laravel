@@ -21,8 +21,9 @@ class TiendaController extends Controller
             ->with('categoria')
             ->withSum('detallesOrden as unidades_vendidas', 'cantidad')
             ->orderByDesc('creado_en')
-            ->paginate(12, ['*'], 'productos');
-        $ordenes = OrdenTienda::query()->with('cliente.usuario')->orderByDesc('creado_en')->paginate(12, ['*'], 'ordenes');
+            ->paginate(10, ['*'], 'productos')
+            ->withQueryString();
+        $ordenes = OrdenTienda::query()->with('cliente.usuario')->orderByDesc('creado_en')->paginate(10, ['*'], 'ordenes')->withQueryString();
 
         return view('admin.tienda.index', compact('categorias', 'productos', 'ordenes'));
     }

@@ -27,6 +27,7 @@ Route::middleware(['auth', 'role:ADMIN'])->prefix('admin')->name('admin.')->grou
     Route::get('/solicitudes/{id}', [SolicitudController::class, 'show'])->name('solicitudes.show');
     Route::post('/solicitudes/{id}/aprobar', [SolicitudController::class, 'aprobar'])->name('solicitudes.aprobar');
     Route::post('/solicitudes/{id}/rechazar', [SolicitudController::class, 'rechazar'])->name('solicitudes.rechazar');
+    Route::post('/solicitudes/{id}/suspender', [SolicitudController::class, 'suspender'])->name('solicitudes.suspender');
 
     Route::get('/pagos', [PagoController::class, 'index'])->name('pagos.index');
 
@@ -63,7 +64,9 @@ Route::middleware(['auth', 'role:ADMIN'])->prefix('admin')->name('admin.')->grou
     Route::post('/instituciones/{id}/enlaces', [InstitucionController::class, 'storeEnlace'])->name('instituciones.enlaces');
 
     Route::get('/horarios', [HorarioPresencialController::class, 'index'])->name('horarios.index');
+    Route::post('/horarios', [HorarioPresencialController::class, 'store'])->name('horarios.store');
     Route::put('/horarios/{id}', [HorarioPresencialController::class, 'update'])->name('horarios.update');
+    Route::delete('/horarios/{id}', [HorarioPresencialController::class, 'destroy'])->name('horarios.destroy');
 
     Route::get('/pasarelas', [PasarelaController::class, 'index'])->name('pasarelas.index');
     Route::put('/pasarelas/{id}', [PasarelaController::class, 'update'])->name('pasarelas.update');
@@ -80,8 +83,12 @@ Route::middleware(['auth', 'role:ADMIN'])->prefix('admin')->name('admin.')->grou
     Route::get('/eventos', [EventoController::class, 'index'])->name('eventos.index');
     Route::post('/eventos', [EventoController::class, 'store'])->name('eventos.store');
     Route::put('/eventos/{id}', [EventoController::class, 'update'])->name('eventos.update');
+    Route::delete('/eventos/{id}', [EventoController::class, 'destroy'])->name('eventos.destroy');
 
     Route::get('/calendario', [CalendarioController::class, 'index'])->name('calendario.index');
+    Route::post('/calendario/sesiones', [CalendarioController::class, 'store'])->name('calendario.sesiones.store');
+    Route::put('/calendario/sesiones/{id}', [CalendarioController::class, 'update'])->name('calendario.sesiones.update');
+    Route::delete('/calendario/sesiones/{id}', [CalendarioController::class, 'destroy'])->name('calendario.sesiones.destroy');
     Route::get('/comunidad', [ComunidadController::class, 'index'])->name('comunidad.index');
     Route::get('/comunidad/{id}', [ComunidadController::class, 'show'])->name('comunidad.show');
     Route::get('/estadisticas', [EstadisticaController::class, 'index'])->name('estadisticas.index');

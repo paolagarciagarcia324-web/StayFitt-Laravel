@@ -20,6 +20,7 @@ return new class extends Migration
             'correo' => $correo,
             'email' => $correo,
             'password_hash' => Hash::make($password),
+            'foto_perfil_url' => 'images/admin/paola-avatar.png',
             'estado' => 'ACTIVO',
             'estado_cuenta' => 'ACTIVO',
             'acepto_terminos' => 1,

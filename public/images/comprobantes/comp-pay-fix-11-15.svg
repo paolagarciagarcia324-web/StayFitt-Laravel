@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ff2d78"/>
+      <stop offset="100%" stop-color="#2ef5e6"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="1200" fill="#0a0e17"/>
+  <rect x="40" y="40" width="820" height="1120" rx="28" fill="#121a2b" stroke="url(#g)" stroke-width="3"/>
+  <text x="80" y="120" fill="#2ef5e6" font-family="Montserrat, Arial, sans-serif" font-size="22" font-weight="800" letter-spacing="4">FIGUEFIT</text>
+  <text x="80" y="155" fill="#ffffff" font-family="Montserrat, Arial, sans-serif" font-size="36" font-weight="800">Comprobante de pago</text>
+  <text x="80" y="195" fill="rgba(255,255,255,0.55)" font-family="Montserrat, Arial, sans-serif" font-size="16">Generado automáticamente por pasarela</text>
+  <line x1="80" y1="230" x2="820" y2="230" stroke="rgba(46,245,230,0.25)" stroke-width="2"/>
+  <text x="80" y="290" fill="rgba(255,255,255,0.45)" font-family="Montserrat, Arial, sans-serif" font-size="14" font-weight="700">PASARELA</text>
+  <text x="80" y="325" fill="#ffffff" font-family="Montserrat, Arial, sans-serif" font-size="28" font-weight="800">EPAYCO</text>
+  <text x="80" y="390" fill="rgba(255,255,255,0.45)" font-family="Montserrat, Arial, sans-serif" font-size="14" font-weight="700">REFERENCIA</text>
+  <text x="80" y="425" fill="#2ef5e6" font-family="Montserrat, Arial, sans-serif" font-size="24" font-weight="700">PAY-FIX-11</text>
+  <text x="80" y="490" fill="rgba(255,255,255,0.45)" font-family="Montserrat, Arial, sans-serif" font-size="14" font-weight="700">SOLICITUD</text>
+  <text x="80" y="525" fill="#ffffff" font-family="Montserrat, Arial, sans-serif" font-size="24" font-weight="700">Fit011</text>
+  <text x="80" y="590" fill="rgba(255,255,255,0.45)" font-family="Montserrat, Arial, sans-serif" font-size="14" font-weight="700">CLIENTE</text>
+  <text x="80" y="625" fill="#ffffff" font-family="Montserrat, Arial, sans-serif" font-size="24" font-weight="700">Luisa Hernández</text>
+  <text x="80" y="660" fill="rgba(255,255,255,0.55)" font-family="Montserrat, Arial, sans-serif" font-size="16">luisa.h@demo.figuefit.test</text>
+  <text x="80" y="725" fill="rgba(255,255,255,0.45)" font-family="Montserrat, Arial, sans-serif" font-size="14" font-weight="700">MONTO</text>
+  <text x="80" y="770" fill="#ff2d78" font-family="Montserrat, Arial, sans-serif" font-size="40" font-weight="800">$89.000 COP</text>
+  <text x="80" y="840" fill="rgba(255,255,255,0.45)" font-family="Montserrat, Arial, sans-serif" font-size="14" font-weight="700">MÉTODO</text>
+  <text x="80" y="875" fill="#ffffff" font-family="Montserrat, Arial, sans-serif" font-size="22" font-weight="700">PSE</text>
+  <text x="80" y="940" fill="rgba(255,255,255,0.45)" font-family="Montserrat, Arial, sans-serif" font-size="14" font-weight="700">FECHA</text>
+  <text x="80" y="975" fill="#ffffff" font-family="Montserrat, Arial, sans-serif" font-size="22" font-weight="700">20/08/2026 17:47</text>
+  <text x="80" y="1040" fill="rgba(255,255,255,0.45)" font-family="Montserrat, Arial, sans-serif" font-size="14" font-weight="700">ESTADO</text>
+  <text x="80" y="1075" fill="#2ef5e6" font-family="Montserrat, Arial, sans-serif" font-size="24" font-weight="800">VALIDADO</text>
+  <text x="80" y="1135" fill="rgba(255,255,255,0.35)" font-family="Montserrat, Arial, sans-serif" font-size="13">FigueFit Studio · comprobante oficial de pasarela</text>
+</svg>

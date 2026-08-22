@@ -80,6 +80,14 @@
                             <label><span>Correo *</span><input type="email" name="correo" value="{{ old('correo') }}" required></label>
                             <label><span>Teléfono *</span><input type="text" name="telefono" value="{{ old('telefono') }}" required></label>
                             <label><span>Ciudad *</span><input type="text" name="ciudad" value="{{ old('ciudad') }}" required></label>
+                            <label>
+                                <span>Género *</span>
+                                <select name="genero" required>
+                                    <option value="">Selecciona...</option>
+                                    <option value="FEMENINO" @selected(old('genero') === 'FEMENINO')">Femenino</option>
+                                    <option value="MASCULINO" @selected(old('genero') === 'MASCULINO')">Masculino</option>
+                                </select>
+                            </label>
                             <label><span>Objetivo</span><input type="text" name="objetivo_principal" value="{{ old('objetivo_principal') }}" placeholder="Fuerza, salud, definición..."></label>
                         </div>
                     </div>

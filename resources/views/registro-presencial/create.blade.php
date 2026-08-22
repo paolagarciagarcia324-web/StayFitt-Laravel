@@ -85,11 +85,9 @@
                             <label>
                                 <span>Género *</span>
                                 <select name="genero" required>
-                                    <option value="">Selecciona...</option>
-                                    @foreach (['FEMENINO', 'MASCULINO', 'OTRO', 'NO_INFORMA'] as $genero)
-                                        <option value="{{ $genero }}" @selected(old('genero') === $genero)>{{ ucfirst(strtolower(str_replace('_', ' ', $genero))) }}</option>
-                                    @endforeach
+                                    <option value="FEMENINO" @selected(old('genero', 'FEMENINO') === 'FEMENINO')">Femenino</option>
                                 </select>
+                                <small class="ff-field-note">Presencial: solo género femenino.</small>
                             </label>
                             <label><span>Objetivo *</span><input type="text" name="objetivo_principal" value="{{ old('objetivo_principal') }}" placeholder="Fuerza, salud, definición..." required></label>
                         </div>
@@ -139,7 +137,7 @@
                                     <span class="ff-horario-body">
                                         <strong>{{ $horario->nombre }}</strong>
                                         <em>{{ $horario->dias }}</em>
-                                        <small>{{ substr((string) $horario->hora_inicio, 0, 5) }} – {{ substr((string) $horario->hora_fin, 0, 5) }}</small>
+                                        <small>{{ $horario->rangoHora12() }}</small>
                                     </span>
                                 </label>
                             @endforeach

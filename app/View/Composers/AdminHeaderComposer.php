@@ -2,6 +2,7 @@
 
 namespace App\View\Composers;
 
+use App\Models\OrdenDetalle;
 use App\Models\PlanCliente;
 use App\Models\SolicitudCompra;
 use App\Models\User;
@@ -41,16 +42,16 @@ class AdminHeaderComposer
             ->limit(8)
             ->get(['id_user', 'nombres', 'apellidos', 'ultimo_acceso_en']);
 
-        $topProductos = DB::table('orden_detalle as d')
-            ->join('ordenes_tienda as o', 'o.id_orden', '=', 'd.id_orden')
-            ->join('productos_tienda as p', 'p.id_producto', '=', 'd.id_producto')
+        $topProductos = OrdenDetalle::query()
+            ->join('ordenes_tienda as o', 'o.id_orden', '=', 'orden_detalle.id_orden')
+            ->join('productos_tienda as p', 'p.id_producto', '=', 'orden_detalle.id_producto')
             ->where('o.creado_en', '>=', $mesInicio)
             ->groupBy('p.id_producto', 'p.nombre')
-            ->orderByRaw('SUM(d.cantidad) DESC')
+            ->orderByRaw('SUM(orden_detalle.cantidad) DESC')
             ->limit(6)
             ->get([
                 'p.nombre',
-                DB::raw('SUM(d.cantidad) as unidades'),
+                DB::raw('SUM(orden_detalle.cantidad) as unidades'),
             ]);
 
         $alertas = PlanCliente::query()
@@ -65,6 +66,14 @@ class AdminHeaderComposer
             ->where('estado_solicitud', 'PENDIENTE')
             ->count();
 
+        $latestPendiente = SolicitudCompra::query()
+            ->where('estado_solicitud', 'PENDIENTE')
+            ->max('creado_en');
+
+        $navSolicitudesLatestAt = $latestPendiente
+            ? Carbon::parse($latestPendiente)->toIso8601String()
+            : null;
+
         $view->with([
             'headerEntraron' => $entraron,
             'headerActivos' => $activos,
@@ -72,6 +81,7 @@ class AdminHeaderComposer
             'headerTopProductos' => $topProductos,
             'headerAlertas' => $alertas,
             'navSolicitudesPendientes' => $navSolicitudesPendientes,
+            'navSolicitudesLatestAt' => $navSolicitudesLatestAt,
         ]);
     }
 }

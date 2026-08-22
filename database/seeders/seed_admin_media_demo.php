@@ -70,9 +70,12 @@ foreach ($pasarelaLogos as $codigo => $url) {
     ]);
 }
 
-$recibo = 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80';
-DB::table('pagos')->where('estado_pago', 'VALIDADO')->whereNull('comprobante_url')->update(['comprobante_url' => $recibo]);
-DB::table('ordenes_tienda')->whereNull('comprobante_url')->update(['comprobante_url' => $recibo]);
+// Comprobante demo realista (misma imagen en pagos/órdenes para preview de despliegue)
+$recibo = 'images/comprobantes/recibo-ejemplo.png';
+if (is_file(public_path($recibo))) {
+    DB::table('pagos')->update(['comprobante_url' => $recibo]);
+    DB::table('ordenes_tienda')->update(['comprobante_url' => $recibo]);
+}
 
 echo "planes=".DB::table('planes')->whereNotNull('imagen_url')->count().PHP_EOL;
 echo "avatars=".DB::table('usuarios')->whereNotNull('foto_perfil_url')->count().PHP_EOL;

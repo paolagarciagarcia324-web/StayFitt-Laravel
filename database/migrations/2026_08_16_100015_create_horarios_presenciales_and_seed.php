@@ -42,7 +42,7 @@ return new class extends Migration
                 'hora_inicio' => '06:00:00',
                 'hora_fin' => '07:00:00',
                 'cupo_maximo' => 18,
-                'link_whatsapp' => 'https://chat.whatsapp.com/figuefit-manana-06',
+                'link_whatsapp' => 'FigueFit CLUB 6:00 AM',
                 'orden' => 1,
             ],
             [
@@ -52,7 +52,7 @@ return new class extends Migration
                 'hora_inicio' => '08:00:00',
                 'hora_fin' => '09:00:00',
                 'cupo_maximo' => 18,
-                'link_whatsapp' => 'https://chat.whatsapp.com/figuefit-manana-08',
+                'link_whatsapp' => 'FigueFit CLUB 8:00 AM',
                 'orden' => 2,
             ],
             [
@@ -62,7 +62,7 @@ return new class extends Migration
                 'hora_inicio' => '17:00:00',
                 'hora_fin' => '18:00:00',
                 'cupo_maximo' => 20,
-                'link_whatsapp' => 'https://chat.whatsapp.com/figuefit-tarde-17',
+                'link_whatsapp' => 'FigueFit CLUB 5:00 PM',
                 'orden' => 3,
             ],
             [
@@ -72,7 +72,7 @@ return new class extends Migration
                 'hora_inicio' => '19:00:00',
                 'hora_fin' => '20:00:00',
                 'cupo_maximo' => 22,
-                'link_whatsapp' => 'https://chat.whatsapp.com/figuefit-noche-19',
+                'link_whatsapp' => 'FigueFit CLUB 7:00 PM',
                 'orden' => 4,
             ],
         ];
@@ -168,10 +168,10 @@ return new class extends Migration
                 }
                 DB::table('grupos_whatsapp')->insert([
                     'id_config_wa' => $idConfig,
-                    'nombre' => 'WA · '.$h->nombre,
+                    'nombre' => $h->link_whatsapp ?: ('FigueFit CLUB '.$h->codigo),
                     'tipo' => 'HORARIO',
                     'criterio' => $h->codigo,
-                    'link_invitacion' => $h->link_whatsapp,
+                    'link_invitacion' => 'https://chat.whatsapp.com/figuefit-'.strtolower((string) $h->codigo),
                     'estado' => 'ACTIVO',
                 ]);
             }

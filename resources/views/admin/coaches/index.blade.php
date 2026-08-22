@@ -6,10 +6,11 @@
 @section('content')
     <section class="ad-card ad-users">
         <div class="ad-users-bar">
-            <form class="ad-users-search" method="GET" action="{{ route('admin.coaches.index') }}">
-                <span>⌕</span>
-                <input type="search" name="q" value="{{ $q }}" placeholder="Buscar por nombre">
-            </form>
+            @include('partials.admin-search', [
+                'action' => route('admin.coaches.index'),
+                'value' => $q,
+                'placeholder' => 'Buscar por nombre',
+            ])
             <button class="ad-btn ad-btn-add" type="button" data-open-coach-form>+ Crear coach</button>
         </div>
 

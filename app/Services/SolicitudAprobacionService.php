@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\AccesoClienteModulo;
 use App\Models\Cliente;
+use App\Models\HorarioPresencial;
 use App\Models\MedidaAntropometricaInicial;
 use App\Models\Pago;
 use App\Models\PlanCliente;
@@ -15,6 +16,10 @@ use Illuminate\Support\Facades\DB;
 
 class SolicitudAprobacionService
 {
+    public function __construct(private ComprobantePasarelaService $comprobantes)
+    {
+    }
+
     public function aprobar(SolicitudCompra $solicitud, ?string $observacion = null): void
     {
         $this->activar($solicitud, $observacion, false);
@@ -25,13 +30,14 @@ class SolicitudAprobacionService
         $this->activar(
             $solicitud,
             'Activación automática: pago aprobado por '.$pasarela.'.',
-            true
+            true,
+            $pasarela
         );
     }
 
-    private function activar(SolicitudCompra $solicitud, ?string $observacion, bool $porPasarela): void
+    private function activar(SolicitudCompra $solicitud, ?string $observacion, bool $porPasarela, ?string $pasarela = null): void
     {
-        DB::transaction(function () use ($solicitud, $observacion, $porPasarela) {
+        DB::transaction(function () use ($solicitud, $observacion, $porPasarela, $pasarela) {
             $solicitud->load(['plan.modulos', 'pago']);
 
             if ($solicitud->estado_solicitud === 'VALIDADA') {
@@ -109,7 +115,7 @@ class SolicitudAprobacionService
             ));
 
             if ($idHorario) {
-                DB::table('horarios_presenciales')
+                HorarioPresencial::query()
                     ->where('id_horario', $idHorario)
                     ->increment('cupo_ocupado');
             }
@@ -138,6 +144,10 @@ class SolicitudAprobacionService
                     'fecha_validacion' => now(),
                     'observacion_admin' => $observacion,
                 ]);
+
+                if ($porPasarela || (filled($pago->pasarela) && ! in_array(strtoupper((string) $pago->pasarela), ['', 'NINGUNA', 'PENDIENTE'], true))) {
+                    $this->comprobantes->asegurar($pago->fresh(), $solicitud, $pasarela);
+                }
             }
 
             $inicio = now()->toDateString();
@@ -200,6 +210,73 @@ class SolicitudAprobacionService
                     'observacion_admin' => $observacion,
                 ]);
             }
+
+            $this->suspenderClienteDeSolicitud(
+                $solicitud,
+                $observacion ?: 'Solicitud rechazada por novedad en el pago.'
+            );
         });
+    }
+
+    /**
+     * Suspende el acceso del cliente cuando hay fraude o pago no reflejado.
+     * La activación normal ocurre por pasarela; el admin solo actúa ante incidencias.
+     */
+    public function suspenderPorFraude(SolicitudCompra $solicitud, ?string $motivo = null): void
+    {
+        DB::transaction(function () use ($solicitud, $motivo) {
+            $motivo = $motivo ?: 'Acceso suspendido: incidencia o comprobante de pago no válido.';
+
+            $solicitud->update([
+                'revisado_por' => Auth::id(),
+                'fecha_revision' => now(),
+                'observacion_admin' => $motivo,
+            ]);
+
+            if ($solicitud->pago) {
+                $solicitud->pago->update([
+                    'estado_pago' => 'RECHAZADO',
+                    'validado_por' => Auth::id(),
+                    'fecha_validacion' => now(),
+                    'observacion_admin' => $motivo,
+                ]);
+            }
+
+            if ($solicitud->estado_solicitud === 'PENDIENTE') {
+                $solicitud->update(['estado_solicitud' => 'RECHAZADA']);
+            }
+
+            $this->suspenderClienteDeSolicitud($solicitud, $motivo);
+        });
+    }
+
+    private function suspenderClienteDeSolicitud(SolicitudCompra $solicitud, string $motivo): void
+    {
+        $usuario = User::query()->where('correo', $solicitud->correo)->first();
+        if (! $usuario) {
+            return;
+        }
+
+        $cliente = Cliente::query()->where('id_user', $usuario->id_user)->first();
+        if (! $cliente) {
+            return;
+        }
+
+        $cliente->update(['estado_cliente' => 'SUSPENDIDO']);
+
+        PlanCliente::query()
+            ->where('id_cliente', $cliente->id_cliente)
+            ->where('estado_plan_cliente', 'ACTIVO')
+            ->update(['estado_plan_cliente' => 'SUSPENDIDO']);
+
+        AccesoClienteModulo::query()
+            ->where('id_cliente', $cliente->id_cliente)
+            ->where('estado_acceso', 'ACTIVO')
+            ->update(['estado_acceso' => 'INACTIVO']);
+
+        $usuario->update([
+            'estado' => 'SUSPENDIDO',
+            'estado_cuenta' => 'SUSPENDIDO',
+        ]);
     }
 }

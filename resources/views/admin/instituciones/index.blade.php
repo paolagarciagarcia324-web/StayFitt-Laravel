@@ -10,10 +10,11 @@
 @section('content')
     <section class="ad-card ad-users">
         <div class="ad-users-bar">
-            <form class="ad-users-search" method="GET" action="{{ route('admin.instituciones.index') }}">
-                <span>⌕</span>
-                <input type="search" name="q" value="{{ $q }}" placeholder="Buscar institución o cliente">
-            </form>
+            @include('partials.admin-search', [
+                'action' => route('admin.instituciones.index'),
+                'value' => $q,
+                'placeholder' => 'Buscar institución o cliente',
+            ])
         </div>
 
         @forelse ($instituciones as $inst)

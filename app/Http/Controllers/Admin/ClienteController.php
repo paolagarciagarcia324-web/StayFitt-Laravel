@@ -128,7 +128,7 @@ class ClienteController extends Controller
                 });
             })
             ->orderByDesc('creado_en')
-            ->paginate(20)
+            ->paginate(10)
             ->withQueryString();
 
         return view("admin.clientes.{$view}", compact('clientes', 'title', 'subtitle', 'q'));

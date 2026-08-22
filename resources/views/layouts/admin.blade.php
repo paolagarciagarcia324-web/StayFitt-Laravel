@@ -20,41 +20,30 @@
     </script>
 </head>
 <body class="ad-body">
-    @php
-        $adminUser = auth()->user();
-        $adminAvatar = $adminUser?->avatarUrl();
-    @endphp
-    <input class="ad-nav-check" type="checkbox" id="ad-nav-toggle">
+    <input class="ad-nav-check" type="checkbox" id="ad-nav-toggle" checked>
 
     <aside class="ad-sidebar">
         <div class="ad-brand">
-            <div class="ad-brand-avatar">
-                @if ($adminAvatar)
-                    <img src="{{ $adminAvatar }}" alt="{{ $adminUser?->nombres }}" onerror="this.style.display='none'; this.nextElementSibling.hidden=false;">
-                    <span class="ad-user-icon" hidden>
-                        @include('partials.admin-icon', ['icon' => 'clientes'])
-                    </span>
-                @else
-                    <span class="ad-user-icon">
-                        @include('partials.admin-icon', ['icon' => 'clientes'])
-                    </span>
-                @endif
+            <div class="ad-brand-mark">
+                <img src="{{ asset('images/admin/figuefit-logo-circle.png') }}" alt="FigueFit">
             </div>
-            <span>
-                <small>FigueFit</small>
-                <strong>Admin</strong>
-            </span>
+            <div class="ad-brand-copy">
+                <strong>FigueFit</strong>
+                <small>Studio</small>
+            </div>
         </div>
 
         <nav class="ad-nav" data-admin-nav>
             @php
                 $pend = (int) ($navSolicitudesPendientes ?? 0);
+                $pendLatest = $navSolicitudesLatestAt ?? null;
                 $opOpen = request()->routeIs('admin.solicitudes.*', 'admin.pagos.*', 'admin.horarios.*', 'admin.eventos.*', 'admin.calendario.*');
                 $perOpen = request()->routeIs('admin.usuarios.*', 'admin.clientes.*', 'admin.instituciones.*', 'admin.coaches.*');
                 $cliOpen = request()->routeIs('admin.clientes.*');
                 $comOpen = request()->routeIs('admin.planes.*', 'admin.cupones.*', 'admin.tienda.*', 'admin.pasarelas.*');
                 $comuOpen = request()->routeIs('admin.whatsapp.*', 'admin.comunidad.*');
                 $anOpen = request()->routeIs('admin.estadisticas.*', 'admin.reportes.*');
+                $onSolicitudes = request()->routeIs('admin.solicitudes.*');
             @endphp
 
             <a href="{{ route('admin.dashboard') }}" class="ad-nav-link {{ request()->routeIs('admin.dashboard') ? 'is-active' : '' }}">
@@ -66,18 +55,26 @@
                 <summary>
                     <span class="ad-nav-orb is-cyan">@include('partials.admin-icon', ['icon' => 'pagos'])</span>
                     <span class="ad-nav-group-title">Operación</span>
-                    @if ($pend > 0)
-                        <span class="ad-nav-badge">{{ $pend }}</span>
-                    @endif
+                    <span
+                        class="ad-nav-badge"
+                        data-seen-badge="solicitudes"
+                        data-latest="{{ $pendLatest }}"
+                        data-count="{{ $pend }}"
+                        @if ($pend < 1) hidden @endif
+                    >{{ $pend }}</span>
                     <span class="ad-nav-chevron" aria-hidden="true"></span>
                 </summary>
                 <div class="ad-nav-children">
                     <a href="{{ route('admin.solicitudes.index') }}" class="ad-nav-link {{ request()->routeIs('admin.solicitudes.*') ? 'is-active' : '' }}">
                         <span class="ad-nav-dot"></span>
                         Solicitudes
-                        @if ($pend > 0)
-                            <span class="ad-nav-badge">{{ $pend }}</span>
-                        @endif
+                        <span
+                            class="ad-nav-badge"
+                            data-seen-badge="solicitudes"
+                            data-latest="{{ $pendLatest }}"
+                            data-count="{{ $pend }}"
+                            @if ($pend < 1) hidden @endif
+                        >{{ $pend }}</span>
                     </a>
                     <a href="{{ route('admin.pagos.index') }}" class="ad-nav-link {{ request()->routeIs('admin.pagos.*') ? 'is-active' : '' }}">
                         <span class="ad-nav-dot"></span>
@@ -100,7 +97,7 @@
 
             <details class="ad-nav-group {{ $perOpen ? 'is-route-active' : '' }}" data-nav-group="personas" @if ($perOpen) open @endif>
                 <summary>
-                    <span class="ad-nav-orb is-pink">@include('partials.admin-icon', ['icon' => 'usuarios'])</span>
+                    <span class="ad-nav-orb is-pink">@include('partials.admin-icon', ['icon' => 'personas'])</span>
                     <span class="ad-nav-group-title">Personas</span>
                     <span class="ad-nav-chevron" aria-hidden="true"></span>
                 </summary>
@@ -210,7 +207,11 @@
 
     <div class="ad-wrap">
         <header class="ad-header">
-            <label class="ad-nav-burger" for="ad-nav-toggle" aria-label="Menú">☰</label>
+            <label class="ad-nav-burger" for="ad-nav-toggle" aria-label="Menú">
+                <span></span>
+                <span></span>
+                <span></span>
+            </label>
             <div class="ad-header-actions">
                 @include('partials.admin-header-tools')
             </div>
@@ -229,18 +230,22 @@
                 </div>
             </header>
 
-            @if (session('success'))
-                <div class="ad-alert">{{ session('success') }}</div>
-            @endif
+            @hasSection('flash')
+                @yield('flash')
+            @else
+                @if (session('success'))
+                    <div class="ad-alert">{{ session('success') }}</div>
+                @endif
 
-            @if (isset($errors) && $errors->any())
-                <div class="ad-alert ad-alert-error">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
+                @if (isset($errors) && $errors->any())
+                    <div class="ad-alert ad-alert-error">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
             @endif
 
             <main class="ad-content">
@@ -277,6 +282,9 @@
                     var open = box.getAttribute('data-box') === id && box.hasAttribute('hidden');
                     box.toggleAttribute('hidden', !open);
                 });
+                if (id === 'ventas' || id === 'alertas') {
+                    markHeaderSeen(id);
+                }
             });
 
             document.addEventListener('click', function (event) {
@@ -312,6 +320,108 @@
                     try { localStorage.setItem(KEY, JSON.stringify(stored)); } catch (e) {}
                 }, true);
             })();
+
+            // Badges: hide when viewed / until newer items appear
+            var SEEN_KEY = 'ff-admin-seen';
+            function readSeen() {
+                try { return JSON.parse(localStorage.getItem(SEEN_KEY) || '{}') || {}; } catch (e) { return {}; }
+            }
+            function writeSeen(data) {
+                try { localStorage.setItem(SEEN_KEY, JSON.stringify(data)); } catch (e) {}
+            }
+            function syncSolicitudesBadges() {
+                var seen = readSeen();
+                var seenAt = seen.solicitudesSeenAt || null;
+                document.querySelectorAll('[data-seen-badge="solicitudes"]').forEach(function (el) {
+                    var count = parseInt(el.getAttribute('data-count') || '0', 10);
+                    var latest = el.getAttribute('data-latest') || '';
+                    var show = count > 0 && (!seenAt || (latest && latest > seenAt));
+                    el.toggleAttribute('hidden', !show);
+                    if (show) el.textContent = String(count);
+                });
+            }
+            function markSolicitudesSeen() {
+                var seen = readSeen();
+                var latest = '';
+                document.querySelectorAll('[data-seen-badge="solicitudes"]').forEach(function (el) {
+                    var v = el.getAttribute('data-latest') || '';
+                    if (v && v > latest) latest = v;
+                });
+                seen.solicitudesSeenAt = latest || new Date().toISOString();
+                writeSeen(seen);
+                syncSolicitudesBadges();
+            }
+            function syncHeaderDots() {
+                var seen = readSeen();
+                document.querySelectorAll('[data-seen-dot]').forEach(function (el) {
+                    var key = el.getAttribute('data-seen-dot');
+                    var count = parseInt(el.getAttribute('data-count') || '0', 10);
+                    var seenCount = parseInt(seen[key + 'SeenCount'] || '-1', 10);
+                    var show = count > 0 && count !== seenCount;
+                    el.toggleAttribute('hidden', !show);
+                });
+            }
+            function markHeaderSeen(key) {
+                var seen = readSeen();
+                var el = document.querySelector('[data-seen-dot="' + key + '"]');
+                var count = el ? parseInt(el.getAttribute('data-count') || '0', 10) : 0;
+                seen[key + 'SeenCount'] = count;
+                writeSeen(seen);
+                syncHeaderDots();
+            }
+
+            syncSolicitudesBadges();
+            syncHeaderDots();
+            @if (!empty($onSolicitudes) && $onSolicitudes)
+            markSolicitudesSeen();
+            @endif
+
+            document.querySelectorAll('[data-admin-search]').forEach(function (form) {
+                var input = form.querySelector('[data-admin-search-input]');
+                var clear = form.querySelector('[data-admin-search-clear]');
+                if (!input || !clear) return;
+                var live = form.hasAttribute('data-admin-search-live');
+                var lastSubmitted = input.value;
+                var timer = null;
+
+                function syncClear() {
+                    var has = !!(input.value && String(input.value).trim());
+                    clear.hidden = !has;
+                }
+
+                function submitSearch() {
+                    if (input.value === lastSubmitted) return;
+                    lastSubmitted = input.value;
+                    if (typeof form.requestSubmit === 'function') form.requestSubmit();
+                    else form.submit();
+                }
+
+                input.addEventListener('input', function () {
+                    syncClear();
+                    if (!live) return;
+                    clearTimeout(timer);
+                    timer = setTimeout(submitSearch, 320);
+                });
+
+                clear.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    clearTimeout(timer);
+                    input.value = '';
+                    lastSubmitted = '';
+                    syncClear();
+                    window.location.href = clear.getAttribute('href') || form.getAttribute('action') || window.location.pathname;
+                });
+
+                syncClear();
+
+                if (live && input.value) {
+                    input.focus();
+                    try {
+                        var len = input.value.length;
+                        input.setSelectionRange(len, len);
+                    } catch (err) {}
+                }
+            });
         })();
     </script>
 </body>

@@ -1,5 +1,6 @@
 @php
     $adminUser = $adminUser ?? auth()->user();
+    $adminAvatar = $adminUser?->avatarUrl();
     $iniciales = $adminUser?->iniciales() ?? 'FF';
     $topCount = (int) ($headerTopProductos?->count() ?? 0);
     $alertaCount = (int) ($headerAlertas?->count() ?? 0);
@@ -48,9 +49,12 @@
         <div class="ad-tool">
             <button type="button" class="ad-tool-btn" data-panel="ventas" aria-label="Productos más vendidos">
                 @include('partials.admin-icon', ['icon' => 'bolso'])
-                @if ($topCount > 0)
-                    <em class="ad-badge-dot is-cyan">{{ $topCount }}</em>
-                @endif
+                <em
+                    class="ad-badge-dot is-cyan"
+                    data-seen-dot="ventas"
+                    data-count="{{ $topCount }}"
+                    @if ($topCount < 1) hidden @endif
+                >{{ $topCount }}</em>
             </button>
             <div class="ad-tool-panel" data-box="ventas" hidden>
                 <header>
@@ -71,9 +75,12 @@
         <div class="ad-tool">
             <button type="button" class="ad-tool-btn" data-panel="alertas" aria-label="Planes por vencer">
                 @include('partials.admin-icon', ['icon' => 'alerta'])
-                @if ($alertaCount > 0)
-                    <em class="ad-badge-dot is-alert">{{ $alertaCount }}</em>
-                @endif
+                <em
+                    class="ad-badge-dot is-alert"
+                    data-seen-dot="alertas"
+                    data-count="{{ $alertaCount }}"
+                    @if ($alertaCount < 1) hidden @endif
+                >{{ $alertaCount }}</em>
             </button>
             <div class="ad-tool-panel" data-box="alertas" hidden>
                 <header>
@@ -97,5 +104,9 @@
         </button>
     </div>
 
-    <span class="ad-avatar-initials" title="{{ $adminUser?->nombres }} {{ $adminUser?->apellidos }}">{{ $iniciales }}</span>
+    @if ($adminAvatar)
+        <img class="ad-header-avatar is-photo" src="{{ $adminAvatar }}" alt="{{ $adminUser?->nombres }}" title="{{ $adminUser?->nombres }} {{ $adminUser?->apellidos }}">
+    @else
+        <span class="ad-avatar-initials" title="{{ $adminUser?->nombres }} {{ $adminUser?->apellidos }}">{{ $iniciales }}</span>
+    @endif
 </div>

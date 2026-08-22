@@ -79,21 +79,24 @@ class User extends Authenticatable
 
     public function avatarUrl(): ?string
     {
-        if (! empty($this->foto_perfil_url)) {
-            $path = trim((string) $this->foto_perfil_url);
-            if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, '/')) {
-                return $path;
-            }
-
-            return asset('storage/'.$path);
-        }
-
-        $email = strtolower(trim($this->getEmailForPasswordReset()));
-        if ($email === '') {
+        if (empty($this->foto_perfil_url)) {
             return null;
         }
 
-        return 'https://www.gravatar.com/avatar/'.md5($email).'?s=128&d=404';
+        $path = trim((string) $this->foto_perfil_url);
+        if ($path === '') {
+            return null;
+        }
+
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, '/')) {
+            return $path;
+        }
+
+        if (str_starts_with($path, 'images/') || str_starts_with($path, 'css/') || str_starts_with($path, 'js/')) {
+            return asset($path);
+        }
+
+        return asset('storage/'.$path);
     }
 
     public function getNameAttribute(): string

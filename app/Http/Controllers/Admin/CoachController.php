@@ -27,7 +27,7 @@ class CoachController extends Controller
                 });
             })
             ->orderByDesc('creado_en')
-            ->paginate(20)
+            ->paginate(10)
             ->withQueryString();
 
         return view('admin.coaches.index', compact('coaches', 'q'));

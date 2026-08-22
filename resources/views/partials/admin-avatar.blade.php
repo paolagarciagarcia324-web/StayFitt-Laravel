@@ -1,11 +1,17 @@
 @php
     $user = $user ?? null;
-    $foto = $user?->foto_perfil_url ?: $user?->avatarUrl();
+    $foto = $user?->avatarUrl();
     $iniciales = $user?->iniciales() ?? 'FF';
     $size = $size ?? 'md';
+    $sizeClass = $size === 'sm' ? 'is-sm' : '';
 @endphp
 @if ($foto)
-    <img class="ad-user-avatar {{ $size === 'sm' ? 'is-sm' : '' }}" src="{{ $foto }}" alt="{{ $user?->nombres }}">
+    <img
+        class="ad-user-avatar {{ $sizeClass }}"
+        src="{{ $foto }}"
+        alt="{{ $user?->nombres }}"
+        onerror="this.outerHTML='<span class=&quot;ad-user-avatar is-initials {{ $sizeClass }}&quot;>{{ e($iniciales) }}</span>'"
+    >
 @else
-    <span class="ad-user-avatar is-initials {{ $size === 'sm' ? 'is-sm' : '' }}">{{ $iniciales }}</span>
+    <span class="ad-user-avatar is-initials {{ $sizeClass }}">{{ $iniciales }}</span>
 @endif

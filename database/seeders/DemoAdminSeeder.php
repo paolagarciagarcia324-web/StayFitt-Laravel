@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\SolicitudCompra;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -99,7 +100,7 @@ class DemoAdminSeeder extends Seeder
             $clientesData = [
                 ['Valentina', 'Gómez', 'valen.gomez@demo.figuefit.test', 'VIRTUAL', 'INDIVIDUAL', 'ACTIVO', 'Bajar grasa', $planVirtualPro, $coachIds[0], null, null],
                 ['Andrés', 'Pérez', 'andres.perez@demo.figuefit.test', 'VIRTUAL', 'INDIVIDUAL', 'ACTIVO', 'Ganar músculo', $planVirtual, $coachIds[1], null, null],
-                ['Sofía', 'Castro', 'sofia.castro@demo.figuefit.test', 'VIRTUAL', 'INDIVIDUAL', 'PENDIENTE_PAGO', 'Mejorar hábitos', $planVirtual, $coachIds[0], null, null],
+                ['Sofía', 'Castro', 'sofia.castro@demo.figuefit.test', 'VIRTUAL', 'INDIVIDUAL', 'ACTIVO', 'Mejorar hábitos', $planVirtual, $coachIds[0], null, null],
                 ['Julián', 'Rojas', 'julian.rojas@demo.figuefit.test', 'PRESENCIAL', 'INDIVIDUAL', 'ACTIVO', 'Fuerza', $planPresencial, $coachIds[1], null, $horarios[2] ?? null],
                 ['Mariana', 'López', 'mariana.lopez@demo.figuefit.test', 'PRESENCIAL', 'INDIVIDUAL', 'ACTIVO', 'Tonificar', $planPresencial, $coachIds[0], null, $horarios[0] ?? null],
                 ['Felipe', 'Nieto', 'felipe.nieto@demo.figuefit.test', 'PRESENCIAL', 'INDIVIDUAL', 'ACTIVA', 'Condición física', $planPresencial, $coachIds[1], null, $horarios[3] ?? null],
@@ -155,9 +156,15 @@ class DemoAdminSeeder extends Seeder
                     'asignado_en' => now()->subDays(30 - $idx),
                 ]);
 
-                $solCodigo = 'SOL-DEMO-'.str_pad((string) ($idx + 1), 3, '0', STR_PAD_LEFT);
+                $solCodigo = SolicitudCompra::generarCodigo($modalidad, $nombres, $apellidos);
                 $precio = (float) ($planes[$idPlan]->precio ?? 89000);
                 $estadoSol = in_array($estado, ['ACTIVO', 'ACTIVA'], true) ? 'VALIDADA' : ($estado === 'PENDIENTE_PAGO' ? 'PENDIENTE' : 'RECHAZADA');
+
+                $fechaRev = $estadoSol !== 'PENDIENTE' ? now()->subDays(34 - $idx) : null;
+                $pasarelas = ['BOLD', 'EPAYCO', 'MERCADOPAGO'];
+                $metodosPago = ['TARJETA', 'PSE', 'TARJETA'];
+                $pasarela = $pasarelas[$idx % 3];
+                $metodoPago = $metodosPago[$idx % 3];
 
                 $sid = DB::table('solicitudes_compra')->insertGetId([
                     'codigo_solicitud' => $solCodigo,
@@ -165,7 +172,7 @@ class DemoAdminSeeder extends Seeder
                     'id_user' => $uid,
                     'id_cliente' => $cid,
                     'id_institucion' => $idInst,
-                    'origen' => $idx % 3 === 0 ? 'PASARELA' : 'COMPROBANTE',
+                    'origen' => 'PASARELA',
                     'modalidad' => $modalidad,
                     'tipo_cliente' => $tipo,
                     'nombres' => $nombres,
@@ -185,11 +192,15 @@ class DemoAdminSeeder extends Seeder
                     'reserva_cupo' => 1,
                     'observacion_admin' => $estadoSol === 'VALIDADA' ? 'Aprobado demo' : null,
                     'revisado_por' => $estadoSol !== 'PENDIENTE' ? $adminId : null,
-                    'revisada_en' => $estadoSol !== 'PENDIENTE' ? now()->subDays(34 - $idx) : null,
+                    'revisada_en' => $fechaRev,
+                    'fecha_revision' => $fechaRev,
                     'creado_en' => now()->subDays(38 - $idx),
                 ]);
 
-                $pagoEstado = $estadoSol === 'VALIDADA' ? 'VALIDADO' : ($estadoSol === 'PENDIENTE' ? 'PENDIENTE' : 'RECHAZADO');
+                // Cola de revisión: pago ya confirmado por pasarela (VALIDADO); RECHAZADA => RECHAZADO
+                $pagoEstado = $estadoSol === 'RECHAZADA' ? 'RECHAZADO' : 'VALIDADO';
+                $fechaPago = now()->subDays(36 - $idx);
+                $duracionPlan = (int) ($planes[$idPlan]->duracion_dias ?? 30);
                 $pid = DB::table('pagos')->insertGetId([
                     'id_solicitud' => $sid,
                     'id_cliente' => $cid,
@@ -198,16 +209,17 @@ class DemoAdminSeeder extends Seeder
                     'origen_pago' => 'SOLICITUD_PLAN',
                     'monto' => $precio - ($idx === 0 ? 10000 : 0),
                     'moneda' => 'COP',
-                    'metodo' => $idx % 3 === 0 ? 'PASARELA' : 'TRANSFERENCIA',
-                    'metodo_pago' => $idx % 3 === 0 ? 'PASARELA' : 'TRANSFERENCIA',
-                    'pasarela' => $idx % 3 === 0 ? 'BOLD' : 'NINGUNA',
+                    'metodo' => $metodoPago,
+                    'metodo_pago' => $metodoPago,
+                    'pasarela' => $pasarela,
                     'referencia' => 'REF-DEMO-'.($idx + 1),
                     'referencia_pago' => 'PAY-DEMO-'.($idx + 1),
+                    'comprobante_url' => null,
                     'estado_pago' => $pagoEstado,
-                    'fecha_pago' => now()->subDays(36 - $idx),
+                    'fecha_pago' => $fechaPago,
                     'fecha_validacion' => $pagoEstado === 'VALIDADO' ? now()->subDays(34 - $idx) : null,
                     'validado_por' => $pagoEstado === 'VALIDADO' ? $adminId : null,
-                    'creado_en' => now()->subDays(min(25, 36 - $idx)),
+                    'creado_en' => $fechaPago,
                 ]);
 
                 if ($pagoEstado === 'VALIDADO') {
@@ -216,11 +228,11 @@ class DemoAdminSeeder extends Seeder
                         'id_plan' => $idPlan,
                         'id_solicitud' => $sid,
                         'id_pago' => $pid,
-                        'fecha_inicio' => now()->subDays(30)->toDateString(),
-                        'fecha_fin' => now()->addDays(30)->toDateString(),
+                        'fecha_inicio' => $fechaPago->toDateString(),
+                        'fecha_fin' => $fechaPago->copy()->addDays($duracionPlan)->toDateString(),
                         'estado' => 'ACTIVO',
                         'estado_plan_cliente' => 'ACTIVO',
-                        'creado_en' => now()->subDays(30),
+                        'creado_en' => $fechaPago,
                     ]);
                     $planClienteIds[$cid] = $pcid;
                     DB::table('pagos')->where('id_pago', $pid)->update(['id_plan_cliente' => $pcid]);
@@ -236,9 +248,9 @@ class DemoAdminSeeder extends Seeder
                             'id_plan_cliente' => $pcid,
                             'estado' => 'ACTIVO',
                             'estado_acceso' => 'ACTIVO',
-                            'fecha_inicio' => now()->subDays(30)->toDateString(),
-                            'fecha_fin' => now()->addDays(30)->toDateString(),
-                            'creado_en' => now()->subDays(30),
+                            'fecha_inicio' => $fechaPago->toDateString(),
+                            'fecha_fin' => $fechaPago->copy()->addDays($duracionPlan)->toDateString(),
+                            'creado_en' => $fechaPago,
                         ]);
                     }
                     if ($modalidad === 'VIRTUAL' && isset($modulos['CONTENIDO_VIRTUAL'])) {
@@ -248,9 +260,9 @@ class DemoAdminSeeder extends Seeder
                             'id_plan_cliente' => $pcid,
                             'estado' => 'ACTIVO',
                             'estado_acceso' => 'ACTIVO',
-                            'fecha_inicio' => now()->subDays(30)->toDateString(),
-                            'fecha_fin' => now()->addDays(30)->toDateString(),
-                            'creado_en' => now()->subDays(30),
+                            'fecha_inicio' => $fechaPago->toDateString(),
+                            'fecha_fin' => $fechaPago->copy()->addDays($duracionPlan)->toDateString(),
+                            'creado_en' => $fechaPago,
                         ]);
                     }
                     if ($modalidad === 'PRESENCIAL' && isset($modulos['TIENDA'])) {
@@ -260,24 +272,26 @@ class DemoAdminSeeder extends Seeder
                             'id_plan_cliente' => $pcid,
                             'estado' => 'ACTIVO',
                             'estado_acceso' => 'ACTIVO',
-                            'fecha_inicio' => now()->subDays(30)->toDateString(),
-                            'fecha_fin' => now()->addDays(30)->toDateString(),
-                            'creado_en' => now()->subDays(30),
+                            'fecha_inicio' => $fechaPago->toDateString(),
+                            'fecha_fin' => $fechaPago->copy()->addDays($duracionPlan)->toDateString(),
+                            'creado_en' => $fechaPago,
                         ]);
                     }
                 }
             }
 
-            // Solicitudes pendientes extra (sin cliente aún)
+            // Solo novedades que requieren validación admin (no el flujo normal de pago)
             foreach ([
-                ['Luisa', 'Hernández', 'luisa.h@demo.figuefit.test', $planVirtual, 'VIRTUAL'],
-                ['Mateo', 'Silva', 'mateo.s@demo.figuefit.test', $planPresencial, 'PRESENCIAL'],
-            ] as $i => [$n, $a, $c, $p, $m]) {
+                [
+                    'Mateo', 'Silva', 'mateo.s@demo.figuefit.test', $planPresencial, 'PRESENCIAL', 'EPAYCO', 'PSE',
+                    'Novedad: pago reportado por pasarela pero no reflejado en conciliación. Requiere validación admin.',
+                ],
+            ] as $i => [$n, $a, $c, $p, $m, $pasarelaExtra, $metodoExtra, $motivoNovedad]) {
                 $precio = (float) ($planes[$p]->precio ?? 89000);
-                DB::table('solicitudes_compra')->insert([
-                    'codigo_solicitud' => 'SOL-DEMO-P'.($i + 1),
+                $sidExtra = DB::table('solicitudes_compra')->insertGetId([
+                    'codigo_solicitud' => SolicitudCompra::generarCodigo($m, $n, $a),
                     'id_plan' => $p,
-                    'origen' => 'COMPROBANTE',
+                    'origen' => 'PASARELA',
                     'modalidad' => $m,
                     'tipo_cliente' => 'INDIVIDUAL',
                     'nombres' => $n,
@@ -295,7 +309,35 @@ class DemoAdminSeeder extends Seeder
                     'fecha_aceptacion_terminos' => now()->subHours(6 + $i),
                     'estado_solicitud' => 'PENDIENTE',
                     'reserva_cupo' => 1,
+                    'observacion_admin' => $motivoNovedad,
+                    'datos_extra_json' => json_encode([
+                        'tipo' => 'NOVEDAD',
+                        'motivo' => 'PAGO_NO_REFLEJADO',
+                        'requiere_validacion_admin' => true,
+                    ]),
+                    'fecha_revision' => null,
+                    'revisada_en' => null,
                     'creado_en' => now()->subHours(6 + $i),
+                ]);
+
+                DB::table('pagos')->insert([
+                    'id_solicitud' => $sidExtra,
+                    'id_plan' => $p,
+                    'tipo_pago' => 'PLAN',
+                    'origen_pago' => 'SOLICITUD_PLAN',
+                    'monto' => $precio,
+                    'moneda' => 'COP',
+                    'metodo' => $metodoExtra,
+                    'metodo_pago' => $metodoExtra,
+                    'pasarela' => $pasarelaExtra,
+                    'referencia' => 'REF-NOV-'.($i + 1),
+                    'referencia_pago' => 'PAY-NOV-'.($i + 1),
+                    'comprobante_url' => null,
+                    'estado_pago' => 'VALIDADO',
+                    'fecha_pago' => now()->subHours(5 + $i),
+                    'fecha_validacion' => now()->subHours(5 + $i),
+                    'observacion_admin' => $motivoNovedad,
+                    'creado_en' => now()->subHours(5 + $i),
                 ]);
             }
 
@@ -417,22 +459,35 @@ class DemoAdminSeeder extends Seeder
                 ]);
             }
 
-            // Sesiones
-            for ($d = 0; $d < 10; $d++) {
-                DB::table('sesiones')->insert([
-                    'id_coach' => $coachIds[$d % count($coachIds)],
-                    'tipo' => $d % 2 ? 'GRUPAL' : 'INDIVIDUAL',
-                    'titulo' => $d % 2 ? 'Sesión grupal funcional' : 'Seguimiento 1:1',
-                    'fecha' => now()->addDays($d)->toDateString(),
+            // Sesiones (2 coherentes FigueFit)
+            DB::table('sesiones')->insert([
+                [
+                    'id_coach' => $coachIds[0],
+                    'tipo' => 'GRUPAL',
+                    'titulo' => 'Clase funcional FigueFit',
+                    'fecha' => now()->addDays(2)->toDateString(),
                     'hora_inicio' => '07:00:00',
                     'hora_fin' => '08:00:00',
-                    'modalidad' => $d % 3 ? 'PRESENCIAL' : 'VIRTUAL',
-                    'cupo_maximo' => $d % 2 ? 12 : 1,
-                    'cupo_reservado' => $d % 2 ? 6 : 1,
+                    'modalidad' => 'PRESENCIAL',
+                    'cupo_maximo' => 12,
+                    'cupo_reservado' => 4,
                     'estado' => 'PROGRAMADA',
                     'creado_en' => $now,
-                ]);
-            }
+                ],
+                [
+                    'id_coach' => $coachIds[1 % count($coachIds)],
+                    'tipo' => 'INDIVIDUAL',
+                    'titulo' => 'Seguimiento 1:1 nutrición',
+                    'fecha' => now()->addDays(5)->toDateString(),
+                    'hora_inicio' => '16:00:00',
+                    'hora_fin' => '16:45:00',
+                    'modalidad' => 'VIRTUAL',
+                    'cupo_maximo' => 1,
+                    'cupo_reservado' => 1,
+                    'estado' => 'PROGRAMADA',
+                    'creado_en' => $now,
+                ],
+            ]);
 
             // Comunidad / chats
             $chatId = DB::table('chats')->insertGetId([
@@ -491,24 +546,51 @@ class DemoAdminSeeder extends Seeder
 
             // Pagos del mes adicionales para KPI
             foreach ([89000, 159000, 249000, 65000] as $i => $monto) {
-                DB::table('pagos')->insert([
+                $fechaPagoMes = now()->subDays($i + 1);
+                $duracion = (int) ($planes[$planVirtual]->duracion_dias ?? 30);
+                $pidMes = DB::table('pagos')->insertGetId([
                     'id_cliente' => $clienteIds[$i] ?? $clienteIds[0],
                     'id_plan' => $planVirtual,
                     'tipo_pago' => 'PLAN',
                     'origen_pago' => 'SOLICITUD_PLAN',
                     'monto' => $monto,
                     'moneda' => 'COP',
-                    'metodo_pago' => 'PASARELA',
+                    'metodo' => $i % 2 === 0 ? 'TARJETA' : 'PSE',
+                    'metodo_pago' => $i % 2 === 0 ? 'TARJETA' : 'PSE',
                     'pasarela' => 'EPAYCO',
+                    'referencia' => 'REF-MES-'.($i + 1),
                     'referencia_pago' => 'PAY-MES-'.($i + 1),
+                    'comprobante_url' => null,
                     'estado_pago' => 'VALIDADO',
-                    'fecha_pago' => now()->subDays($i + 1),
+                    'fecha_pago' => $fechaPagoMes,
                     'fecha_validacion' => now()->subDays($i),
                     'validado_por' => $adminId ?: null,
-                    'creado_en' => now()->subDays($i + 1),
+                    'creado_en' => $fechaPagoMes,
                 ]);
+
+                $pcidMes = DB::table('planes_cliente')->insertGetId([
+                    'id_cliente' => $clienteIds[$i] ?? $clienteIds[0],
+                    'id_plan' => $planVirtual,
+                    'id_pago' => $pidMes,
+                    'fecha_inicio' => $fechaPagoMes->toDateString(),
+                    'fecha_fin' => $fechaPagoMes->copy()->addDays($duracion)->toDateString(),
+                    'estado' => 'ACTIVO',
+                    'estado_plan_cliente' => 'ACTIVO',
+                    'creado_en' => $fechaPagoMes,
+                ]);
+                DB::table('pagos')->where('id_pago', $pidMes)->update(['id_plan_cliente' => $pcidMes]);
             }
         });
+
+        $svc = app(\App\Services\ComprobantePasarelaService::class);
+        \App\Models\Pago::query()
+            ->with('solicitud')
+            ->whereNotNull('pasarela')
+            ->whereNotIn('pasarela', ['NINGUNA', 'PENDIENTE', ''])
+            ->orderBy('id_pago')
+            ->each(function (\App\Models\Pago $pago) use ($svc) {
+                $svc->asegurar($pago, $pago->solicitud, (string) $pago->pasarela);
+            });
 
         $this->command?->info('Demo Admin cargado. Password usuarios demo: demo12345');
     }

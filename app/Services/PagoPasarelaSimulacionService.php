@@ -11,6 +11,8 @@ use RuntimeException;
 
 class PagoPasarelaSimulacionService
 {
+    public function __construct(private ComprobantePasarelaService $comprobantes) {}
+
     public const CADENA = ['BOLD', 'EPAYCO', 'MERCADOPAGO'];
 
     public function cobrar(Pago $pago, SolicitudCompra $solicitud, array $input): string
@@ -74,7 +76,11 @@ class PagoPasarelaSimulacionService
                 'metodo' => $metodo,
                 'metodo_pago' => $metodo,
                 'pasarela' => $codigo,
+                'estado_pago' => 'VALIDADO',
+                'fecha_validacion' => now(),
             ]);
+
+            $this->comprobantes->asegurar($pago->fresh(), $solicitud, $codigo);
 
             $extra = is_array($solicitud->datos_extra_json) ? $solicitud->datos_extra_json : [];
             $extra['pago_simulado'] = [
