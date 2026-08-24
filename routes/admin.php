@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AsistenteController;
 use App\Http\Controllers\Admin\CalendarioController;
 use App\Http\Controllers\Admin\ClienteController;
 use App\Http\Controllers\Admin\CoachController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\Admin\InstitucionController;
 use App\Http\Controllers\Admin\PagoController;
 use App\Http\Controllers\Admin\PasarelaController;
 use App\Http\Controllers\Admin\PlanController;
+use App\Http\Controllers\Admin\PropuestaPlanController;
 use App\Http\Controllers\Admin\ReporteController;
 use App\Http\Controllers\Admin\SolicitudController;
 use App\Http\Controllers\Admin\TiendaController;
@@ -37,6 +39,14 @@ Route::middleware(['auth', 'role:ADMIN'])->prefix('admin')->name('admin.')->grou
     Route::get('/planes/{plan}/editar', [PlanController::class, 'edit'])->name('planes.edit');
     Route::put('/planes/{plan}', [PlanController::class, 'update'])->name('planes.update');
 
+    Route::get('/propuestas', [PropuestaPlanController::class, 'index'])->name('propuestas.index');
+    Route::get('/propuestas/{propuesta}', [PropuestaPlanController::class, 'show'])->name('propuestas.show');
+    Route::get('/propuestas/{propuesta}/publicar', [PropuestaPlanController::class, 'publicarForm'])->name('propuestas.publicar.form');
+    Route::post('/propuestas/{propuesta}/publicar', [PropuestaPlanController::class, 'publicar'])->name('propuestas.publicar');
+    Route::post('/propuestas/{propuesta}/rechazar', [PropuestaPlanController::class, 'rechazar'])->name('propuestas.rechazar');
+
+    Route::redirect('/novedades', '/staff/novedades')->name('novedades.index');
+
     Route::get('/cupones', [CuponController::class, 'index'])->name('cupones.index');
     Route::post('/cupones', [CuponController::class, 'store'])->name('cupones.store');
     Route::put('/cupones/{id}', [CuponController::class, 'update'])->name('cupones.update');
@@ -48,14 +58,19 @@ Route::middleware(['auth', 'role:ADMIN'])->prefix('admin')->name('admin.')->grou
     Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
     Route::get('/clientes/virtuales', [ClienteController::class, 'virtuales'])->name('clientes.virtuales');
     Route::get('/clientes/presenciales', [ClienteController::class, 'presenciales'])->name('clientes.presenciales');
+    Route::get('/clientes/{id}/edit', [ClienteController::class, 'edit'])->name('clientes.edit');
     Route::get('/clientes/{id}', [ClienteController::class, 'show'])->name('clientes.show');
     Route::put('/clientes/{id}', [ClienteController::class, 'update'])->name('clientes.update');
+    Route::put('/clientes/{id}/completo', [ClienteController::class, 'updateCompleto'])->name('clientes.updateCompleto');
+    Route::delete('/clientes/{id}', [ClienteController::class, 'destroy'])->name('clientes.destroy');
     Route::post('/clientes/{id}/coach', [ClienteController::class, 'asignarCoach'])->name('clientes.coach');
     Route::put('/clientes/{id}/accesos/{accesoId}', [ClienteController::class, 'updateAcceso'])->name('clientes.acceso');
 
     Route::get('/coaches', [CoachController::class, 'index'])->name('coaches.index');
     Route::post('/coaches', [CoachController::class, 'store'])->name('coaches.store');
     Route::put('/coaches/{id}', [CoachController::class, 'update'])->name('coaches.update');
+
+    Route::get('/asistentes', [AsistenteController::class, 'index'])->name('asistentes.index');
 
     Route::get('/instituciones', [InstitucionController::class, 'index'])->name('instituciones.index');
     Route::post('/instituciones', [InstitucionController::class, 'store'])->name('instituciones.store');

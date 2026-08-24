@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PlanNutricional extends Model
 {
@@ -27,6 +28,7 @@ class PlanNutricional extends Model
         'id_cliente',
         'id_coach',
         'id_plan_cliente',
+        'id_propuesta',
         'nombre',
         'objetivo',
         'kcal_objetivo',
@@ -34,14 +36,21 @@ class PlanNutricional extends Model
         'carbohidratos_g',
         'grasas_g',
         'recomendaciones',
-        'estado'
+        'estado',
     ];
+
     public function coach(): BelongsTo
     {
         return $this->belongsTo(Coach::class, 'id_coach', 'id_coach');
     }
+
     public function cliente(): BelongsTo
     {
         return $this->belongsTo(Cliente::class, 'id_cliente', 'id_cliente');
+    }
+
+    public function comidas(): HasMany
+    {
+        return $this->hasMany(Comida::class, 'id_plan_nutricional', 'id_plan_nutricional')->orderBy('orden');
     }
 }

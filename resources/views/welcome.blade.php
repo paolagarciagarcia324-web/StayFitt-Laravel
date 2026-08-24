@@ -16,9 +16,47 @@
         </span>
 
         <div class="ff-actions">
+            @if (($novedades ?? collect())->isNotEmpty())
+                <button type="button" class="ff-news-trigger" data-news-open aria-haspopup="dialog" aria-controls="ff-news-panel">
+                    <span class="ff-news-trigger-pulse" aria-hidden="true"></span>
+                    <span class="ff-news-trigger-label">Novedades</span>
+                    <span class="ff-news-trigger-badge">{{ $novedades->count() }}</span>
+                </button>
+            @endif
             @include('partials.ff-cta', ['href' => route('login'), 'label' => 'INICIAR SESIÓN', 'icon' => 'login', 'class' => 'ff-btn ff-btn-quiet'])
         </div>
     </header>
+
+    @if (($novedades ?? collect())->isNotEmpty())
+        <div class="ff-news-overlay" data-news-overlay hidden></div>
+        <aside class="ff-news-panel" id="ff-news-panel" data-news-panel hidden role="dialog" aria-modal="true" aria-label="Novedades FigueFit">
+            <div class="ff-news-panel-head">
+                <div>
+                    <p class="ff-news-kicker">Lo nuevo en FigueFit</p>
+                    <h2>Novedades</h2>
+                </div>
+                <button type="button" class="ff-news-close" data-news-close aria-label="Cerrar">×</button>
+            </div>
+            <div class="ff-news-track">
+                @foreach ($novedades as $novedad)
+                    <article class="ff-news-card">
+                        <div class="ff-news-card-media" style="background-image: url('{{ $novedad->imagenSrc() }}')"></div>
+                        <div class="ff-news-card-body">
+                            <span class="ff-news-type">{{ $novedad->etiquetaTipo() }}</span>
+                            <h3>{{ $novedad->titulo }}</h3>
+                            @if ($novedad->subtitulo)
+                                <p class="ff-news-sub">{{ $novedad->subtitulo }}</p>
+                            @endif
+                            @if ($novedad->descripcion)
+                                <p>{{ $novedad->descripcion }}</p>
+                            @endif
+                            <a class="ff-news-cta" href="{{ $novedad->destinoUrl() }}">{{ $novedad->boton_texto }}</a>
+                        </div>
+                    </article>
+                @endforeach
+            </div>
+        </aside>
+    @endif
 
     <main>
         <section id="inicio" class="ff-hero" data-section>
@@ -266,5 +304,35 @@
     </a>
 
     <script src="{{ asset('js/welcome.js') }}"></script>
+    <script>
+        (function () {
+            var openBtn = document.querySelector('[data-news-open]');
+            var panel = document.querySelector('[data-news-panel]');
+            var overlay = document.querySelector('[data-news-overlay]');
+            if (!openBtn || !panel) return;
+
+            function openNews() {
+                panel.hidden = false;
+                if (overlay) overlay.hidden = false;
+                document.body.classList.add('ff-news-open');
+                openBtn.setAttribute('aria-expanded', 'true');
+            }
+            function closeNews() {
+                panel.hidden = true;
+                if (overlay) overlay.hidden = true;
+                document.body.classList.remove('ff-news-open');
+                openBtn.setAttribute('aria-expanded', 'false');
+            }
+
+            openBtn.addEventListener('click', openNews);
+            document.querySelectorAll('[data-news-close]').forEach(function (btn) {
+                btn.addEventListener('click', closeNews);
+            });
+            if (overlay) overlay.addEventListener('click', closeNews);
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') closeNews();
+            });
+        })();
+    </script>
 </body>
 </html>

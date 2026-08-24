@@ -47,7 +47,16 @@ class InstitucionController extends Controller
             ->limit(50)
             ->get();
 
-        return view('admin.instituciones.index', compact('instituciones', 'q', 'planes', 'clientesSinInst'));
+        $kpis = [
+            'total' => $instituciones->count(),
+            'activas' => $instituciones->where('estado', 'ACTIVA')->count(),
+            'cupos_usados' => (int) $instituciones->sum('cupos_usados'),
+            'cupos_totales' => (int) $instituciones->sum('cupos_totales'),
+            'enlaces' => $instituciones->sum(fn ($i) => $i->enlaces->count()),
+            'miembros' => $instituciones->sum(fn ($i) => $i->clientes->count()),
+        ];
+
+        return view('admin.instituciones.index', compact('instituciones', 'q', 'planes', 'clientesSinInst', 'kpis'));
     }
 
     public function store(Request $request): RedirectResponse

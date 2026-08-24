@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminUsuarioPresencialRequest;
+use App\Http\Requests\AdminUsuarioUpdateRequest;
+use App\Models\AccesoClienteModulo;
+use App\Models\Cliente;
 use App\Models\HorarioPresencial;
 use App\Models\Pago;
 use App\Models\Plan;
@@ -38,6 +41,7 @@ class UsuarioController extends Controller
                 $query->where(function ($inner) use ($q) {
                     $inner->where('nombres', 'like', "%{$q}%")
                         ->orWhere('apellidos', 'like', "%{$q}%")
+                        ->orWhere('documento_identidad', 'like', "%{$q}%")
                         ->orWhereRaw("CONCAT(nombres, ' ', apellidos) LIKE ?", ["%{$q}%"]);
                 });
             })
@@ -45,11 +49,10 @@ class UsuarioController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        $horarios = HorarioPresencial::activos()->get();
-        $plan = $this->planPresencial();
         $roles = Rol::query()->orderBy('id_rol')->get();
+        $kpis = $this->buildPersonasKpis();
 
-        return view('admin.usuarios.index', compact('usuarios', 'horarios', 'plan', 'q', 'roles'));
+        return view('admin.usuarios.index', compact('usuarios', 'q', 'roles', 'kpis'));
     }
 
     public function store(AdminUsuarioPresencialRequest $request): RedirectResponse
@@ -156,33 +159,98 @@ class UsuarioController extends Controller
         });
 
         return redirect()
-            ->route('admin.usuarios.index')
-            ->with('success', 'Usuario presencial creado. Acceso inicial: correo + documento.');
+            ->route('admin.clientes.presenciales')
+            ->with('cliente_ok', ['accion' => 'creado']);
     }
 
-    public function update(Request $request, int $id): RedirectResponse
+    public function update(AdminUsuarioUpdateRequest $request, int $id): RedirectResponse
     {
-        $usuario = User::query()->findOrFail($id);
-
-        $data = $request->validate([
-            'estado' => ['required', 'in:PENDIENTE,ACTIVO,INACTIVO,BLOQUEADO'],
-            'roles' => ['nullable', 'array'],
-            'roles.*' => ['integer', 'exists:roles,id_rol'],
-            'foto_perfil_url' => ['nullable', 'string', 'max:500'],
-            'foto' => ['nullable', 'image', 'max:4096'],
-        ]);
+        $usuario = User::query()->with('cliente')->findOrFail($id);
+        $data = $request->validated();
 
         $usuario->update([
+            'nombres' => $data['nombres'],
+            'apellidos' => $data['apellidos'],
+            'Tipo_documento' => $data['tipo_documento'],
+            'documento_identidad' => $data['documento_identidad'],
+            'correo' => $data['correo'],
+            'email' => $data['correo'],
+            'telefono' => $data['telefono'],
             'estado' => $data['estado'],
             'estado_cuenta' => $data['estado'],
             'foto_perfil_url' => $this->resolveMedia($request, 'foto', 'avatars', 'foto_perfil_url', $usuario->foto_perfil_url),
         ]);
 
-        if ($request->has('roles')) {
-            $usuario->roles()->sync($data['roles'] ?? []);
+        if ($usuario->cliente) {
+            $usuario->cliente->update([
+                'tipo_documento' => $data['tipo_documento'],
+                'documento' => $data['documento_identidad'],
+                'genero' => $data['genero'],
+                'ciudad' => $data['ciudad'],
+                'fecha_nacimiento' => $data['fecha_nacimiento'],
+                'objetivo_principal' => $data['objetivo_principal'],
+            ]);
         }
 
-        return back()->with('success', 'Usuario actualizado.');
+        $usuario->roles()->sync($data['roles'] ?? []);
+        $usuario->load('roles', 'cliente');
+
+        $this->revokeClienteIfNeeded($usuario);
+
+        return back()->with('usuario_ok', ['accion' => 'actualizado']);
+    }
+
+    private function buildPersonasKpis(): array
+    {
+        $sinAdmin = function ($query) {
+            $query->where('codigo', 'ADMIN')->orWhere('codigo_rol', 'ADMIN');
+        };
+
+        $conRolCliente = function ($query) {
+            $query->whereIn('codigo', ['CLIENTE', 'CLIENTE_INSTITUCIONAL'])
+                ->orWhereIn('codigo_rol', ['CLIENTE', 'CLIENTE_INSTITUCIONAL']);
+        };
+
+        return [
+            'total' => User::query()
+                ->whereHas('cliente')
+                ->whereDoesntHave('roles', $sinAdmin)
+                ->count(),
+            'virtuales' => Cliente::query()
+                ->where('modalidad', 'VIRTUAL')
+                ->whereHas('usuario.roles', $conRolCliente)
+                ->count(),
+            'presenciales' => Cliente::query()
+                ->where('modalidad', 'PRESENCIAL')
+                ->whereHas('usuario.roles', $conRolCliente)
+                ->count(),
+            'coaches' => User::query()
+                ->whereHas('roles', fn ($q) => $q->where('codigo', 'COACH')->orWhere('codigo_rol', 'COACH'))
+                ->count(),
+            'asistentes' => User::query()
+                ->whereHas('roles', fn ($q) => $q->where('codigo', 'ASISTENTE_TECNICO')->orWhere('codigo_rol', 'ASISTENTE_TECNICO'))
+                ->count(),
+        ];
+    }
+
+    private function revokeClienteIfNeeded(User $usuario): void
+    {
+        $esCliente = $usuario->roles->contains(function ($rol) {
+            $codigo = strtoupper((string) ($rol->codigo ?: $rol->codigo_rol));
+
+            return in_array($codigo, ['CLIENTE', 'CLIENTE_INSTITUCIONAL'], true);
+        });
+
+        if ($esCliente || ! $usuario->cliente) {
+            return;
+        }
+
+        $cliente = $usuario->cliente;
+        $cliente->update(['estado_cliente' => 'INACTIVO']);
+
+        AccesoClienteModulo::query()
+            ->where('id_cliente', $cliente->id_cliente)
+            ->update(['estado_acceso' => 'SUSPENDIDO']);
     }
 
     private function planPresencial(): ?Plan

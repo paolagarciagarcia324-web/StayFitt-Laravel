@@ -18,6 +18,7 @@ return new class extends Migration
         DB::table('roles')->insert([
             ['codigo' => 'ADMIN', 'codigo_rol' => 'ADMIN', 'nombre' => 'Administrador', 'descripcion' => 'Gestión total del sistema StayFit', 'estado' => 'ACTIVO'],
             ['codigo' => 'COACH', 'codigo_rol' => 'COACH', 'nombre' => 'Coach', 'descripcion' => 'Acompañamiento de clientes asignados', 'estado' => 'ACTIVO'],
+            ['codigo' => 'ASISTENTE_TECNICO', 'codigo_rol' => 'ASISTENTE_TECNICO', 'nombre' => 'Asistente Técnico de Coach', 'descripcion' => 'Apoyo operativo al coach: rutinas, videos, propuestas y novedades welcome', 'estado' => 'ACTIVO'],
             ['codigo' => 'CLIENTE', 'codigo_rol' => 'CLIENTE', 'nombre' => 'Cliente Individual', 'descripcion' => 'Cliente Virtual o Presencial', 'estado' => 'ACTIVO'],
             ['codigo' => 'CLIENTE_INSTITUCIONAL', 'codigo_rol' => 'CLIENTE_INSTITUCIONAL', 'nombre' => 'Cliente Institucional', 'descripcion' => 'Cliente vinculado a institución', 'estado' => 'ACTIVO'],
         ]);

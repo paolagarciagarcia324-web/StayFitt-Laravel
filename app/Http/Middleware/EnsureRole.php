@@ -19,7 +19,14 @@ class EnsureRole
             return redirect()->route('login');
         }
 
-        foreach ($roles as $rol) {
+        $allowed = collect($roles)
+            ->flatMap(fn (string $rol) => preg_split('/[|,]/', $rol) ?: [])
+            ->map(fn (string $rol) => strtoupper(trim($rol)))
+            ->filter()
+            ->unique()
+            ->values();
+
+        foreach ($allowed as $rol) {
             if ($user->tieneRol($rol)) {
                 return $next($request);
             }

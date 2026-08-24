@@ -38,12 +38,15 @@
                 $pend = (int) ($navSolicitudesPendientes ?? 0);
                 $pendLatest = $navSolicitudesLatestAt ?? null;
                 $opOpen = request()->routeIs('admin.solicitudes.*', 'admin.pagos.*', 'admin.horarios.*', 'admin.eventos.*', 'admin.calendario.*');
-                $perOpen = request()->routeIs('admin.usuarios.*', 'admin.clientes.*', 'admin.instituciones.*', 'admin.coaches.*');
+                $perOpen = request()->routeIs('admin.usuarios.*', 'admin.clientes.*', 'admin.instituciones.*', 'admin.coaches.*', 'admin.asistentes.*');
                 $cliOpen = request()->routeIs('admin.clientes.*');
-                $comOpen = request()->routeIs('admin.planes.*', 'admin.cupones.*', 'admin.tienda.*', 'admin.pasarelas.*');
+                $comOpen = request()->routeIs('admin.planes.*', 'admin.propuestas.*', 'admin.cupones.*', 'admin.tienda.*', 'admin.pasarelas.*', 'admin.novedades.*', 'staff.novedades.*');
                 $comuOpen = request()->routeIs('admin.whatsapp.*', 'admin.comunidad.*');
                 $anOpen = request()->routeIs('admin.estadisticas.*', 'admin.reportes.*');
                 $onSolicitudes = request()->routeIs('admin.solicitudes.*');
+                $navPropuestasPendientes = (int) (\App\Models\PropuestaPlan::query()
+                    ->where('estado', \App\Models\PropuestaPlan::ESTADO_PENDIENTE_REVISION)
+                    ->count());
             @endphp
 
             <a href="{{ route('admin.dashboard') }}" class="ad-nav-link {{ request()->routeIs('admin.dashboard') ? 'is-active' : '' }}">
@@ -131,6 +134,10 @@
                         <span class="ad-nav-dot"></span>
                         Coaches
                     </a>
+                    <a href="{{ route('admin.asistentes.index') }}" class="ad-nav-link {{ request()->routeIs('admin.asistentes.*') ? 'is-active' : '' }}">
+                        <span class="ad-nav-dot"></span>
+                        Asistentes
+                    </a>
                 </div>
             </details>
 
@@ -144,6 +151,17 @@
                     <a href="{{ route('admin.planes.index') }}" class="ad-nav-link {{ request()->routeIs('admin.planes.*') ? 'is-active' : '' }}">
                         <span class="ad-nav-dot"></span>
                         Planes
+                    </a>
+                    <a href="{{ route('admin.propuestas.index') }}" class="ad-nav-link {{ request()->routeIs('admin.propuestas.*') ? 'is-active' : '' }}">
+                        <span class="ad-nav-dot"></span>
+                        Propuestas
+                        @if ($navPropuestasPendientes > 0)
+                            <span class="ad-nav-badge">{{ $navPropuestasPendientes }}</span>
+                        @endif
+                    </a>
+                    <a href="{{ route('staff.novedades.index') }}" class="ad-nav-link {{ request()->routeIs('staff.novedades.*', 'admin.novedades.*') ? 'is-active' : '' }}">
+                        <span class="ad-nav-dot"></span>
+                        Novedades
                     </a>
                     <a href="{{ route('admin.cupones.index') }}" class="ad-nav-link {{ request()->routeIs('admin.cupones.*') ? 'is-active' : '' }}">
                         <span class="ad-nav-dot"></span>
@@ -235,6 +253,10 @@
             @else
                 @if (session('success'))
                     <div class="ad-alert">{{ session('success') }}</div>
+                @endif
+
+                @if (session('error'))
+                    <div class="ad-alert ad-alert-error">{{ session('error') }}</div>
                 @endif
 
                 @if (isset($errors) && $errors->any())

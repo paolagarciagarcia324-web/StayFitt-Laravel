@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CategoriaVideo extends Model
 {
@@ -20,10 +21,16 @@ class CategoriaVideo extends Model
     protected $fillable = [
         'id_programa',
         'nombre',
-        'orden'
+        'orden',
     ];
+
     public function programa(): BelongsTo
     {
         return $this->belongsTo(ProgramaVirtual::class, 'id_programa', 'id_programa');
+    }
+
+    public function videos(): HasMany
+    {
+        return $this->hasMany(Video::class, 'id_categoria_video', 'id_categoria_video')->orderBy('dia_orden');
     }
 }

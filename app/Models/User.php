@@ -227,6 +227,11 @@ class User extends Authenticatable
         return $this->hasOne(Cliente::class, 'id_user', 'id_user');
     }
 
+    public function coach(): HasOne
+    {
+        return $this->hasOne(Coach::class, 'id_user', 'id_user');
+    }
+
     public function iniciales(): string
     {
         $n = mb_substr(trim((string) $this->nombres), 0, 1);

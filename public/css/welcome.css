@@ -1925,3 +1925,176 @@ body.ff-reg-page {
         grid-template-columns: 1fr;
     }
 }
+
+/* —— Novedades welcome (header + panel) —— */
+.ff-news-trigger {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 16px 0 14px;
+    border: 0;
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #120e16;
+    background: linear-gradient(120deg, #ff2d78 0%, #ff6aa3 48%, #2ef5e6 120%);
+    box-shadow: 0 10px 28px rgba(255, 45, 120, 0.35);
+    animation: ff-news-pop 2.4s ease-in-out infinite;
+}
+.ff-news-trigger-pulse {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #120e16;
+    box-shadow: 0 0 0 0 rgba(18, 14, 22, 0.45);
+    animation: ff-news-pulse 1.6s ease-out infinite;
+}
+.ff-news-trigger-badge {
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    background: rgba(18, 14, 22, 0.9);
+    color: #2ef5e6;
+    font-size: 11px;
+}
+@keyframes ff-news-pop {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
+}
+@keyframes ff-news-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(18, 14, 22, 0.5); }
+    100% { box-shadow: 0 0 0 10px rgba(18, 14, 22, 0); }
+}
+.ff-news-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    background: rgba(8, 6, 12, 0.62);
+    backdrop-filter: blur(4px);
+}
+.ff-news-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 70;
+    width: min(420px, 100vw);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(180deg, #24182c 0%, #17121c 100%);
+    border-left: 1px solid rgba(255,255,255,0.08);
+    box-shadow: -20px 0 50px rgba(0,0,0,0.45);
+    animation: ff-news-slide 0.28s ease;
+}
+@keyframes ff-news-slide {
+    from { transform: translateX(18px); opacity: 0.6; }
+    to { transform: translateX(0); opacity: 1; }
+}
+.ff-news-panel-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 28px 22px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.ff-news-kicker {
+    margin: 0 0 4px;
+    color: #2ef5e6;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+.ff-news-panel-head h2 {
+    margin: 0;
+    font-size: 24px;
+}
+.ff-news-close {
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    line-height: 1;
+}
+.ff-news-track {
+    overflow: auto;
+    padding: 16px 18px 32px;
+    display: grid;
+    gap: 16px;
+}
+.ff-news-card {
+    border-radius: 18px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+}
+.ff-news-card-media {
+    height: 168px;
+    background-size: cover;
+    background-position: center;
+}
+.ff-news-card-body {
+    padding: 16px;
+    display: grid;
+    gap: 8px;
+}
+.ff-news-type {
+    justify-self: start;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #120e16;
+    background: #2ef5e6;
+}
+.ff-news-card-body h3 {
+    margin: 0;
+    font-size: 18px;
+}
+.ff-news-sub {
+    margin: 0;
+    color: rgba(255,255,255,0.72);
+    font-weight: 600;
+}
+.ff-news-card-body p {
+    margin: 0;
+    color: rgba(255,255,255,0.68);
+    font-size: 14px;
+    line-height: 1.45;
+}
+.ff-news-cta {
+    margin-top: 6px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 42px;
+    padding: 0 16px;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #fff;
+    background: linear-gradient(120deg, #ff2d78, #ff4da6);
+}
+body.ff-news-open { overflow: hidden; }
+@media (max-width: 640px) {
+    .ff-news-trigger-label { display: none; }
+    .ff-news-panel { width: 100vw; }
+}

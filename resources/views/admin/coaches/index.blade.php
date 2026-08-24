@@ -1,7 +1,12 @@
 @extends('layouts.admin')
 
 @section('title', 'Coaches')
-@section('subtitle', 'Equipo de coaches')
+@section('subtitle')
+    <span class="ad-page-intro">
+        <span class="ad-page-intro-lead">Equipo de coaches</span>
+        <span class="ad-page-intro-note">Especialidad, clientes asignados y estado del coach.</span>
+    </span>
+@endsection
 
 @section('content')
     <section class="ad-card ad-users">

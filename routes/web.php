@@ -25,6 +25,14 @@ Route::get('/dashboard', function () {
         return redirect()->route('admin.dashboard');
     }
 
+    if ($user?->tieneRol('ASISTENTE_TECNICO')) {
+        return redirect()->route('staff.dashboard');
+    }
+
+    if ($user?->tieneRol('COACH')) {
+        return redirect()->route('coach.dashboard');
+    }
+
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
 
@@ -35,4 +43,6 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/admin.php';
+require __DIR__.'/coach.php';
+require __DIR__.'/staff.php';
 require __DIR__.'/auth.php';

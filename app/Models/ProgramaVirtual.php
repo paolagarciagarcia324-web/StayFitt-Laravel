@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ProgramaVirtual extends Model
 {
@@ -21,10 +22,17 @@ class ProgramaVirtual extends Model
         'nombre',
         'descripcion',
         'id_plan',
-        'estado'
+        'id_propuesta',
+        'estado',
     ];
+
     public function plan(): BelongsTo
     {
         return $this->belongsTo(Plan::class, 'id_plan', 'id_plan');
+    }
+
+    public function categorias(): HasMany
+    {
+        return $this->hasMany(CategoriaVideo::class, 'id_programa', 'id_programa')->orderBy('orden');
     }
 }
