@@ -38,6 +38,7 @@ Route::middleware(['auth', 'role:ADMIN'])->prefix('admin')->name('admin.')->grou
     Route::post('/planes', [PlanController::class, 'store'])->name('planes.store');
     Route::get('/planes/{plan}/editar', [PlanController::class, 'edit'])->name('planes.edit');
     Route::put('/planes/{plan}', [PlanController::class, 'update'])->name('planes.update');
+    Route::delete('/planes/{plan}', [PlanController::class, 'destroy'])->name('planes.destroy');
 
     Route::get('/propuestas', [PropuestaPlanController::class, 'index'])->name('propuestas.index');
     Route::get('/propuestas/{propuesta}', [PropuestaPlanController::class, 'show'])->name('propuestas.show');
@@ -71,12 +72,17 @@ Route::middleware(['auth', 'role:ADMIN'])->prefix('admin')->name('admin.')->grou
     Route::put('/coaches/{id}', [CoachController::class, 'update'])->name('coaches.update');
 
     Route::get('/asistentes', [AsistenteController::class, 'index'])->name('asistentes.index');
+    Route::post('/asistentes', [AsistenteController::class, 'store'])->name('asistentes.store');
+    Route::put('/asistentes/{id}', [AsistenteController::class, 'update'])->name('asistentes.update');
+    Route::delete('/asistentes/{id}', [AsistenteController::class, 'destroy'])->name('asistentes.destroy');
 
     Route::get('/instituciones', [InstitucionController::class, 'index'])->name('instituciones.index');
     Route::post('/instituciones', [InstitucionController::class, 'store'])->name('instituciones.store');
     Route::put('/instituciones/{id}', [InstitucionController::class, 'update'])->name('instituciones.update');
+    Route::delete('/instituciones/{id}', [InstitucionController::class, 'destroy'])->name('instituciones.destroy');
     Route::post('/instituciones/{id}/vincular', [InstitucionController::class, 'vincularCliente'])->name('instituciones.vincular');
     Route::post('/instituciones/{id}/enlaces', [InstitucionController::class, 'storeEnlace'])->name('instituciones.enlaces');
+    Route::delete('/instituciones/{id}/enlaces/{enlaceId}', [InstitucionController::class, 'destroyEnlace'])->name('instituciones.enlaces.destroy');
 
     Route::get('/horarios', [HorarioPresencialController::class, 'index'])->name('horarios.index');
     Route::post('/horarios', [HorarioPresencialController::class, 'store'])->name('horarios.store');

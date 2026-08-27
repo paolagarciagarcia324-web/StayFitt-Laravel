@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ModuloServicio;
 use App\Models\Plan;
+use App\Models\PlanCliente;
 use App\Support\ResolvesAdminMedia;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,13 +16,18 @@ use Illuminate\View\View;
 class PlanController extends Controller
 {
     use ResolvesAdminMedia;
+
     public function index(Request $request): View
     {
         $q = trim((string) $request->get('q', ''));
 
         $planes = Plan::query()
             ->with('modulos')
-            ->when($q !== '', fn ($query) => $query->where('nombre', 'like', "%{$q}%"))
+            ->when($q !== '', fn ($query) => $query->where(function ($inner) use ($q) {
+                $inner->where('nombre', 'like', "%{$q}%")
+                    ->orWhere('codigo', 'like', "%{$q}%")
+                    ->orWhere('slug', 'like', "%{$q}%");
+            }))
             ->orderBy('orden')
             ->get();
 
@@ -30,11 +36,9 @@ class PlanController extends Controller
         return view('admin.planes.index', compact('planes', 'modulos', 'q'));
     }
 
-    public function create(): View
+    public function create(): RedirectResponse
     {
-        $modulos = ModuloServicio::orderBy('orden')->get();
-
-        return view('admin.planes.form', ['plan' => new Plan, 'modulos' => $modulos]);
+        return redirect()->route('admin.planes.index', ['create' => 1]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -50,15 +54,14 @@ class PlanController extends Controller
         $plan = Plan::create($data);
         $plan->modulos()->sync($this->modulosSync($request->input('modulos', [])));
 
-        return redirect()->route('admin.planes.index')->with('success', 'Plan creado.');
+        return redirect()
+            ->route('admin.planes.index')
+            ->with('plan_ok', ['accion' => 'creado']);
     }
 
-    public function edit(Plan $plan): View
+    public function edit(Plan $plan): RedirectResponse
     {
-        $plan->load('modulos');
-        $modulos = ModuloServicio::orderBy('orden')->get();
-
-        return view('admin.planes.form', compact('plan', 'modulos'));
+        return redirect()->route('admin.planes.index', ['edit' => $plan->slug]);
     }
 
     public function update(Request $request, Plan $plan): RedirectResponse
@@ -69,7 +72,30 @@ class PlanController extends Controller
         $plan->update($data);
         $plan->modulos()->sync($this->modulosSync($request->input('modulos', [])));
 
-        return redirect()->route('admin.planes.index')->with('success', 'Plan actualizado.');
+        return redirect()
+            ->route('admin.planes.index', $request->only('q'))
+            ->with('plan_ok', ['accion' => 'actualizado']);
+    }
+
+    public function destroy(Plan $plan): RedirectResponse
+    {
+        $tieneClientes = PlanCliente::query()->where('id_plan', $plan->id_plan)->exists();
+        $tieneOcupacion = (int) $plan->cupos_ocupados > 0 || (int) $plan->cupos_reservados > 0;
+
+        if ($tieneClientes || $tieneOcupacion) {
+            $plan->update(['estado_plan' => 'INACTIVO']);
+
+            return redirect()
+                ->route('admin.planes.index')
+                ->with('plan_ok', ['accion' => 'desactivado']);
+        }
+
+        $plan->modulos()->detach();
+        $plan->delete();
+
+        return redirect()
+            ->route('admin.planes.index')
+            ->with('plan_ok', ['accion' => 'eliminado']);
     }
 
     private function validated(Request $request): array

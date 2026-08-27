@@ -20,6 +20,7 @@
                     'action' => route('admin.clientes.presenciales'),
                     'value' => $q,
                     'placeholder' => 'Buscar por nombre',
+                    'live' => true,
                 ])
                 <button class="ad-btn ad-btn-add" type="button" data-open-user-form>+ Crear nuevo usuario</button>
             </div>

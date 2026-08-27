@@ -84,8 +84,9 @@
                 $nacLabel = $c->fecha_nacimiento
                     ? \Illuminate\Support\Carbon::parse($c->fecha_nacimiento)->format('d/m/Y')
                     : null;
+                $searchBlob = mb_strtolower(trim(($nombre).' '.($u?->correo ?? '').' '.($instNombre).' '.($planNombre)));
             @endphp
-            <tr>
+            <tr data-search="{{ $searchBlob }}">
                 @unless ($compact)
                     <td class="ad-cli-col-num">{{ isset($clientes) && method_exists($clientes, 'firstItem') ? $clientes->firstItem() + $index : $index + 1 }}</td>
                 @endunless
@@ -206,6 +207,7 @@
         @endforelse
     </tbody>
 </table>
+<p class="ad-live-search-empty" data-live-search-empty hidden>Ningún cliente coincide con esa búsqueda.</p>
 @if (isset($clientes) && method_exists($clientes, 'links') && ! $compact)
     <div class="ad-pagination">{{ $clientes->links() }}</div>
 @endif

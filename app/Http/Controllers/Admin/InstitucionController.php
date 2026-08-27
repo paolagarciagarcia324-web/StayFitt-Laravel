@@ -4,13 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cliente;
-use App\Models\Coach;
 use App\Models\EnlaceRegistroInstitucional;
 use App\Models\Institucion;
 use App\Models\Plan;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -44,7 +44,7 @@ class InstitucionController extends Controller
             ->with('usuario')
             ->whereNull('id_institucion')
             ->orderByDesc('creado_en')
-            ->limit(50)
+            ->limit(100)
             ->get();
 
         $kpis = [
@@ -79,7 +79,7 @@ class InstitucionController extends Controller
             'cupos_usados' => 0,
         ]);
 
-        return back()->with('success', 'Institución creada.');
+        return back()->with('institucion_ok', ['accion' => 'creada']);
     }
 
     public function update(Request $request, int $id): RedirectResponse
@@ -100,7 +100,7 @@ class InstitucionController extends Controller
 
         $institucion->update($data);
 
-        return back()->with('success', 'Institución actualizada.');
+        return back()->with('institucion_ok', ['accion' => 'actualizada']);
     }
 
     public function vincularCliente(Request $request, int $id): RedirectResponse
@@ -114,7 +114,7 @@ class InstitucionController extends Controller
         $cliente = Cliente::query()->findOrFail($data['id_cliente']);
 
         if ((int) $cliente->id_institucion === (int) $institucion->id_institucion) {
-            return back()->with('success', 'El cliente ya está vinculado a esta institución.');
+            return back()->with('institucion_ok', ['accion' => 'vinculado']);
         }
 
         if ((int) $institucion->cupos_totales > 0
@@ -129,7 +129,7 @@ class InstitucionController extends Controller
 
         $institucion->increment('cupos_usados');
 
-        return back()->with('success', 'Cliente vinculado a la institución.');
+        return back()->with('institucion_ok', ['accion' => 'vinculado']);
     }
 
     public function storeEnlace(Request $request, int $id): RedirectResponse
@@ -153,6 +153,42 @@ class InstitucionController extends Controller
             'creado_por' => Auth::id(),
         ]);
 
-        return back()->with('success', 'Enlace institucional generado.');
+        return back()->with('institucion_ok', ['accion' => 'enlace']);
+    }
+
+    public function destroyEnlace(int $id, int $enlaceId): RedirectResponse
+    {
+        $institucion = Institucion::query()->findOrFail($id);
+
+        $enlace = EnlaceRegistroInstitucional::query()
+            ->where('id_institucion', $institucion->id_institucion)
+            ->where('id_enlace', $enlaceId)
+            ->firstOrFail();
+
+        $enlace->delete();
+
+        return back()->with('institucion_ok', ['accion' => 'enlace_eliminado']);
+    }
+
+    public function destroy(int $id): RedirectResponse
+    {
+        $institucion = Institucion::query()->findOrFail($id);
+
+        DB::transaction(function () use ($institucion) {
+            Cliente::query()
+                ->where('id_institucion', $institucion->id_institucion)
+                ->update([
+                    'id_institucion' => null,
+                    'tipo_cliente' => 'INDIVIDUAL',
+                ]);
+
+            EnlaceRegistroInstitucional::query()
+                ->where('id_institucion', $institucion->id_institucion)
+                ->delete();
+
+            $institucion->delete();
+        });
+
+        return back()->with('institucion_ok', ['accion' => 'eliminada']);
     }
 }

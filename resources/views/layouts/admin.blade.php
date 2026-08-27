@@ -405,10 +405,59 @@
                 var live = form.hasAttribute('data-admin-search-live');
                 var lastSubmitted = input.value;
                 var timer = null;
+                var board = form.closest('.ad-cli-board, .ad-users, .ad-inst-board') || form.parentElement;
+                var surface = board ? board.querySelector('.ad-cli-board-surface, .ad-inst-grid, table.ad-table') : null;
 
                 function syncClear() {
                     var has = !!(input.value && String(input.value).trim());
                     clear.hidden = !has;
+                }
+
+                function normalize(text) {
+                    return String(text || '')
+                        .toLowerCase()
+                        .normalize('NFD')
+                        .replace(/[\u0300-\u036f]/g, '')
+                        .trim();
+                }
+
+                function filterLocalRows(query) {
+                    if (!board) return;
+                    var q = normalize(query);
+                    var cards = board.querySelectorAll('[data-inst-card]');
+                    if (cards.length) {
+                        var estadoBtn = board.querySelector('[data-inst-filter].is-active');
+                        var estadoKey = estadoBtn ? estadoBtn.getAttribute('data-inst-filter') : 'ALL';
+                        var visible = 0;
+                        cards.forEach(function (card) {
+                            var estadoOk = estadoKey === 'ALL' || card.getAttribute('data-estado') === estadoKey;
+                            var hay = normalize(card.getAttribute('data-search') || card.textContent || '');
+                            var textOk = !q || hay.indexOf(q) !== -1;
+                            var show = estadoOk && textOk;
+                            card.hidden = !show;
+                            if (show) visible++;
+                        });
+                        var emptyFilter = board.querySelector('[data-inst-filter-empty]');
+                        if (emptyFilter) emptyFilter.hidden = visible > 0 || cards.length === 0;
+                        if (surface) surface.classList.toggle('is-filtering', !!q);
+                        return;
+                    }
+                    var rows = board.querySelectorAll('table.ad-table tbody tr');
+                    if (!rows.length) return;
+                    var visibleRows = 0;
+                    rows.forEach(function (row) {
+                        if (row.querySelector('td.ad-empty, .ad-empty')) {
+                            row.hidden = !!q;
+                            return;
+                        }
+                        var hay = normalize(row.getAttribute('data-search') || row.textContent || '');
+                        var show = !q || hay.indexOf(q) !== -1;
+                        row.hidden = !show;
+                        if (show) visibleRows++;
+                    });
+                    var emptyNote = board.querySelector('[data-live-search-empty]');
+                    if (emptyNote) emptyNote.hidden = !(q && visibleRows === 0 && rows.length);
+                    if (surface) surface.classList.toggle('is-filtering', !!q);
                 }
 
                 function submitSearch() {
@@ -421,8 +470,11 @@
                 input.addEventListener('input', function () {
                     syncClear();
                     if (!live) return;
+                    filterLocalRows(input.value);
                     clearTimeout(timer);
-                    timer = setTimeout(submitSearch, 320);
+                    /* Tarjetas de Instituciones: filtro local instantáneo (sin recarga). */
+                    if (board && board.querySelector('[data-inst-card]')) return;
+                    timer = setTimeout(submitSearch, 380);
                 });
 
                 clear.addEventListener('click', function (e) {
@@ -431,10 +483,12 @@
                     input.value = '';
                     lastSubmitted = '';
                     syncClear();
+                    filterLocalRows('');
                     window.location.href = clear.getAttribute('href') || form.getAttribute('action') || window.location.pathname;
                 });
 
                 syncClear();
+                if (live) filterLocalRows(input.value);
 
                 if (live && input.value) {
                     input.focus();

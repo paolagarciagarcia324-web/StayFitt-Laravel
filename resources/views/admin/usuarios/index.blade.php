@@ -438,12 +438,6 @@
                 });
             }
             interceptSubmit(
-                createForm,
-                '¿Crear usuario?',
-                'Se creará la cuenta con los datos del formulario. Confirma solo si todo está correcto.',
-                'Sí, crear'
-            );
-            interceptSubmit(
                 editForm,
                 '¿Guardar cambios?',
                 'Se actualizarán la identidad, la foto, el estado y los roles de este usuario.',

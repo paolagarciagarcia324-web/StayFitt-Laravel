@@ -19,6 +19,7 @@
                 'action' => route('admin.clientes.virtuales'),
                 'value' => $q,
                 'placeholder' => 'Buscar por nombre',
+                'live' => true,
             ])
         </div>
 
