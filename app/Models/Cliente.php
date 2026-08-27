@@ -20,6 +20,14 @@ class Cliente extends Model
 
     const UPDATED_AT = 'actualizado_en';
 
+    protected $casts = [
+        'fecha_nacimiento' => 'date',
+        'fecha_alta' => 'date',
+        'fecha_activacion' => 'date',
+        'peso_inicial_kg' => 'decimal:2',
+        'estatura_cm' => 'decimal:2',
+    ];
+
     protected $fillable = [
         'id_user',
         'id_coach',

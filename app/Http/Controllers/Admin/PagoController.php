@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\AdminPagoUpdateRequest;
 use App\Models\Pago;
 use App\Services\ComprobantePasarelaService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class PagoController extends Controller
@@ -45,5 +48,37 @@ class PagoController extends Controller
         }
 
         return view('admin.pagos.index', compact('pagos', 'q'));
+    }
+
+    public function show(int $id): View
+    {
+        $pago = Pago::query()
+            ->with(['solicitud.plan', 'plan', 'planCliente.cliente.usuario'])
+            ->findOrFail($id);
+
+        if ($pago->solicitud && $pago->solicitud->pago) {
+            $pasarela = strtoupper((string) ($pago->pasarela ?: 'PASARELA'));
+            $this->comprobantes->asegurar($pago, $pago->solicitud, $pasarela);
+            $pago->refresh();
+        }
+
+        return view('admin.pagos.show', compact('pago'));
+    }
+
+    public function update(AdminPagoUpdateRequest $request, int $id): RedirectResponse
+    {
+        $pago = Pago::query()->with('solicitud')->findOrFail($id);
+        $data = $request->validated();
+
+        $pago->update([
+            'estado_pago' => $data['estado_pago'],
+            'observacion_admin' => $data['observacion_admin'] ?? $pago->observacion_admin,
+            'validado_por' => Auth::id(),
+            'fecha_validacion' => now(),
+        ]);
+
+        return redirect()
+            ->route('admin.pagos.show', $pago->id_pago)
+            ->with('success', 'Estado del pago actualizado.');
     }
 }

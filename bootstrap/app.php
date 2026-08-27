@@ -14,6 +14,12 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'role' => \App\Http\Middleware\EnsureRole::class,
+            'modulo' => \App\Http\Middleware\EnsureModuloAcceso::class,
+        ]);
+
+        // Webhooks externos (Meta WhatsApp) no envían token CSRF de Laravel.
+        $middleware->validateCsrfTokens(except: [
+            'webhooks/whatsapp',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

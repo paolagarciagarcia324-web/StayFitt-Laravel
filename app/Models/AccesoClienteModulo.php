@@ -26,9 +26,9 @@ class AccesoClienteModulo extends Model
         'estado_acceso',
     ];
 
-    public function plan(): BelongsTo
+    public function planCliente(): BelongsTo
     {
-        return $this->belongsTo(Plan::class, 'id_plan', 'id_plan');
+        return $this->belongsTo(PlanCliente::class, 'id_plan_cliente', 'id_plan_cliente');
     }
 
     public function modulo(): BelongsTo

@@ -9,6 +9,13 @@
 @endsection
 
 @section('content')
+    @if (session('coach_temp_password'))
+        <div class="ad-card" style="margin-bottom:16px;border-color:var(--cyan)">
+            <strong>Contraseña temporal del coach:</strong> <code>{{ session('coach_temp_password') }}</code>
+            <span class="ad-user-mail"> — Comunicar al coach de forma segura.</span>
+        </div>
+    @endif
+
     <section class="ad-card ad-users">
         <div class="ad-users-bar">
             @include('partials.admin-search', [
@@ -67,6 +74,13 @@
                                     data-telefono="{{ $u?->telefono }}">
                                     @include('partials.admin-icon', ['icon' => 'edit'])
                                 </button>
+                                @if ($c->estado_coach === 'ACTIVO')
+                                    <form method="POST" action="{{ route('admin.coaches.destroy', $c->id_coach) }}" style="display:inline" onsubmit="return confirm('¿Desactivar este coach?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="ad-icon-btn" type="submit" title="Desactivar" aria-label="Desactivar coach">×</button>
+                                    </form>
+                                @endif
                             </div>
                         </td>
                     </tr>

@@ -56,6 +56,11 @@ class Pago extends Model
         return $this->belongsTo(SolicitudCompra::class, 'id_solicitud', 'id_solicitud');
     }
 
+    public function cliente(): BelongsTo
+    {
+        return $this->belongsTo(Cliente::class, 'id_cliente', 'id_cliente');
+    }
+
     public function plan(): BelongsTo
     {
         return $this->belongsTo(Plan::class, 'id_plan', 'id_plan');

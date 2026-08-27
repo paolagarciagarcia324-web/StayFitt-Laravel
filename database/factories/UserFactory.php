@@ -33,6 +33,15 @@ class UserFactory extends Factory
         ];
     }
 
+    public function configure(): static
+    {
+        return $this->afterMaking(function (User $user) {
+            if ($user->getAuthPassword() === '') {
+                $user->assignPassword('password');
+            }
+        });
+    }
+
     public function unverified(): static
     {
         return $this->state(fn (array $attributes) => [

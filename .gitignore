@@ -25,3 +25,6 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+/_doc_extract/
+/scripts/_list_staff_users.php
+storage/app/reportes/*

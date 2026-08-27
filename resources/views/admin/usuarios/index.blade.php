@@ -283,6 +283,10 @@
                 </div>
 
                 <div class="ad-modal-actions ad-user-edit-actions">
+                    <form method="POST" id="user-reset-password-form" action="#" style="margin-right:auto">
+                        @csrf
+                        <button class="ad-btn ad-btn-ghost" type="submit">Restablecer contraseña</button>
+                    </form>
                     <button class="ad-btn ad-btn-ghost" type="button" data-close-user-edit>Cancelar</button>
                     <button class="ad-btn" type="submit">Guardar</button>
                 </div>
@@ -496,6 +500,10 @@
                 editForm.querySelectorAll('[data-role-id]').forEach(function (cb) {
                     cb.checked = roles.indexOf(cb.getAttribute('data-role-id')) !== -1;
                 });
+                var resetForm = document.getElementById('user-reset-password-form');
+                if (resetForm) {
+                    resetForm.action = @json(url('/admin/usuarios')).replace(/\/$/, '') + '/' + btn.getAttribute('data-id') + '/reset-password';
+                }
                 editModal.hidden = false;
                 editModal.classList.add('is-open');
             }
@@ -513,6 +521,11 @@
                 b.addEventListener('click', closeEdit);
             });
             editModal?.addEventListener('click', function (e) { if (e.target === editModal) closeEdit(); });
+            document.getElementById('user-reset-password-form')?.addEventListener('submit', function (e) {
+                if (!confirm('¿Generar una nueva contraseña temporal para este usuario?')) {
+                    e.preventDefault();
+                }
+            });
         })();
     </script>
 
@@ -522,10 +535,12 @@
             $accion = $ok['accion'] ?? '';
             $accionLabel = match ($accion) {
                 'creado' => 'Usuario creado',
+                'password_reset' => 'Contraseña restablecida',
                 default => 'Usuario actualizado',
             };
             $detalle = match ($accion) {
-                'creado' => 'La cuenta quedó lista. Acceso inicial: correo + documento.',
+                'creado' => 'La cuenta quedó activa. Revisa la contraseña temporal comunicada al cliente.',
+                'password_reset' => 'Nueva contraseña temporal: '.($ok['temp_password'] ?? '').' — Correo: '.($ok['correo'] ?? ''),
                 default => 'Los cambios de identidad, foto, estado y roles se guardaron correctamente.',
             };
         @endphp

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Rol;
 use App\Models\User;
+use App\Support\GeneratesTemporaryPassword;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -94,6 +95,8 @@ class AsistenteController extends Controller
 
             $correo = strtolower(trim($data['correo']));
 
+            $tempPassword = GeneratesTemporaryPassword::make();
+
             $usuario = User::create([
                 'nombres' => $data['nombres'],
                 'apellidos' => $data['apellidos'],
@@ -101,19 +104,20 @@ class AsistenteController extends Controller
                 'email' => $correo,
                 'telefono' => $data['telefono'] ?? null,
                 'documento_identidad' => $data['documento_identidad'],
-                'password_hash' => $data['documento_identidad'],
                 'estado' => 'ACTIVO',
                 'estado_cuenta' => 'ACTIVO',
                 'acepto_terminos' => true,
                 'fecha_aceptacion_terminos' => now(),
                 'correo_verificado_en' => now(),
             ]);
+            $usuario->assignPassword($tempPassword);
+            $usuario->save();
 
             $usuario->roles()->syncWithoutDetaching([$rol->id_rol]);
 
             return redirect()
                 ->route('admin.asistentes.index')
-                ->with('asistente_ok', ['accion' => 'creado']);
+                ->with('asistente_ok', ['accion' => 'creado', 'temp_password' => $tempPassword]);
         }
 
         return back()->withErrors(['modo' => 'Selecciona un modo de registro válido.'])->withInput();

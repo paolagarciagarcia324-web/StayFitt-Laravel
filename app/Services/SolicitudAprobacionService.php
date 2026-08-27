@@ -11,23 +11,29 @@ use App\Models\PlanCliente;
 use App\Models\Rol;
 use App\Models\SolicitudCompra;
 use App\Models\User;
+use App\Services\Comunicacion\ChatService;
+use App\Services\Comunicacion\InvitacionWhatsappService;
+use App\Support\GeneratesTemporaryPassword;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class SolicitudAprobacionService
 {
-    public function __construct(private ComprobantePasarelaService $comprobantes)
-    {
+    public function __construct(
+        private ComprobantePasarelaService $comprobantes,
+        private InvitacionWhatsappService $invitacionesWhatsapp,
+        private ChatService $chatService,
+    ) {
     }
 
-    public function aprobar(SolicitudCompra $solicitud, ?string $observacion = null): void
+    public function aprobar(SolicitudCompra $solicitud, ?string $observacion = null): ?string
     {
-        $this->activar($solicitud, $observacion, false);
+        return $this->activar($solicitud, $observacion, false);
     }
 
-    public function activarPorPasarela(SolicitudCompra $solicitud, string $pasarela): void
+    public function activarPorPasarela(SolicitudCompra $solicitud, string $pasarela): ?string
     {
-        $this->activar(
+        return $this->activar(
             $solicitud,
             'Activación automática: pago aprobado por '.$pasarela.'.',
             true,
@@ -35,9 +41,12 @@ class SolicitudAprobacionService
         );
     }
 
-    private function activar(SolicitudCompra $solicitud, ?string $observacion, bool $porPasarela, ?string $pasarela = null): void
+    private function activar(SolicitudCompra $solicitud, ?string $observacion, bool $porPasarela, ?string $pasarela = null): ?string
     {
-        DB::transaction(function () use ($solicitud, $observacion, $porPasarela, $pasarela) {
+        $tempPassword = null;
+        $clienteActivado = null;
+
+        DB::transaction(function () use ($solicitud, $observacion, $porPasarela, $pasarela, &$tempPassword, &$clienteActivado) {
             $solicitud->load(['plan.modulos', 'pago']);
 
             if ($solicitud->estado_solicitud === 'VALIDADA') {
@@ -47,6 +56,8 @@ class SolicitudAprobacionService
             $plan = $solicitud->plan;
             $pago = $solicitud->pago;
 
+            $usuarioExistente = User::query()->where('correo', $solicitud->correo)->first();
+
             $usuario = User::firstOrCreate(
                 ['correo' => $solicitud->correo],
                 [
@@ -55,13 +66,18 @@ class SolicitudAprobacionService
                     'documento_identidad' => $solicitud->documento_identidad,
                     'telefono' => $solicitud->telefono,
                     'email' => $solicitud->correo,
-                    'password_hash' => $solicitud->documento_identidad,
                     'acepto_terminos' => true,
                     'fecha_aceptacion_terminos' => $solicitud->fecha_aceptacion_terminos ?? now(),
                     'estado' => 'ACTIVO',
                     'correo_verificado_en' => now(),
                 ]
             );
+
+            if (! $usuarioExistente) {
+                $tempPassword = GeneratesTemporaryPassword::make();
+                $usuario->assignPassword($tempPassword);
+                $usuario->save();
+            }
 
             if ($usuario->estado !== 'ACTIVO') {
                 $usuario->update(['estado' => 'ACTIVO']);
@@ -187,7 +203,21 @@ class SolicitudAprobacionService
                 'fecha_revision' => now(),
                 'observacion_admin' => $observacion,
             ]);
+
+            $clienteActivado = $cliente;
         });
+
+        if ($clienteActivado) {
+            $clienteFresh = $clienteActivado->fresh(['horario', 'usuario']);
+
+            if (strtoupper((string) $solicitud->modalidad) === 'PRESENCIAL') {
+                $this->invitacionesWhatsapp->generarParaActivacion($clienteFresh);
+            } else {
+                $this->chatService->obtenerOcrearChatCoachCliente($clienteFresh);
+            }
+        }
+
+        return $tempPassword;
     }
 
     public function rechazar(SolicitudCompra $solicitud, ?string $observacion = null): void

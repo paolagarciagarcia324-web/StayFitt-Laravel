@@ -3,39 +3,27 @@
 namespace App\Http\Controllers\Coach;
 
 use App\Http\Controllers\Controller;
-use App\Models\PropuestaPlan;
+use App\Services\Coach\CoachHubService;
 use App\Support\ResolvesStaffCoach;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
     use ResolvesStaffCoach;
 
-    public function index(): View
+    public function index(CoachHubService $hub): View
     {
-        $user = Auth::user();
+        $coach = $this->resolveCoachOrAbort()->load('usuario');
+        $data = $hub->dashboard($coach);
 
-        $base = PropuestaPlan::query()
-            ->when(
-                $user->tieneRol('COACH') && ! $user->tieneRol('ASISTENTE_TECNICO') && ! $user->tieneRol('ADMIN'),
-                function ($query) use ($user) {
-                    $query->where('id_coach', $user->coach?->id_coach ?: 0);
-                }
-            );
-
-        $stats = [
-            'borradores' => (clone $base)->whereIn('estado', [
-                PropuestaPlan::ESTADO_BORRADOR_ENTRENAMIENTO,
-                PropuestaPlan::ESTADO_BORRADOR_NUTRICION,
-            ])->count(),
-            'pendientes' => (clone $base)->where('estado', PropuestaPlan::ESTADO_PENDIENTE_REVISION)->count(),
-            'publicados' => (clone $base)->where('estado', PropuestaPlan::ESTADO_PUBLICADO)->count(),
-            'rechazados' => (clone $base)->where('estado', PropuestaPlan::ESTADO_RECHAZADO)->count(),
-        ];
-
-        $recientes = (clone $base)->orderByDesc('id_propuesta')->limit(6)->get();
-
-        return view('coach.dashboard', compact('stats', 'recientes'));
+        return view('coach.dashboard', [
+            'coach' => $coach,
+            'kpis' => $data['kpis'],
+            'clientes' => $data['clientes'],
+            'sesiones' => $data['sesiones'],
+            'progresos' => $data['progresos'],
+            'pendientes' => $data['pendientes'],
+            'propuestas' => $data['propuestas'],
+        ]);
     }
 }

@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\AdminCuponStoreRequest;
+use App\Http\Requests\Admin\AdminCuponUpdateRequest;
 use App\Models\DescuentoCupon;
 use App\Models\Plan;
+use App\Models\UsoCupon;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
@@ -20,18 +22,9 @@ class CuponController extends Controller
         return view('admin.cupones.index', compact('cupones', 'planes'));
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(AdminCuponStoreRequest $request): RedirectResponse
     {
-        $data = $request->validate([
-            'codigo' => ['required', 'string', 'max:40', 'unique:descuentos_cupones,codigo'],
-            'tipo' => ['required', 'in:PORCENTAJE,MONTO'],
-            'valor' => ['required', 'numeric', 'min:0'],
-            'id_plan' => ['nullable', 'integer', 'exists:planes,id_plan'],
-            'fecha_inicio' => ['required', 'date'],
-            'fecha_fin' => ['required', 'date', 'after:fecha_inicio'],
-            'usos_maximos' => ['nullable', 'integer', 'min:1'],
-            'estado' => ['required', 'in:ACTIVO,INACTIVO'],
-        ]);
+        $data = $request->validated();
 
         DescuentoCupon::create([
             'codigo' => strtoupper($data['codigo']),
@@ -52,17 +45,10 @@ class CuponController extends Controller
         return back()->with('success', 'Cupón creado.');
     }
 
-    public function update(Request $request, int $id): RedirectResponse
+    public function update(AdminCuponUpdateRequest $request, int $id): RedirectResponse
     {
         $cupon = DescuentoCupon::query()->findOrFail($id);
-
-        $data = $request->validate([
-            'valor' => ['required', 'numeric', 'min:0'],
-            'fecha_inicio' => ['required', 'date'],
-            'fecha_fin' => ['required', 'date', 'after:fecha_inicio'],
-            'usos_maximos' => ['nullable', 'integer', 'min:1'],
-            'estado' => ['required', 'in:ACTIVO,INACTIVO'],
-        ]);
+        $data = $request->validated();
 
         $cupon->update([
             'valor' => $data['valor'],
@@ -75,5 +61,29 @@ class CuponController extends Controller
         ]);
 
         return back()->with('success', 'Cupón actualizado.');
+    }
+
+    public function destroy(int $id): RedirectResponse
+    {
+        $cupon = DescuentoCupon::query()->findOrFail($id);
+
+        $cupon->update([
+            'estado' => 'INACTIVO',
+            'estado_cupon' => 'INACTIVO',
+        ]);
+
+        return back()->with('success', 'Cupón desactivado.');
+    }
+
+    public function usos(int $id): View
+    {
+        $cupon = DescuentoCupon::query()->with('plan')->findOrFail($id);
+        $usos = UsoCupon::query()
+            ->with('solicitud')
+            ->where('id_descuento', $cupon->id_descuento)
+            ->orderByDesc('usado_en')
+            ->paginate(15);
+
+        return view('admin.cupones.usos', compact('cupon', 'usos'));
     }
 }

@@ -47,6 +47,29 @@
         </a>
     </div>
 
+    <section class="ad-card" style="margin-bottom:0">
+        <div class="ad-card-head">
+            <h2>Accesos rápidos</h2>
+        </div>
+        <div class="ad-kpis" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
+            <a class="ad-kpi accent-pink" href="{{ route('admin.solicitudes.index') }}">
+                <div class="ad-kpi-copy"><strong>{{ $solicitudesPendientes }}</strong><span>Solicitudes pendientes</span></div>
+            </a>
+            <a class="ad-kpi accent-cyan" href="{{ route('admin.propuestas.index') }}">
+                <div class="ad-kpi-copy"><strong>{{ $propuestasPendientes }}</strong><span>Propuestas por revisar</span></div>
+            </a>
+            <a class="ad-kpi accent-pink" href="{{ route('admin.usuarios.index') }}">
+                <div class="ad-kpi-copy"><strong>→</strong><span>Gestión usuarios</span></div>
+            </a>
+            <a class="ad-kpi accent-cyan" href="{{ route('admin.estadisticas.index') }}">
+                <div class="ad-kpi-copy"><strong>→</strong><span>Análisis</span></div>
+            </a>
+            <a class="ad-kpi accent-pink" href="{{ route('admin.reportes.index') }}">
+                <div class="ad-kpi-copy"><strong>→</strong><span>Reportes</span></div>
+            </a>
+        </div>
+    </section>
+
     <div class="ad-split">
         <section class="ad-card">
             <div class="ad-card-head">

@@ -43,4 +43,37 @@
             slides[current].classList.add('is-active');
         }, 5000);
     }
+
+    // Modal novedades welcome
+    const newsOpenBtn = document.querySelector('[data-news-open]');
+    const newsModal = document.querySelector('[data-news-modal]');
+    if (newsOpenBtn && newsModal) {
+        const newsCloseBtns = newsModal.querySelectorAll('[data-news-close]');
+
+        const openNews = () => {
+            newsModal.classList.remove('is-hidden');
+            newsModal.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('ff-news-open');
+            newsOpenBtn.setAttribute('aria-expanded', 'true');
+        };
+
+        const closeNews = () => {
+            newsModal.classList.add('is-hidden');
+            newsModal.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('ff-news-open');
+            newsOpenBtn.setAttribute('aria-expanded', 'false');
+            newsOpenBtn.focus();
+        };
+
+        newsOpenBtn.addEventListener('click', openNews);
+        newsCloseBtns.forEach((btn) => btn.addEventListener('click', closeNews));
+        newsModal.addEventListener('click', (e) => {
+            if (e.target === newsModal) closeNews();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !newsModal.classList.contains('is-hidden')) {
+                closeNews();
+            }
+        });
+    }
 })();

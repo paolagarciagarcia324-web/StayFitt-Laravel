@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin-ds.css') }}">
     <script>
         (function () {
             try {
@@ -38,11 +39,11 @@
                 $pend = (int) ($navSolicitudesPendientes ?? 0);
                 $pendLatest = $navSolicitudesLatestAt ?? null;
                 $opOpen = request()->routeIs('admin.solicitudes.*', 'admin.pagos.*', 'admin.horarios.*', 'admin.eventos.*', 'admin.calendario.*');
-                $perOpen = request()->routeIs('admin.usuarios.*', 'admin.clientes.*', 'admin.instituciones.*', 'admin.coaches.*', 'admin.asistentes.*');
+                $perOpen = request()->routeIs('admin.usuarios.*', 'admin.clientes.*', 'admin.instituciones.*', 'admin.coaches.*', 'admin.asistentes.*', 'admin.roles.*', 'admin.configuracion.*');
                 $cliOpen = request()->routeIs('admin.clientes.*');
                 $comOpen = request()->routeIs('admin.planes.*', 'admin.propuestas.*', 'admin.cupones.*', 'admin.tienda.*', 'admin.pasarelas.*', 'admin.novedades.*', 'staff.novedades.*');
                 $comuOpen = request()->routeIs('admin.whatsapp.*', 'admin.comunidad.*');
-                $anOpen = request()->routeIs('admin.estadisticas.*', 'admin.reportes.*');
+                $anOpen = request()->routeIs('admin.analisis.*', 'admin.estadisticas.*', 'admin.reportes.*');
                 $onSolicitudes = request()->routeIs('admin.solicitudes.*');
                 $navPropuestasPendientes = (int) (\App\Models\PropuestaPlan::query()
                     ->where('estado', \App\Models\PropuestaPlan::ESTADO_PENDIENTE_REVISION)
@@ -138,6 +139,14 @@
                         <span class="ad-nav-dot"></span>
                         Asistentes
                     </a>
+                    <a href="{{ route('admin.roles.index') }}" class="ad-nav-link {{ request()->routeIs('admin.roles.*') ? 'is-active' : '' }}">
+                        <span class="ad-nav-dot"></span>
+                        Roles
+                    </a>
+                    <a href="{{ route('admin.configuracion.index') }}" class="ad-nav-link {{ request()->routeIs('admin.configuracion.*') ? 'is-active' : '' }}">
+                        <span class="ad-nav-dot"></span>
+                        Configuración
+                    </a>
                 </div>
             </details>
 
@@ -203,6 +212,10 @@
                     <span class="ad-nav-chevron" aria-hidden="true"></span>
                 </summary>
                 <div class="ad-nav-children">
+                    <a href="{{ route('admin.analisis.index') }}" class="ad-nav-link {{ request()->routeIs('admin.analisis.*') ? 'is-active' : '' }}">
+                        <span class="ad-nav-dot"></span>
+                        Resumen
+                    </a>
                     <a href="{{ route('admin.estadisticas.index') }}" class="ad-nav-link {{ request()->routeIs('admin.estadisticas.*') ? 'is-active' : '' }}">
                         <span class="ad-nav-dot"></span>
                         Estadísticas
@@ -271,7 +284,9 @@
             @endif
 
             <main class="ad-content">
-                @yield('content')
+                <div class="ad-page ad-page--wide">
+                    @yield('content')
+                </div>
             </main>
         </div>
     </div>
@@ -500,5 +515,6 @@
             });
         })();
     </script>
+    @stack('scripts')
 </body>
 </html>

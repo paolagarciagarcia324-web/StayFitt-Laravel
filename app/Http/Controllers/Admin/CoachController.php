@@ -7,6 +7,7 @@ use App\Http\Requests\AdminCoachRequest;
 use App\Models\Coach;
 use App\Models\Rol;
 use App\Models\User;
+use App\Support\GeneratesTemporaryPassword;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -35,18 +36,21 @@ class CoachController extends Controller
 
     public function store(AdminCoachRequest $request): RedirectResponse
     {
+        $tempPassword = GeneratesTemporaryPassword::make();
+
         $usuario = User::create([
             'nombres' => $request->nombres,
             'apellidos' => $request->apellidos,
             'correo' => $request->correo,
             'telefono' => $request->telefono,
             'documento_identidad' => $request->documento_identidad,
-            'password_hash' => $request->documento_identidad,
             'estado' => 'ACTIVO',
             'acepto_terminos' => true,
             'fecha_aceptacion_terminos' => now(),
             'correo_verificado_en' => now(),
         ]);
+        $usuario->assignPassword($tempPassword);
+        $usuario->save();
 
         $rolCoach = Rol::where('codigo', 'COACH')->orWhere('codigo_rol', 'COACH')->value('id_rol');
         if ($rolCoach) {
@@ -64,7 +68,8 @@ class CoachController extends Controller
 
         return redirect()
             ->route('admin.coaches.index')
-            ->with('success', 'Coach creado. Acceso: correo + documento.');
+            ->with('success', 'Coach creado correctamente.')
+            ->with('coach_temp_password', $tempPassword);
     }
 
     public function update(Request $request, int $id): RedirectResponse
@@ -91,5 +96,18 @@ class CoachController extends Controller
         }
 
         return back()->with('success', 'Coach actualizado.');
+    }
+
+    public function destroy(int $id): RedirectResponse
+    {
+        $coach = Coach::query()->with('usuario')->findOrFail($id);
+
+        $coach->update(['estado_coach' => 'INACTIVO']);
+
+        if ($coach->usuario) {
+            $coach->usuario->update(['estado' => 'INACTIVO', 'estado_cuenta' => 'INACTIVO']);
+        }
+
+        return back()->with('success', 'Coach desactivado correctamente.');
     }
 }

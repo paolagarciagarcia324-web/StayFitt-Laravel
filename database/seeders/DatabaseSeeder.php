@@ -8,8 +8,9 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // Bundle único profesional (incluye usuarios, comercial, comunidad, análisis)
         $this->call([
-            DemoAdminSeeder::class,
+            DemoDataSeeder::class,
         ]);
     }
 }

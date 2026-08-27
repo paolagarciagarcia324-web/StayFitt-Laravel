@@ -1,0 +1,684 @@
+/**
+ * FigueFit Admin Design System v2
+ * Complementa admin.css — no rompe clases existentes (.ad-card, .ad-form, .ad-table…).
+ * Identidad: dark navy + pink #ff2d78 + cyan #2ef5e6 + Montserrat.
+ */
+
+:root {
+    --ad-radius: 14px;
+    --ad-radius-sm: 10px;
+    --ad-space-1: 6px;
+    --ad-space-2: 10px;
+    --ad-space-3: 14px;
+    --ad-space-4: 18px;
+    --ad-space-5: 24px;
+    --ad-text: #e9edf5;
+    --ad-text-soft: rgba(255, 255, 255, 0.58);
+    --ad-text-faint: rgba(255, 255, 255, 0.38);
+    --ad-ok: #34d399;
+    --ad-warn: #fbbf24;
+    --ad-danger: #fb7185;
+    --ad-surface: rgba(18, 26, 43, 0.92);
+    --ad-surface-2: rgba(15, 22, 36, 0.96);
+    --ad-elev: 0 10px 28px rgba(0, 0, 0, 0.28);
+}
+
+/* ========== Page shell ========== */
+.ad-page {
+    display: grid;
+    gap: var(--ad-space-4);
+    max-width: 1280px;
+}
+
+.ad-page--wide {
+    max-width: none;
+}
+
+.ad-page-hero {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--ad-space-3);
+    padding: 4px 2px 2px;
+}
+
+.ad-page-hero__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.ad-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--ad-text-soft);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+
+.ad-chip.is-ok {
+    border-color: rgba(52, 211, 153, 0.35);
+    color: var(--ad-ok);
+    background: rgba(52, 211, 153, 0.08);
+}
+
+.ad-chip.is-off {
+    border-color: rgba(251, 113, 133, 0.35);
+    color: var(--ad-danger);
+    background: rgba(251, 113, 133, 0.08);
+}
+
+.ad-chip.is-cyan {
+    border-color: rgba(46, 245, 230, 0.3);
+    color: var(--cyan);
+    background: rgba(46, 245, 230, 0.06);
+}
+
+/* ========== Panel / card polish ========== */
+.ad-panel {
+    background: var(--ad-surface);
+    border: 1px solid var(--line);
+    border-radius: var(--ad-radius);
+    box-shadow: var(--ad-elev);
+    overflow: hidden;
+}
+
+.ad-panel__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent);
+}
+
+.ad-panel__head h2,
+.ad-panel__title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: #fff;
+}
+
+.ad-panel__sub {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: var(--ad-text-soft);
+    line-height: 1.35;
+}
+
+.ad-panel__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.ad-panel__body {
+    padding: 16px;
+}
+
+.ad-panel__body--flush {
+    padding: 0;
+}
+
+.ad-panel__foot {
+    padding: 12px 16px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+    background: rgba(0, 0, 0, 0.12);
+}
+
+/* Compact existing cards inside .ad-page */
+.ad-page > .ad-card,
+.ad-page .ad-panel .ad-card {
+    box-shadow: none;
+}
+
+.ad-page .ad-card {
+    border-radius: var(--ad-radius);
+}
+
+/* ========== Grids ========== */
+.ad-grid {
+    display: grid;
+    gap: var(--ad-space-4);
+}
+
+.ad-grid-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ad-grid-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ad-grid-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.ad-grid-12 {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--ad-space-4);
+}
+
+.ad-col-4 { grid-column: span 4; }
+.ad-col-5 { grid-column: span 5; }
+.ad-col-6 { grid-column: span 6; }
+.ad-col-7 { grid-column: span 7; }
+.ad-col-8 { grid-column: span 8; }
+.ad-col-12 { grid-column: span 12; }
+
+/* ========== KPI strip denser ========== */
+.ad-page .ad-kpis {
+    gap: 12px;
+}
+
+.ad-page .ad-kpi {
+    padding: 14px 16px;
+    border-radius: var(--ad-radius);
+    min-height: 88px;
+}
+
+.ad-stat {
+    display: grid;
+    gap: 4px;
+    padding: 14px 16px;
+    border-radius: var(--ad-radius-sm);
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.025);
+}
+
+.ad-stat strong {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #fff;
+    line-height: 1.1;
+}
+
+.ad-stat span {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ad-text-soft);
+}
+
+.ad-stat.is-pink strong { color: var(--pink); }
+.ad-stat.is-cyan strong { color: var(--cyan); }
+
+/* ========== Form sections ========== */
+.ad-form-section {
+    border: 1px solid var(--line);
+    border-radius: var(--ad-radius-sm);
+    background: rgba(0, 0, 0, 0.14);
+    overflow: hidden;
+}
+
+.ad-form-section + .ad-form-section {
+    margin-top: 12px;
+}
+
+.ad-form-section > summary,
+.ad-form-section__head {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.02);
+    user-select: none;
+}
+
+.ad-form-section > summary::-webkit-details-marker { display: none; }
+
+.ad-form-section > summary::after {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid var(--cyan);
+    border-bottom: 2px solid var(--cyan);
+    transform: rotate(45deg);
+    transition: transform 0.2s ease;
+    opacity: 0.7;
+}
+
+.ad-form-section[open] > summary::after {
+    transform: rotate(225deg);
+    margin-top: 4px;
+}
+
+.ad-form-section__body {
+    padding: 14px;
+    display: grid;
+    gap: 12px;
+    border-top: 1px solid var(--line);
+}
+
+.ad-form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-top: 4px;
+}
+
+.ad-check {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 8px;
+}
+
+.ad-check span { margin: 0 !important; }
+
+/* ========== Toolbar / filters ========== */
+.ad-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: end;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--ad-radius);
+    background: var(--ad-surface-2);
+}
+
+.ad-toolbar .ad-form,
+.ad-toolbar form {
+    display: contents;
+}
+
+.ad-toolbar label {
+    display: grid;
+    gap: 4px;
+    min-width: 140px;
+    flex: 1 1 140px;
+}
+
+.ad-toolbar label span {
+    font-size: 11px;
+    color: var(--ad-text-soft);
+    font-weight: 600;
+}
+
+.ad-toolbar input,
+.ad-toolbar select {
+    width: 100%;
+    height: 38px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: #0e1524;
+    color: #fff;
+    padding: 0 10px;
+    font: inherit;
+}
+
+.ad-toolbar__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-left: auto;
+}
+
+/* ========== Tables ========== */
+.ad-table-wrap {
+    overflow: auto;
+    max-height: min(520px, 62vh);
+    border-radius: 0 0 var(--ad-radius) var(--ad-radius);
+}
+
+.ad-panel .ad-table-wrap {
+    border-top: 1px solid var(--line);
+}
+
+.ad-page .ad-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #151d2e;
+    backdrop-filter: blur(6px);
+}
+
+.ad-page .ad-table tbody tr:hover td {
+    background: rgba(46, 245, 230, 0.04);
+}
+
+.ad-row-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: flex-end;
+}
+
+.ad-row-actions .ad-btn,
+.ad-row-actions button {
+    white-space: nowrap;
+}
+
+/* ========== Tabs ========== */
+.ad-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 4px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: rgba(0, 0, 0, 0.2);
+    width: fit-content;
+    max-width: 100%;
+}
+
+.ad-tabs a,
+.ad-tabs button {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: var(--ad-text-soft);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 8px 12px;
+    border-radius: 9px;
+    cursor: pointer;
+}
+
+.ad-tabs a.is-active,
+.ad-tabs button.is-active,
+.ad-tabs a:hover,
+.ad-tabs button:hover {
+    color: #fff;
+    background: rgba(255, 45, 120, 0.16);
+}
+
+.ad-tab-panels > [hidden] { display: none !important; }
+
+/* ========== Mini cards (module tiles) ========== */
+.ad-tile {
+    display: grid;
+    gap: 10px;
+    padding: 16px;
+    border-radius: var(--ad-radius);
+    border: 1px solid var(--line);
+    background:
+        linear-gradient(160deg, rgba(255, 45, 120, 0.06), transparent 42%),
+        var(--ad-surface);
+    min-height: 140px;
+}
+
+.ad-tile h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.ad-tile p {
+    margin: 0;
+    font-size: 12px;
+    color: var(--ad-text-soft);
+    line-height: 1.4;
+}
+
+.ad-tile__top {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: flex-start;
+}
+
+/* ========== Status rail ========== */
+.ad-status-rail {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+}
+
+/* ========== Content density ========== */
+.ad-main .ad-top {
+    margin-bottom: 6px;
+}
+
+.ad-main .ad-top h1 {
+    font-size: clamp(1.25rem, 1.5vw, 1.55rem);
+}
+
+.ad-main .ad-content {
+    padding-bottom: 28px;
+}
+
+.ad-alert {
+    border-radius: 12px;
+}
+
+/* Sidebar polish */
+.ad-nav-group > summary {
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.ad-nav-group.is-route-active > summary {
+    color: #fff;
+    background: rgba(255, 45, 120, 0.08);
+}
+
+.ad-nav-link.is-active {
+    box-shadow: inset 2px 0 0 var(--pink);
+}
+
+/* Buttons consistency */
+.ad-btn {
+    border-radius: 10px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.ad-btn-ghost {
+    background: transparent;
+}
+
+/* Inline style debt helpers */
+.ad-stack { display: grid; gap: 12px; }
+.ad-stack-sm { display: grid; gap: 8px; }
+.ad-mt-0 { margin-top: 0 !important; }
+.ad-mb-0 { margin-bottom: 0 !important; }
+
+/* Empty states */
+.ad-page .ad-empty,
+.ad-panel .ad-empty {
+    padding: 18px 8px;
+    text-align: center;
+    color: var(--ad-text-faint);
+    font-size: 13px;
+}
+
+/* ========== Cliente virtual shell ========== */
+.ad-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+}
+.ad-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+}
+.ad-mini-card {
+    background: var(--ad-surface, rgba(255,255,255,.04));
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 16px;
+    padding: 16px;
+    display: grid;
+    gap: 8px;
+}
+.ad-mini-card h3 { margin: 0; font-size: 16px; }
+.ad-mini-card p { margin: 0; font-size: 13px; color: var(--ad-text-soft); }
+.ad-mini-card.is-featured { border-color: rgba(255, 45, 120, .45); box-shadow: 0 0 0 1px rgba(255, 45, 120, .15); }
+.ad-price { font-weight: 700; color: var(--ad-text); }
+.ad-price small { font-weight: 500; opacity: .7; }
+.ad-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 14px;
+}
+.ad-form-grid label {
+    display: grid;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--ad-text-soft);
+}
+.ad-form-grid input,
+.ad-form-grid select,
+.ad-form-grid textarea {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(0,0,0,.2);
+    color: var(--ad-text);
+    padding: 10px 12px;
+    font: inherit;
+}
+.ad-form-grid .ad-span-2 { grid-column: span 2; }
+.ad-dl {
+    display: grid;
+    gap: 10px;
+}
+.ad-dl > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    padding-bottom: 8px;
+}
+.ad-dl dt { color: var(--ad-text-faint); font-size: 12px; }
+.ad-dl dd { margin: 0; font-weight: 600; text-align: right; }
+.ad-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.ad-list-item:last-child { border-bottom: 0; }
+.ad-chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.ad-nav-badge {
+    margin-left: auto;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: #ff2d78;
+    color: #fff;
+    font-size: 11px;
+    font-style: normal;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.ad-bullets { margin: 8px 0 0; padding-left: 18px; }
+.ad-bullets li { margin: 4px 0; }
+.ad-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 120px;
+    padding-top: 8px;
+}
+.ad-chart span {
+    flex: 1;
+    min-width: 8px;
+    border-radius: 6px 6px 2px 2px;
+    background: linear-gradient(180deg, #2ef5e6, #ff2d78);
+    opacity: .9;
+}
+.ad-video-frame {
+    aspect-ratio: 16/9;
+    width: 100%;
+    border: 0;
+    border-radius: 14px;
+    background: #000;
+}
+
+@media (max-width: 720px) {
+    .ad-form-grid { grid-template-columns: 1fr; }
+    .ad-form-grid .ad-span-2 { grid-column: span 1; }
+    .ad-dl > div,
+    .ad-list-item { flex-direction: column; }
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 1100px) {
+    .ad-grid-3,
+    .ad-grid-4,
+    .ad-status-rail { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .ad-col-4,
+    .ad-col-5,
+    .ad-col-6,
+    .ad-col-7,
+    .ad-col-8 { grid-column: span 12; }
+    .ad-grid-12 { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 720px) {
+    .ad-grid-2,
+    .ad-grid-3,
+    .ad-grid-4,
+    .ad-status-rail { grid-template-columns: 1fr; }
+    .ad-toolbar__actions { margin-left: 0; width: 100%; }
+    .ad-toolbar label { min-width: 100%; flex: 1 1 100%; }
+    .ad-panel__head { flex-direction: column; }
+    .ad-table-wrap { max-height: 70vh; }
+}
+
+/* Light theme */
+html.ad-theme-light {
+    --ad-text: #171922;
+    --ad-text-soft: rgba(23, 25, 34, 0.62);
+    --ad-text-faint: rgba(23, 25, 34, 0.42);
+    --ad-surface: #ffffff;
+    --ad-surface-2: #f6f7fb;
+    --ad-elev: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+html.ad-theme-light .ad-panel,
+html.ad-theme-light .ad-tile,
+html.ad-theme-light .ad-toolbar,
+html.ad-theme-light .ad-stat {
+    background: var(--ad-surface);
+}
+
+html.ad-theme-light .ad-panel__title,
+html.ad-theme-light .ad-panel__head h2,
+html.ad-theme-light .ad-tile h3,
+html.ad-theme-light .ad-stat strong,
+html.ad-theme-light .ad-form-section > summary {
+    color: #171922;
+}
+
+html.ad-theme-light .ad-page .ad-table thead th {
+    background: #f0f2f8;
+}
+
+html.ad-theme-light .ad-toolbar input,
+html.ad-theme-light .ad-toolbar select {
+    background: #fff;
+    color: #171922;
+}

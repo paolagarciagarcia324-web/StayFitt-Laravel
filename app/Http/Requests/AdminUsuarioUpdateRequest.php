@@ -2,14 +2,16 @@
 
 namespace App\Http\Requests;
 
+use App\Support\FiltersAssignableRoles;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class AdminUsuarioUpdateRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->tieneRol('ADMIN') ?? false;
     }
 
     public function rules(): array
@@ -43,5 +45,23 @@ class AdminUsuarioUpdateRequest extends FormRequest
             'foto_perfil_url' => ['nullable', 'string', 'max:500'],
             'foto' => ['nullable', 'image', 'max:4096'],
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $v) {
+            $adminId = FiltersAssignableRoles::adminRoleId();
+            if ($adminId && in_array($adminId, $this->input('roles', []), true)) {
+                $v->errors()->add('roles', 'No puedes asignar el rol ADMIN desde esta pantalla.');
+            }
+        });
+    }
+
+    /**
+     * @return array<int>
+     */
+    public function sanitizedRoleIds(): array
+    {
+        return FiltersAssignableRoles::sanitize($this->input('roles', []));
     }
 }

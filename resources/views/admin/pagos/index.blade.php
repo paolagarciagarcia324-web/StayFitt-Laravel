@@ -30,6 +30,7 @@
                     <th>Estado</th>
                     <th>Fecha pago</th>
                     <th>Vence</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -77,9 +78,10 @@
                         </td>
                         <td>{{ $fechaPago ? $fechaPago->format('d/m/Y H:i') : '—' }}</td>
                         <td>{{ $fechaVence ? $fechaVence->format('d/m/Y') : '—' }}</td>
+                        <td><a class="ad-link" href="{{ route('admin.pagos.show', $p->id_pago) }}">Ver</a></td>
                     </tr>
                 @empty
-                    <tr><td colspan="9" class="ad-empty">No hay pagos registrados.</td></tr>
+                    <tr><td colspan="10" class="ad-empty">No hay pagos registrados.</td></tr>
                 @endforelse
             </tbody>
         </table>

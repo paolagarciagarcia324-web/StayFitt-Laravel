@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Cliente;
-use App\Models\Pago;
+use App\Http\Requests\Admin\AdminReporteExportRequest;
 use App\Models\Plan;
 use App\Models\ReporteGenerado;
-use Illuminate\Http\Request;
+use App\Services\Analitica\FiltroAnalitica;
+use App\Services\Analitica\ReporteExportService;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -17,70 +17,54 @@ class ReporteController extends Controller
 {
     public function index(): View
     {
-        $historial = ReporteGenerado::query()->orderByDesc('generado_en')->limit(20)->get();
+        $historial = ReporteGenerado::query()
+            ->with('usuario')
+            ->orderByDesc('generado_en')
+            ->limit(30)
+            ->get();
 
-        return view('admin.reportes.index', compact('historial'));
+        $planes = Plan::query()->orderBy('orden')->get(['id_plan', 'nombre']);
+        $tipos = ReporteExportService::TIPOS;
+
+        return view('admin.reportes.index', compact('historial', 'planes', 'tipos'));
     }
 
-    public function export(Request $request): StreamedResponse
+    public function preview(AdminReporteExportRequest $request, ReporteExportService $export): View
     {
-        $tipo = $request->validate([
-            'tipo' => ['required', 'in:pagos,clientes,cupos'],
-        ])['tipo'];
+        $data = $request->validated();
+        $filtro = FiltroAnalitica::fromArray($data);
+        $preview = $export->preview($data['tipo'], $filtro);
 
-        $filename = "stayfit_{$tipo}_".now()->format('Ymd_His').'.csv';
-
-        ReporteGenerado::create([
-            'id_user' => Auth::id(),
-            'tipo' => strtoupper($tipo),
-            'parametros_json' => ['export' => 'csv'],
-            'formato' => 'CSV',
-            'url_archivo' => $filename,
-            'generado_en' => now(),
+        return view('admin.reportes.preview', [
+            'preview' => $preview,
+            'tipo' => $data['tipo'],
+            'filtros' => $filtro->toArray(),
+            'tipos' => ReporteExportService::TIPOS,
         ]);
+    }
 
-        return response()->streamDownload(function () use ($tipo) {
-            $out = fopen('php://output', 'w');
+    public function export(AdminReporteExportRequest $request, ReporteExportService $export): StreamedResponse|Response|View
+    {
+        $data = $request->validated();
 
-            if ($tipo === 'pagos') {
-                fputcsv($out, ['id_pago', 'referencia', 'monto', 'moneda', 'estado', 'metodo', 'fecha']);
-                Pago::query()->orderByDesc('id_pago')->limit(2000)->get()->each(function ($p) use ($out) {
-                    fputcsv($out, [
-                        $p->id_pago,
-                        $p->referencia ?: $p->referencia_pago,
-                        $p->monto,
-                        $p->moneda,
-                        $p->estado_pago,
-                        $p->metodo_pago ?: $p->metodo,
-                        optional($p->creado_en)->format('Y-m-d H:i'),
-                    ]);
-                });
-            } elseif ($tipo === 'clientes') {
-                fputcsv($out, ['id_cliente', 'nombres', 'apellidos', 'correo', 'modalidad', 'estado']);
-                Cliente::query()->with('usuario')->orderByDesc('id_cliente')->limit(2000)->get()->each(function ($c) use ($out) {
-                    fputcsv($out, [
-                        $c->id_cliente,
-                        $c->usuario?->nombres,
-                        $c->usuario?->apellidos,
-                        $c->usuario?->correo,
-                        $c->modalidad,
-                        $c->estado_cliente,
-                    ]);
-                });
-            } else {
-                fputcsv($out, ['plan', 'cupos_totales', 'ocupados', 'reservados', 'estado']);
-                Plan::query()->orderBy('orden')->get()->each(function ($p) use ($out) {
-                    fputcsv($out, [
-                        $p->nombre,
-                        $p->cupos_totales,
-                        $p->cupos_ocupados,
-                        $p->cupos_reservados,
-                        $p->estado_plan,
-                    ]);
-                });
-            }
+        if (($data['formato'] ?? '') === 'web') {
+            return $this->preview($request, $export);
+        }
 
-            fclose($out);
-        }, $filename, ['Content-Type' => 'text/csv']);
+        return $export->exportar($data['tipo'], $data['formato'], FiltroAnalitica::fromArray($data));
+    }
+
+    public function download(int $id): StreamedResponse|Response
+    {
+        $reporte = ReporteGenerado::query()->findOrFail($id);
+
+        if (! $reporte->url_archivo || ! Storage::disk('local')->exists($reporte->url_archivo)) {
+            abort(404, 'Archivo de reporte no disponible.');
+        }
+
+        $path = Storage::disk('local')->path($reporte->url_archivo);
+        $name = basename($reporte->url_archivo);
+
+        return response()->download($path, $name);
     }
 }

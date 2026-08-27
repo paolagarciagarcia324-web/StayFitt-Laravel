@@ -1,10 +1,12 @@
 <?php
 
+use App\Http\Controllers\Admin\AnalisisController;
 use App\Http\Controllers\Admin\AsistenteController;
 use App\Http\Controllers\Admin\CalendarioController;
 use App\Http\Controllers\Admin\ClienteController;
 use App\Http\Controllers\Admin\CoachController;
 use App\Http\Controllers\Admin\ComunidadController;
+use App\Http\Controllers\Admin\ConfiguracionController;
 use App\Http\Controllers\Admin\CuponController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EstadisticaController;
@@ -16,6 +18,7 @@ use App\Http\Controllers\Admin\PasarelaController;
 use App\Http\Controllers\Admin\PlanController;
 use App\Http\Controllers\Admin\PropuestaPlanController;
 use App\Http\Controllers\Admin\ReporteController;
+use App\Http\Controllers\Admin\RolController;
 use App\Http\Controllers\Admin\SolicitudController;
 use App\Http\Controllers\Admin\TiendaController;
 use App\Http\Controllers\Admin\UsuarioController;
@@ -32,6 +35,8 @@ Route::middleware(['auth', 'role:ADMIN'])->prefix('admin')->name('admin.')->grou
     Route::post('/solicitudes/{id}/suspender', [SolicitudController::class, 'suspender'])->name('solicitudes.suspender');
 
     Route::get('/pagos', [PagoController::class, 'index'])->name('pagos.index');
+    Route::get('/pagos/{id}', [PagoController::class, 'show'])->name('pagos.show');
+    Route::put('/pagos/{id}', [PagoController::class, 'update'])->name('pagos.update');
 
     Route::get('/planes', [PlanController::class, 'index'])->name('planes.index');
     Route::get('/planes/crear', [PlanController::class, 'create'])->name('planes.create');
@@ -51,10 +56,18 @@ Route::middleware(['auth', 'role:ADMIN'])->prefix('admin')->name('admin.')->grou
     Route::get('/cupones', [CuponController::class, 'index'])->name('cupones.index');
     Route::post('/cupones', [CuponController::class, 'store'])->name('cupones.store');
     Route::put('/cupones/{id}', [CuponController::class, 'update'])->name('cupones.update');
+    Route::delete('/cupones/{id}', [CuponController::class, 'destroy'])->name('cupones.destroy');
+    Route::get('/cupones/{id}/usos', [CuponController::class, 'usos'])->name('cupones.usos');
 
     Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios.index');
     Route::post('/usuarios', [UsuarioController::class, 'store'])->name('usuarios.store');
     Route::put('/usuarios/{id}', [UsuarioController::class, 'update'])->name('usuarios.update');
+    Route::post('/usuarios/{id}/reset-password', [UsuarioController::class, 'resetPassword'])->name('usuarios.reset-password');
+
+    Route::get('/roles', [RolController::class, 'index'])->name('roles.index');
+
+    Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
+    Route::put('/configuracion', [ConfiguracionController::class, 'update'])->name('configuracion.update');
 
     Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
     Route::get('/clientes/virtuales', [ClienteController::class, 'virtuales'])->name('clientes.virtuales');
@@ -70,6 +83,7 @@ Route::middleware(['auth', 'role:ADMIN'])->prefix('admin')->name('admin.')->grou
     Route::get('/coaches', [CoachController::class, 'index'])->name('coaches.index');
     Route::post('/coaches', [CoachController::class, 'store'])->name('coaches.store');
     Route::put('/coaches/{id}', [CoachController::class, 'update'])->name('coaches.update');
+    Route::delete('/coaches/{id}', [CoachController::class, 'destroy'])->name('coaches.destroy');
 
     Route::get('/asistentes', [AsistenteController::class, 'index'])->name('asistentes.index');
     Route::post('/asistentes', [AsistenteController::class, 'store'])->name('asistentes.store');
@@ -96,10 +110,13 @@ Route::middleware(['auth', 'role:ADMIN'])->prefix('admin')->name('admin.')->grou
     Route::post('/tienda', [TiendaController::class, 'store'])->name('tienda.store');
     Route::put('/tienda/ordenes/{id}', [TiendaController::class, 'updateOrden'])->name('tienda.orden');
     Route::put('/tienda/{id}', [TiendaController::class, 'update'])->name('tienda.update');
+    Route::delete('/tienda/{id}', [TiendaController::class, 'destroy'])->name('tienda.destroy');
 
     Route::get('/whatsapp', [WhatsappController::class, 'index'])->name('whatsapp.index');
     Route::put('/whatsapp', [WhatsappController::class, 'update'])->name('whatsapp.update');
     Route::post('/whatsapp/grupos', [WhatsappController::class, 'storeGrupo'])->name('whatsapp.grupos');
+    Route::put('/whatsapp/grupos/{id}', [WhatsappController::class, 'updateGrupo'])->name('whatsapp.grupos.update');
+    Route::delete('/whatsapp/grupos/{id}', [WhatsappController::class, 'destroyGrupo'])->name('whatsapp.grupos.destroy');
 
     Route::get('/eventos', [EventoController::class, 'index'])->name('eventos.index');
     Route::post('/eventos', [EventoController::class, 'store'])->name('eventos.store');
@@ -112,7 +129,12 @@ Route::middleware(['auth', 'role:ADMIN'])->prefix('admin')->name('admin.')->grou
     Route::delete('/calendario/sesiones/{id}', [CalendarioController::class, 'destroy'])->name('calendario.sesiones.destroy');
     Route::get('/comunidad', [ComunidadController::class, 'index'])->name('comunidad.index');
     Route::get('/comunidad/{id}', [ComunidadController::class, 'show'])->name('comunidad.show');
+    Route::put('/comunidad/{id}', [ComunidadController::class, 'updateChat'])->name('comunidad.update');
+    Route::delete('/comunidad/{chatId}/mensajes/{mensajeId}', [ComunidadController::class, 'destroyMensaje'])->name('comunidad.mensajes.destroy');
+    Route::get('/analisis', [AnalisisController::class, 'index'])->name('analisis.index');
     Route::get('/estadisticas', [EstadisticaController::class, 'index'])->name('estadisticas.index');
     Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
+    Route::post('/reportes/preview', [ReporteController::class, 'preview'])->name('reportes.preview');
     Route::post('/reportes/export', [ReporteController::class, 'export'])->name('reportes.export');
+    Route::get('/reportes/{id}/download', [ReporteController::class, 'download'])->name('reportes.download');
 });

@@ -10,6 +10,7 @@ use App\Models\OrdenDetalle;
 use App\Models\OrdenTienda;
 use App\Models\Pago;
 use App\Models\PlanCliente;
+use App\Models\PropuestaPlan;
 use App\Models\SolicitudCompra;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -44,6 +45,14 @@ class DashboardController extends Controller
 
         $horarios = HorarioPresencial::query()->orderBy('orden')->get();
 
+        $propuestasPendientes = PropuestaPlan::query()
+            ->where('estado', PropuestaPlan::ESTADO_PENDIENTE_REVISION)
+            ->count();
+
+        $solicitudesPendientes = (int) ($metricas->solicitudes_pendientes ?? SolicitudCompra::query()
+            ->where('estado_solicitud', 'PENDIENTE')
+            ->count());
+
         $sparks = [
             'clientes' => $this->serieDiaria('clientes', 'creado_en'),
             'ingresos' => $this->serieDiaria('pagos', 'creado_en', "SUM(CASE WHEN estado_pago = 'VALIDADO' THEN monto ELSE 0 END)"),
@@ -59,6 +68,8 @@ class DashboardController extends Controller
             'sparks',
             'planesVendidos',
             'productosVendidos',
+            'propuestasPendientes',
+            'solicitudesPendientes',
         ));
     }
 
@@ -106,7 +117,7 @@ class DashboardController extends Controller
                 ->groupBy('dia')
                 ->pluck('valor', 'dia');
         } catch (\Throwable) {
-            return [2, 3, 2, 5, 4, 6, 5];
+            return array_fill(0, 7, 0);
         }
 
         return $this->completarSerie($desde, $filas);
@@ -127,7 +138,7 @@ class DashboardController extends Controller
                 ->groupBy('dia')
                 ->pluck('valor', 'dia');
         } catch (\Throwable) {
-            return [1, 2, 2, 4, 3, 5, 4];
+            return array_fill(0, 7, 0);
         }
 
         return $this->completarSerie($desde, $filas);

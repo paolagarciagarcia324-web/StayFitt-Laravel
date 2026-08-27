@@ -54,11 +54,17 @@ class SolicitudController extends Controller
     public function aprobar(Request $request, int $id): RedirectResponse
     {
         $solicitud = SolicitudCompra::where('estado_solicitud', 'PENDIENTE')->findOrFail($id);
-        $this->service->aprobar($solicitud, $request->input('observacion_admin'));
+        $tempPassword = $this->service->aprobar($solicitud, $request->input('observacion_admin'));
 
-        return redirect()
+        $redirect = redirect()
             ->route('admin.solicitudes.index')
             ->with('success', "Solicitud {$solicitud->codigo_solicitud} validada. Cliente creado/activado.");
+
+        if ($tempPassword) {
+            $redirect->with('cliente_temp_password', $tempPassword);
+        }
+
+        return $redirect;
     }
 
     public function rechazar(Request $request, int $id): RedirectResponse

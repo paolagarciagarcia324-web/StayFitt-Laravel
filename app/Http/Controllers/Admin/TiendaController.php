@@ -45,7 +45,7 @@ class TiendaController extends Controller
         $imagenUrl = $this->resolveImagen($request, $data['imagen_url'] ?? null);
 
         ProductoTienda::query()->create([
-            'id_categoria_producto' => $data['id_categoria_producto'] ?: $this->categoriaDefault()->id_categoria_producto,
+            'id_categoria_producto' => ($data['id_categoria_producto'] ?? null) ?: $this->categoriaDefault()->id_categoria_producto,
             'sku' => strtoupper($data['sku']),
             'nombre' => $data['nombre'],
             'descripcion' => $data['descripcion'] ?? null,
@@ -82,7 +82,7 @@ class TiendaController extends Controller
         $imagenUrl = $this->resolveImagen($request, $data['imagen_url'] ?? null, $producto->imagen_url);
 
         $producto->update([
-            'id_categoria_producto' => $data['id_categoria_producto'] ?: $producto->id_categoria_producto,
+            'id_categoria_producto' => ($data['id_categoria_producto'] ?? null) ?: $producto->id_categoria_producto,
             'sku' => strtoupper($data['sku']),
             'nombre' => $data['nombre'],
             'descripcion' => $data['descripcion'] ?? null,
@@ -95,6 +95,14 @@ class TiendaController extends Controller
         ]);
 
         return back()->with('success', 'Producto actualizado.');
+    }
+
+    public function destroy(int $id): RedirectResponse
+    {
+        $producto = ProductoTienda::query()->findOrFail($id);
+        $producto->update(['estado' => 'INACTIVO', 'actualizado_en' => now()]);
+
+        return back()->with('success', 'Producto desactivado.');
     }
 
     public function updateOrden(Request $request, int $id): RedirectResponse

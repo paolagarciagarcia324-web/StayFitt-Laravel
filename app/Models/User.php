@@ -32,8 +32,6 @@ class User extends Authenticatable
         'email',
         'codigo_pais',
         'telefono',
-        'password_hash',
-        'password',
         'estado',
         'estado_cuenta',
         'acepto_terminos',
@@ -41,9 +39,12 @@ class User extends Authenticatable
         'correo_verificado_en',
         'email_verificado_en',
         'ultimo_acceso_en',
-        'remember_token',
         'name',
         'foto_perfil_url',
+    ];
+
+    protected $guarded = [
+        'remember_token',
     ];
 
     protected $hidden = [
@@ -160,6 +161,11 @@ class User extends Authenticatable
         $this->attributes['password_hash'] = $this->isHashedPassword($value)
             ? $value
             : Hash::make($value);
+    }
+
+    public function assignPassword(string $plain): void
+    {
+        $this->setPasswordHashAttribute($plain);
     }
 
     public function setEstadoAttribute(?string $value): void

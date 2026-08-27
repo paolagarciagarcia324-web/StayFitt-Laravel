@@ -14,11 +14,12 @@ use App\Models\Rol;
 use App\Models\SolicitudCompra;
 use App\Models\User;
 use App\Services\SolicitudAprobacionService;
+use App\Support\FiltersAssignableRoles;
+use App\Support\GeneratesTemporaryPassword;
 use App\Support\ResolvesAdminMedia;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class UsuarioController extends Controller
@@ -49,7 +50,7 @@ class UsuarioController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        $roles = Rol::query()->orderBy('id_rol')->get();
+        $roles = FiltersAssignableRoles::forForms();
         $kpis = $this->buildPersonasKpis();
 
         return view('admin.usuarios.index', compact('usuarios', 'q', 'roles', 'kpis'));
@@ -72,7 +73,9 @@ class UsuarioController extends Controller
 
         $codigo = SolicitudCompra::generarCodigo('PRESENCIAL', $request->nombres, $request->apellidos);
 
-        DB::transaction(function () use ($request, $plan, $horario, $codigo) {
+        $tempPassword = null;
+
+        DB::transaction(function () use ($request, $plan, $horario, $codigo, &$tempPassword) {
             $datosExtra = [
                 'tipo' => 'REGISTRO_PRESENCIAL',
                 'origen_alta' => 'ADMIN',
@@ -150,7 +153,10 @@ class UsuarioController extends Controller
                 'estado_pago' => 'PENDIENTE',
             ]);
 
-            $this->activacion->aprobar($solicitud->fresh(['plan.modulos', 'pago']), 'Alta presencial desde Admin.');
+            $tempPassword = $this->activacion->aprobar(
+                $solicitud->fresh(['plan.modulos', 'pago']),
+                'Alta presencial desde Admin.'
+            );
 
             $foto = $this->resolveMedia($request, 'foto', 'avatars', 'foto_perfil_url');
             if ($foto) {
@@ -160,7 +166,7 @@ class UsuarioController extends Controller
 
         return redirect()
             ->route('admin.clientes.presenciales')
-            ->with('cliente_ok', ['accion' => 'creado']);
+            ->with('cliente_ok', ['accion' => 'creado', 'temp_password' => $tempPassword]);
     }
 
     public function update(AdminUsuarioUpdateRequest $request, int $id): RedirectResponse
@@ -192,12 +198,31 @@ class UsuarioController extends Controller
             ]);
         }
 
-        $usuario->roles()->sync($data['roles'] ?? []);
+        $usuario->roles()->sync($request->sanitizedRoleIds());
         $usuario->load('roles', 'cliente');
 
         $this->revokeClienteIfNeeded($usuario);
 
         return back()->with('usuario_ok', ['accion' => 'actualizado']);
+    }
+
+    public function resetPassword(int $id): RedirectResponse
+    {
+        $usuario = User::query()->findOrFail($id);
+
+        if ($usuario->tieneRol('ADMIN')) {
+            abort(403, 'No puedes restablecer la contraseña de un administrador desde aquí.');
+        }
+
+        $temp = GeneratesTemporaryPassword::make();
+        $usuario->assignPassword($temp);
+        $usuario->save();
+
+        return back()->with('usuario_ok', [
+            'accion' => 'password_reset',
+            'temp_password' => $temp,
+            'correo' => $usuario->correo,
+        ]);
     }
 
     private function buildPersonasKpis(): array

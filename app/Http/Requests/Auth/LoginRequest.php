@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Auth;
 
 use App\Models\User;
+use App\Services\Auth\LoginUsuarioService;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -24,7 +25,7 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
+            'email' => ['required', 'string', 'max:150'],
             'password' => ['required', 'string'],
         ];
     }
@@ -33,13 +34,16 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        $email = $this->string('email')->toString();
+        $identifier = trim($this->string('email')->toString());
         $password = $this->string('password')->toString();
 
-        /** @var User|null $user */
-        $user = User::query()->where('correo', $email)->first();
+        /** @var LoginUsuarioService $loginService */
+        $loginService = app(LoginUsuarioService::class);
 
-        if (! $user || ! $user->validatePassword($password)) {
+        /** @var User|null $user */
+        $user = $loginService->findByLogin($identifier);
+
+        if (! $user || ! $loginService->credentialsMatch($user, $password)) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -49,9 +53,9 @@ class LoginRequest extends FormRequest
 
         $estado = $user->estado ?: $user->estado_cuenta;
 
-        if ($estado === 'BLOQUEADO') {
+        if (in_array($estado, ['BLOQUEADO', 'SUSPENDIDO'], true)) {
             throw ValidationException::withMessages([
-                'email' => 'Tu cuenta está bloqueada. Contacta al administrador.',
+                'email' => 'Tu cuenta está bloqueada o suspendida. Contacta al administrador.',
             ]);
         }
 
@@ -85,6 +89,8 @@ class LoginRequest extends FormRequest
 
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        $identifier = Str::lower(trim($this->string('email')->toString()));
+
+        return Str::transliterate($identifier.'|'.$this->ip());
     }
 }

@@ -42,6 +42,26 @@ trait ResolvesStaffCoach
         abort(422, 'Debes seleccionar un coach para la propuesta.');
     }
 
+    protected function resolveCoachOrAbort(): Coach
+    {
+        $user = auth()->user();
+        if (! $user) {
+            abort(403);
+        }
+
+        if ($user->coach) {
+            return $user->coach;
+        }
+
+        if ($user->tieneRol('COACH')) {
+            $coachId = $this->resolveCoachIdForUser($user);
+
+            return Coach::query()->findOrFail($coachId);
+        }
+
+        abort(403, 'Debes tener perfil de coach para acceder.');
+    }
+
     protected function userCanAccessPropuesta(User $user, \App\Models\PropuestaPlan $propuesta): bool
     {
         if ($user->tieneRol('ADMIN') || $user->tieneRol('ASISTENTE_TECNICO')) {

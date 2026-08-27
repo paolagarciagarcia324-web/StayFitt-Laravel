@@ -40,4 +40,10 @@ class PlanEntrenamiento extends Model
     {
         return $this->belongsTo(Cliente::class, 'id_cliente', 'id_cliente');
     }
+
+    public function rutinas(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Rutina::class, 'id_plan_entrenamiento', 'id_plan_entrenamiento')
+            ->orderBy('orden');
+    }
 }

@@ -15,4 +15,26 @@ class ModuloServicio extends Model
     const CREATED_AT = 'creado_en';
 
     const UPDATED_AT = 'actualizado_en';
+
+    protected $fillable = [
+        'codigo',
+        'codigo_modulo',
+        'nombre',
+        'nombre_modulo',
+        'descripcion',
+        'icono',
+        'orden',
+        'exclusivo_modalidad',
+        'estado',
+    ];
+
+    public function codigoCanonico(): string
+    {
+        return strtoupper(trim((string) ($this->codigo ?: $this->codigo_modulo)));
+    }
+
+    public function nombreCanonico(): string
+    {
+        return trim((string) ($this->nombre ?: $this->nombre_modulo ?: $this->codigoCanonico()));
+    }
 }

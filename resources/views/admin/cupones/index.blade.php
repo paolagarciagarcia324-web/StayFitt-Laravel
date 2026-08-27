@@ -8,7 +8,8 @@
 @endsection
 
 @section('content')
-    <section class="ad-card ad-users">
+    <x-admin.panel title="Cupones activos y vigentes" subtitle="Descuentos aplicables a planes" flush>
+        <div class="ad-table-wrap">
         <table class="ad-table ad-users-table">
             <thead>
                 <tr>
@@ -33,6 +34,7 @@
                         <td>{{ $cupon->usos_actuales }}/{{ $cupon->usos_maximos ?: $cupon->uso_maximo ?: '∞' }}</td>
                         <td><span class="ad-badge {{ ($cupon->estado ?: $cupon->estado_cupon) === 'ACTIVO' ? 'ad-badge-ok' : 'ad-badge-bad' }}">{{ $cupon->estado ?: $cupon->estado_cupon }}</span></td>
                         <td>
+                            <a class="ad-link" href="{{ route('admin.cupones.usos', $cupon->id_descuento) }}">Usos</a>
                             <button class="ad-btn ad-btn-ghost" type="button"
                                 data-open-cupon-edit
                                 data-id="{{ $cupon->id_descuento }}"
@@ -41,6 +43,13 @@
                                 data-fin="{{ optional($cupon->fecha_fin)->format('Y-m-d\\TH:i') }}"
                                 data-usos="{{ $cupon->usos_maximos ?: $cupon->uso_maximo }}"
                                 data-estado="{{ $cupon->estado ?: $cupon->estado_cupon }}">Editar</button>
+                            @if (($cupon->estado ?: $cupon->estado_cupon) === 'ACTIVO')
+                                <form method="POST" action="{{ route('admin.cupones.destroy', $cupon->id_descuento) }}" style="display:inline" onsubmit="return confirm('¿Desactivar este cupón?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="ad-btn ad-btn-ghost" type="submit">Desactivar</button>
+                                </form>
+                            @endif
                         </td>
                     </tr>
                 @empty
@@ -56,8 +65,11 @@
                 @endforelse
             </tbody>
         </table>
-        <div class="ad-pagination">{{ $cupones->links() }}</div>
-    </section>
+        </div>
+        <div class="ad-panel__foot" style="justify-content:center">
+            {{ $cupones->links() }}
+        </div>
+    </x-admin.panel>
 
     <div class="ad-modal" data-cupon-modal hidden>
         <div class="ad-modal-card">

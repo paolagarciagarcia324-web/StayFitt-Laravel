@@ -37,4 +37,35 @@ class Coach extends Model
     {
         return $this->hasMany(Cliente::class, 'id_coach', 'id_coach');
     }
+
+    public function clientesAsignados(): HasMany
+    {
+        return $this->hasMany(Cliente::class, 'id_coach_asignado', 'id_coach');
+    }
+
+    public function planesEntrenamiento(): HasMany
+    {
+        return $this->hasMany(PlanEntrenamiento::class, 'id_coach', 'id_coach');
+    }
+
+    public function sesiones(): HasMany
+    {
+        return $this->hasMany(Sesion::class, 'id_coach', 'id_coach');
+    }
+
+    public function chats(): HasMany
+    {
+        return $this->hasMany(Chat::class, 'id_coach', 'id_coach');
+    }
+
+    public function totalClientesActivos(): int
+    {
+        return Cliente::query()
+            ->where(function ($q) {
+                $q->where('id_coach', $this->id_coach)
+                    ->orWhere('id_coach_asignado', $this->id_coach);
+            })
+            ->whereIn('estado_cliente', ['ACTIVA', 'ACTIVO'])
+            ->count();
+    }
 }

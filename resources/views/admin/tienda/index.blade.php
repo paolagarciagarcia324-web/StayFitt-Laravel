@@ -55,6 +55,13 @@
                                 <div class="ad-ml-meta">
                                     <span class="ad-pill-days">Stock {{ $producto->stock_total }}</span>
                                     <button class="ad-btn ad-btn-ghost" type="button" data-open-product-edit>Editar</button>
+                                    @if ($producto->estado === 'ACTIVO')
+                                        <form method="POST" action="{{ route('admin.tienda.destroy', $producto->id_producto) }}" style="display:inline" onsubmit="return confirm('¿Desactivar producto?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="ad-btn ad-btn-ghost" type="submit">Desactivar</button>
+                                        </form>
+                                    @endif
                                 </div>
                             </div>
                         </article>

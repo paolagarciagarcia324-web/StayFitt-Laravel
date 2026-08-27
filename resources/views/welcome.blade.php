@@ -17,7 +17,7 @@
 
         <div class="ff-actions">
             @if (($novedades ?? collect())->isNotEmpty())
-                <button type="button" class="ff-news-trigger" data-news-open aria-haspopup="dialog" aria-controls="ff-news-panel">
+                <button type="button" class="ff-news-trigger" data-news-open aria-haspopup="dialog" aria-controls="ff-news-modal" aria-expanded="false">
                     <span class="ff-news-trigger-pulse" aria-hidden="true"></span>
                     <span class="ff-news-trigger-label">Novedades</span>
                     <span class="ff-news-trigger-badge">{{ $novedades->count() }}</span>
@@ -28,34 +28,38 @@
     </header>
 
     @if (($novedades ?? collect())->isNotEmpty())
-        <div class="ff-news-overlay" data-news-overlay hidden></div>
-        <aside class="ff-news-panel" id="ff-news-panel" data-news-panel hidden role="dialog" aria-modal="true" aria-label="Novedades FigueFit">
-            <div class="ff-news-panel-head">
-                <div>
+        <div class="ff-news-modal is-hidden" id="ff-news-modal" data-news-modal role="dialog" aria-modal="true" aria-labelledby="ff-news-title" aria-hidden="true">
+            <div class="ff-news-dialog" role="document">
+                <button type="button" class="ff-news-close" data-news-close aria-label="Cerrar novedades">
+                    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 0 0 5.7 7.11L10.59 12 5.7 16.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.89a1 1 0 0 0 1.41-1.41L13.41 12l4.89-4.89a1 1 0 0 0 0-1.4Z"/></svg>
+                </button>
+
+                <header class="ff-news-dialog-head">
                     <p class="ff-news-kicker">Lo nuevo en FigueFit</p>
-                    <h2>Novedades</h2>
+                    <h2 id="ff-news-title">Novedades</h2>
+                    <p class="ff-news-lead">Promos, planes y actualizaciones de la plataforma.</p>
+                </header>
+
+                <div class="ff-news-grid">
+                    @foreach ($novedades as $novedad)
+                        <article class="ff-news-card">
+                            <div class="ff-news-card-media" style="background-image: url('{{ $novedad->imagenSrc() }}')"></div>
+                            <div class="ff-news-card-body">
+                                <span class="ff-news-type">{{ $novedad->etiquetaTipo() }}</span>
+                                <h3>{{ $novedad->titulo }}</h3>
+                                @if ($novedad->subtitulo)
+                                    <p class="ff-news-sub">{{ $novedad->subtitulo }}</p>
+                                @endif
+                                @if ($novedad->descripcion)
+                                    <p class="ff-news-desc">{{ $novedad->descripcion }}</p>
+                                @endif
+                                <a class="ff-news-cta" href="{{ $novedad->destinoUrl() }}">{{ $novedad->boton_texto }}</a>
+                            </div>
+                        </article>
+                    @endforeach
                 </div>
-                <button type="button" class="ff-news-close" data-news-close aria-label="Cerrar">×</button>
             </div>
-            <div class="ff-news-track">
-                @foreach ($novedades as $novedad)
-                    <article class="ff-news-card">
-                        <div class="ff-news-card-media" style="background-image: url('{{ $novedad->imagenSrc() }}')"></div>
-                        <div class="ff-news-card-body">
-                            <span class="ff-news-type">{{ $novedad->etiquetaTipo() }}</span>
-                            <h3>{{ $novedad->titulo }}</h3>
-                            @if ($novedad->subtitulo)
-                                <p class="ff-news-sub">{{ $novedad->subtitulo }}</p>
-                            @endif
-                            @if ($novedad->descripcion)
-                                <p>{{ $novedad->descripcion }}</p>
-                            @endif
-                            <a class="ff-news-cta" href="{{ $novedad->destinoUrl() }}">{{ $novedad->boton_texto }}</a>
-                        </div>
-                    </article>
-                @endforeach
-            </div>
-        </aside>
+        </div>
     @endif
 
     <main>
@@ -304,35 +308,5 @@
     </a>
 
     <script src="{{ asset('js/welcome.js') }}"></script>
-    <script>
-        (function () {
-            var openBtn = document.querySelector('[data-news-open]');
-            var panel = document.querySelector('[data-news-panel]');
-            var overlay = document.querySelector('[data-news-overlay]');
-            if (!openBtn || !panel) return;
-
-            function openNews() {
-                panel.hidden = false;
-                if (overlay) overlay.hidden = false;
-                document.body.classList.add('ff-news-open');
-                openBtn.setAttribute('aria-expanded', 'true');
-            }
-            function closeNews() {
-                panel.hidden = true;
-                if (overlay) overlay.hidden = true;
-                document.body.classList.remove('ff-news-open');
-                openBtn.setAttribute('aria-expanded', 'false');
-            }
-
-            openBtn.addEventListener('click', openNews);
-            document.querySelectorAll('[data-news-close]').forEach(function (btn) {
-                btn.addEventListener('click', closeNews);
-            });
-            if (overlay) overlay.addEventListener('click', closeNews);
-            document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape') closeNews();
-            });
-        })();
-    </script>
 </body>
 </html>

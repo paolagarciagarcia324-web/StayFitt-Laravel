@@ -279,7 +279,7 @@ Cliente de prueba “compra” y queda con módulos. **Flujo manual cumplido; pa
 4. Storage (comprobantes, fotos, videos)  
 5. IA nutrición y validación de video  
 6. Tests Pest de auth, pago y accesos  
-7. Cliente institucional  
+7. Cliente institucional ✅  
 
 ---
 
