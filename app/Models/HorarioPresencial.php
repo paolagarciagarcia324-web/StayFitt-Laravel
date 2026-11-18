@@ -61,8 +61,43 @@ class HorarioPresencial extends Model
         return self::formatoHora12((string) $this->hora_inicio).' – '.self::formatoHora12((string) $this->hora_fin);
     }
 
+    public function grupoWhatsappVinculado(): ?GrupoWhatsapp
+    {
+        $guardado = trim((string) $this->link_whatsapp);
+        if ($guardado === '') {
+            return GrupoWhatsapp::query()
+                ->where('estado', 'ACTIVO')
+                ->where('criterio', $this->codigo)
+                ->first();
+        }
+
+        if (preg_match('#^https?://#i', $guardado)) {
+            return GrupoWhatsapp::query()
+                ->where('estado', 'ACTIVO')
+                ->where('link_invitacion', $guardado)
+                ->first()
+                ?: GrupoWhatsapp::query()
+                    ->where('estado', 'ACTIVO')
+                    ->where('criterio', $this->codigo)
+                    ->first();
+        }
+
+        return GrupoWhatsapp::query()
+            ->where('estado', 'ACTIVO')
+            ->where(function ($q) use ($guardado) {
+                $q->where('nombre', $guardado)
+                    ->orWhere('criterio', $this->codigo);
+            })
+            ->first();
+    }
+
     public function nombreGrupoWhatsapp(): string
     {
+        $grupo = $this->grupoWhatsappVinculado();
+        if ($grupo) {
+            return $grupo->nombre;
+        }
+
         $guardado = trim((string) $this->link_whatsapp);
         if ($guardado !== '' && ! preg_match('#^https?://#i', $guardado)) {
             return $guardado;
@@ -74,6 +109,11 @@ class HorarioPresencial extends Model
     /** Enlace de invitación al grupo (URL real o demo por código). */
     public function urlGrupoWhatsapp(): string
     {
+        $grupo = $this->grupoWhatsappVinculado();
+        if ($grupo && trim((string) $grupo->link_invitacion) !== '') {
+            return trim((string) $grupo->link_invitacion);
+        }
+
         $guardado = trim((string) $this->link_whatsapp);
         if (preg_match('#^https?://#i', $guardado)) {
             return $guardado;

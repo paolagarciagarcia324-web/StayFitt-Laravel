@@ -423,6 +423,22 @@
                     lastSubmitted = '';
                     syncClear();
                     filterLocalRows('');
+
+                    /* Pagos / instituciones: filtro en vivo local; no recargar ni saltar al inicio del módulo. */
+                    var localOnly = live && board && (
+                        board.querySelector('[data-inst-card]') ||
+                        board.querySelector('[data-pay-card]')
+                    );
+                    if (localOnly) {
+                        try {
+                            var url = new URL(window.location.href);
+                            url.searchParams.delete(input.getAttribute('name') || 'q');
+                            history.replaceState({}, '', url.pathname + url.search + (url.hash || ''));
+                        } catch (err) {}
+                        input.focus();
+                        return;
+                    }
+
                     window.location.href = clear.getAttribute('href') || form.getAttribute('action') || window.location.pathname;
                 });
 

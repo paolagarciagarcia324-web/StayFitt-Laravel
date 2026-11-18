@@ -1733,14 +1733,197 @@
 }
 .ad-gate-logo img { max-width: 70%; max-height: 70%; }
 
-/* Horarios occupancy rings */
+/* Horarios: bloques de 10 + cards estilo período */
+.ad-horario-block {
+    margin-bottom: 22px;
+}
+.ad-horario-block-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 14px;
+}
+.ad-horario-block-badge {
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #2ef5e6;
+    background: rgba(46, 245, 230, 0.12);
+    border: 1px solid rgba(46, 245, 230, 0.28);
+}
+.ad-horario-block-head strong {
+    display: block;
+    font-size: 15px;
+    color: #fff;
+}
+.ad-horario-block-head em {
+    display: block;
+    margin-top: 2px;
+    font-style: normal;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.55);
+}
 .ad-horario-board {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 16px;
 }
-.ad-horario-card { transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease; }
-.ad-horario-card:hover { transform: translateY(-6px); }
+.ad-horario-card {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 10px;
+    padding: 18px;
+    border-radius: 22px;
+    overflow: hidden;
+    isolation: isolate;
+    color: #fff;
+    background:
+        radial-gradient(420px 200px at 88% 8%, rgba(255, 45, 120, 0.22), transparent 58%),
+        radial-gradient(360px 180px at 12% 90%, rgba(46, 245, 230, 0.12), transparent 60%),
+        linear-gradient(165deg, rgba(36, 26, 48, 0.96), rgba(16, 12, 24, 0.98));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.06),
+        0 18px 36px rgba(0, 0, 0, 0.28);
+    animation: adHorarioCardIn 0.55s cubic-bezier(.16,1,.3,1) both;
+    animation-delay: var(--d, 0ms);
+    transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+}
+.ad-horario-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(46, 245, 230, 0.32);
+    box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.4),
+        0 0 28px rgba(255, 45, 120, 0.14);
+}
+.ad-horario-card.is-off { opacity: 0.78; filter: saturate(0.85); }
+.ad-horario-card-shine {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(115deg, transparent 30%, rgba(46, 245, 230, 0.1) 48%, transparent 62%);
+    transform: translateX(-120%);
+    pointer-events: none;
+    z-index: 0;
+}
+.ad-horario-card:hover .ad-horario-card-shine {
+    animation: adHorarioShine 0.9s ease forwards;
+}
+.ad-horario-card > * { position: relative; z-index: 1; }
+.ad-horario-card-nav {
+    display: flex;
+    justify-content: center;
+}
+.ad-horario-card-orb {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    color: #2ef5e6;
+    background: rgba(46, 245, 230, 0.1);
+    border: 1px solid rgba(46, 245, 230, 0.28);
+}
+.ad-horario-card-orb .ad-ico { width: 18px; height: 18px; }
+.ad-horario-card-badge {
+    justify-self: start;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #2ef5e6;
+    background: rgba(46, 245, 230, 0.12);
+    border: 1px solid rgba(46, 245, 230, 0.22);
+}
+.ad-horario-card-badge.is-off {
+    color: #ff8fb8;
+    background: rgba(255, 45, 120, 0.12);
+    border-color: rgba(255, 45, 120, 0.28);
+}
+.ad-horario-card-title {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+}
+.ad-horario-card-sub {
+    margin: 0;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.55);
+}
+.ad-horario-card-list {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 10px 0 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: grid;
+    gap: 9px;
+}
+.ad-horario-card-list li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13px;
+}
+.ad-horario-card-list span { color: rgba(255, 255, 255, 0.55); }
+.ad-horario-card-list strong {
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+.ad-horario-cupo-bar {
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+}
+.ad-horario-cupo-bar i {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #ff2d78, #2ef5e6);
+    transition: width 0.7s cubic-bezier(.16,1,.3,1);
+}
+.ad-horario-wa {
+    margin: 0;
+    padding: 8px 10px;
+    border-radius: 12px;
+    background: rgba(46, 245, 230, 0.07);
+    border: 1px solid rgba(46, 245, 230, 0.18);
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.88);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-decoration: none;
+    display: block;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.ad-horario-wa span {
+    color: #2ef5e6;
+    font-weight: 800;
+    margin-right: 4px;
+}
+.ad-horario-wa:hover {
+    transform: translateY(-1px);
+    border-color: rgba(46, 245, 230, 0.45);
+    box-shadow: 0 0 18px rgba(46, 245, 230, 0.22);
+    color: #fff;
+}
+@keyframes adHorarioCardIn {
+    from { opacity: 0; transform: translateY(16px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes adHorarioShine {
+    to { transform: translateX(120%); }
+}
 
 /* ===== Horarios: KPIs vivos ===== */
 .ad-horario-kpis {
@@ -1872,15 +2055,36 @@
 }
 
 /* ===== Horarios: modal editar con luz/animación ===== */
+.ad-horario-modal.ad-modal {
+    align-items: start;
+    overflow: auto;
+    padding-top: 4vh;
+    padding-bottom: 8vh;
+}
 .ad-horario-modal .ad-horario-modal-card {
     position: relative;
-    overflow: hidden;
+    overflow: visible;
+    max-height: none;
+    width: min(520px, 100%);
     border: 1px solid rgba(46, 245, 230, 0.18);
     box-shadow:
         0 24px 60px rgba(0, 0, 0, 0.45),
         0 0 40px rgba(255, 45, 120, 0.12),
         inset 0 1px 0 rgba(255, 255, 255, 0.08);
     animation: adHorarioModalIn 0.38s cubic-bezier(.16,1,.3,1) both;
+}
+.ad-horario-modal .ad-horario-form {
+    overflow: visible;
+    position: relative;
+    z-index: 2;
+}
+.ad-horario-modal .ad-sf-time,
+.ad-horario-modal .ad-wa-pick {
+    z-index: 3;
+}
+.ad-horario-modal .ad-sf-time:focus-within,
+.ad-horario-modal .ad-wa-pick:focus-within {
+    z-index: 5;
 }
 .ad-horario-modal-glow {
     position: absolute;
@@ -1958,6 +2162,284 @@
     0%, 100% { box-shadow: 0 0 0 1px rgba(46, 245, 230, 0.1), 0 0 18px rgba(46, 245, 230, 0.1); }
     50% { box-shadow: 0 0 0 1px rgba(46, 245, 230, 0.22), 0 0 28px rgba(46, 245, 230, 0.22); }
 }
+
+/* ===== Time picker StayFit ===== */
+.ad-sf-time {
+    position: relative;
+    display: grid;
+    gap: 6px;
+}
+.ad-sf-time-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.72);
+}
+.ad-sf-time-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    min-height: 46px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(46, 245, 230, 0.28);
+    background:
+        linear-gradient(160deg, rgba(46, 245, 230, 0.08), transparent 55%),
+        rgba(12, 10, 18, 0.85);
+    color: #fff;
+    cursor: pointer;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+.ad-sf-time-trigger:hover,
+.ad-sf-time-trigger:focus-visible {
+    border-color: rgba(255, 45, 120, 0.45);
+    box-shadow: 0 0 0 3px rgba(255, 45, 120, 0.12), 0 0 18px rgba(46, 245, 230, 0.12);
+    outline: none;
+}
+.ad-sf-time-trigger strong {
+    font-size: 16px;
+    letter-spacing: -0.02em;
+}
+.ad-sf-time-trigger i,
+.ad-sf-time-trigger .ad-ico {
+    width: 18px;
+    height: 18px;
+    color: #2ef5e6;
+    opacity: 0.9;
+}
+.ad-sf-time.is-open { z-index: 30; }
+.ad-sf-time-panel {
+    position: fixed;
+    z-index: 120;
+    padding: 10px;
+    border-radius: 16px;
+    border: 1px solid rgba(46, 245, 230, 0.28);
+    background: rgba(14, 18, 30, 0.98);
+    box-shadow:
+        0 18px 40px rgba(0, 0, 0, 0.55),
+        0 0 24px rgba(46, 245, 230, 0.1);
+    /* sin animación en open: evita lag al scrollear opciones */
+}
+.ad-sf-time-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+}
+.ad-sf-time-col {
+    max-height: 196px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding: 4px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    will-change: scroll-position;
+}
+.ad-sf-time-col::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;
+    background: transparent;
+}
+.ad-sf-time-opt {
+    display: block;
+    width: 100%;
+    border: 1px solid transparent;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.82);
+    padding: 8px 6px;
+    margin: 2px 0;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    /* sin transition: scroll fluido */
+}
+.ad-sf-time-opt:hover {
+    background: rgba(255, 45, 120, 0.08);
+    color: #ff8fb8;
+    border-color: rgba(255, 45, 120, 0.25);
+}
+.ad-sf-time-opt.is-on {
+    background: rgba(12, 10, 18, 0.65);
+    color: #ff2d78;
+    border: 1px solid #ff2d78;
+    box-shadow: none;
+}
+
+/* ===== WhatsApp group picker ===== */
+.ad-wa-pick {
+    position: relative;
+    display: grid;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+.ad-wa-pick-trigger {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 56px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(46, 245, 230, 0.3);
+    background:
+        linear-gradient(145deg, rgba(37, 211, 102, 0.1), transparent 50%),
+        rgba(12, 10, 18, 0.85);
+    color: #fff;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+.ad-wa-pick-trigger:hover,
+.ad-wa-pick.is-filled .ad-wa-pick-trigger {
+    border-color: rgba(37, 211, 102, 0.55);
+    box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.1), 0 0 18px rgba(46, 245, 230, 0.08);
+}
+.ad-wa-pick.is-error .ad-wa-pick-trigger {
+    border-color: rgba(255, 45, 120, 0.7);
+    box-shadow: 0 0 0 3px rgba(255, 45, 120, 0.15);
+}
+.ad-wa-pick-ico {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    color: #25d366;
+    background: rgba(37, 211, 102, 0.14);
+    border: 1px solid rgba(37, 211, 102, 0.35);
+    flex-shrink: 0;
+}
+.ad-wa-pick-ico .ad-ico { width: 18px; height: 18px; }
+.ad-wa-pick-copy {
+    flex: 1;
+    min-width: 0;
+}
+.ad-wa-pick-copy strong {
+    display: block;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.ad-wa-pick-copy em {
+    display: block;
+    margin-top: 2px;
+    font-style: normal;
+    font-size: 11px;
+    color: var(--muted, rgba(255,255,255,.55));
+}
+.ad-wa-pick-chev {
+    color: #2ef5e6;
+    font-size: 12px;
+}
+.ad-wa-pick-panel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 8px);
+    z-index: 80;
+    padding: 12px;
+    border-radius: 16px;
+    border: 1px solid rgba(37, 211, 102, 0.35);
+    background:
+        radial-gradient(280px 140px at 90% 0%, rgba(37, 211, 102, 0.12), transparent 55%),
+        rgba(12, 16, 28, 0.98);
+    box-shadow: 0 20px 44px rgba(0, 0, 0, 0.55), 0 0 24px rgba(37, 211, 102, 0.1);
+    animation: adHorarioModalIn 0.22s ease both;
+}
+.ad-wa-pick-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+.ad-wa-pick-head strong {
+    font-size: 13px;
+    letter-spacing: 0.02em;
+}
+.ad-wa-pick-head a {
+    font-size: 11px;
+    font-weight: 700;
+    color: #2ef5e6;
+    text-decoration: none;
+}
+.ad-wa-pick-head a:hover { color: #ff2d78; }
+.ad-wa-pick-search {
+    width: 100%;
+    margin-bottom: 8px;
+    min-height: 38px;
+    padding: 8px 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.04);
+    color: #fff;
+}
+.ad-wa-pick-search:focus {
+    outline: none;
+    border-color: rgba(46, 245, 230, 0.45);
+}
+.ad-wa-pick-list {
+    max-height: 220px;
+    overflow: auto;
+    display: grid;
+    gap: 6px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.ad-wa-pick-list::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;
+}
+.ad-wa-pick-item {
+    display: grid;
+    gap: 2px;
+    width: 100%;
+    text-align: left;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(12, 10, 18, 0.55);
+    color: #fff;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+.ad-wa-pick-item:hover {
+    border-color: rgba(255, 45, 120, 0.45);
+    color: #ff8fb8;
+    transform: translateY(-1px);
+}
+.ad-wa-pick-item.is-on {
+    border-color: #ff2d78;
+    background: rgba(12, 10, 18, 0.72);
+    color: #ff2d78;
+    box-shadow: none;
+}
+.ad-wa-pick-item.is-on strong,
+.ad-wa-pick-item.is-on em { color: inherit; }
+.ad-wa-pick-item strong { font-size: 13px; }
+.ad-wa-pick-item em {
+    font-style: normal;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.55);
+}
+.ad-wa-pick-empty,
+.ad-wa-pick-hint {
+    margin: 0;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.55);
+    line-height: 1.45;
+}
+.ad-wa-pick-empty { padding: 12px; text-align: center; }
 
 @media (max-width: 1100px) {
     .ad-horario-kpis { grid-template-columns: 1fr 1fr; }
