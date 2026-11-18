@@ -1,0 +1,47 @@
+[
+    {
+        "id": "CART-LOGIN",
+        "status": "APROBADO",
+        "detail": "login 302"
+    },
+    {
+        "id": "CART-TIENDA",
+        "status": "APROBADO",
+        "detail": "tienda 200"
+    },
+    {
+        "id": "CART-ADD",
+        "status": "APROBADO",
+        "detail": "POST agregar #35 302 loc=http:\/\/127.0.0.1:8000\/cliente\/tienda\r"
+    },
+    {
+        "id": "CART-VIEW",
+        "status": "APROBADO",
+        "detail": "GET carrito 200"
+    },
+    {
+        "id": "CART-CHECKOUT",
+        "status": "APROBADO",
+        "detail": "checkout 302 loc=http:\/\/127.0.0.1:8000\/cliente\/tienda\/ordenes\r"
+    },
+    {
+        "id": "CART-ORDENES",
+        "status": "APROBADO",
+        "detail": "ordenes cliente 200"
+    },
+    {
+        "id": "CART-ADMIN-TIENDA",
+        "status": "APROBADO",
+        "detail": "admin tienda 200"
+    },
+    {
+        "id": "CART-MYSQL-ORDEN",
+        "status": "APROBADO",
+        "detail": "orden id=25 obs=Pedido QA E2E estado=PENDIENTE"
+    },
+    {
+        "id": "CART-STOCK",
+        "status": "APROBADO",
+        "detail": "stock antes=25 despues=25"
+    }
+]

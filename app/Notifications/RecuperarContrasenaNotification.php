@@ -2,14 +2,11 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class RecuperarContrasenaNotification extends Notification
 {
-    use Queueable;
-
     public function __construct(public string $token) {}
 
     public function via(object $notifiable): array
@@ -24,11 +21,14 @@ class RecuperarContrasenaNotification extends Notification
             'email' => $notifiable->getEmailForPasswordReset(),
         ], false));
 
+        $nombre = trim((string) $notifiable->name) ?: 'usuario StayFit';
+
         return (new MailMessage)
-            ->subject('Recupera tu acceso a FigueFit')
-            ->greeting('Hola, '.$notifiable->name)
-            ->line('Recibimos una solicitud para restablecer la contraseña de tu cuenta FigueFit.')
-            ->action('Definir nueva contraseña', $url)
-            ->line('Este enlace vence en 60 minutos. Si no fuiste tú, ignora este mensaje y tu acceso seguirá igual.');
+            ->subject('Recupera tu acceso a StayFit')
+            ->view('emails.recuperar-contrasena', [
+                'url' => $url,
+                'nombre' => $nombre,
+                'minutos' => 60,
+            ]);
     }
 }

@@ -8,7 +8,12 @@ use App\Models\Cliente;
 use App\Models\Coach;
 use App\Models\HistorialAsignacionCoach;
 use App\Models\HorarioPresencial;
+use App\Models\Institucion;
 use App\Models\Plan;
+use App\Models\PlanCliente;
+use App\Models\Rol;
+use App\Models\User;
+use App\Services\Comunicacion\ChatService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,6 +23,8 @@ use Illuminate\View\View;
 
 class ClienteController extends Controller
 {
+    public function __construct(private ChatService $chats) {}
+
     public function index(): RedirectResponse
     {
         return redirect()->route('admin.clientes.virtuales');
@@ -69,6 +76,8 @@ class ClienteController extends Controller
             $cliente->usuario->update(['telefono' => $data['telefono']]);
         }
 
+        $this->aplicarEfectosEstado($cliente->fresh('usuario'), $data['estado_cliente']);
+
         return redirect()
             ->route($this->listRouteName($cliente))
             ->with('success', 'Cliente actualizado.');
@@ -119,6 +128,8 @@ class ClienteController extends Controller
                         'motivo' => $data['motivo'] ?? 'Actualización desde Admin',
                         'asignado_en' => now(),
                     ]);
+
+                    $this->abrirChatCoachSiAplica($cliente);
                 }
             }
 
@@ -140,6 +151,8 @@ class ClienteController extends Controller
                 ]);
             }
         });
+
+        $this->aplicarEfectosEstado($cliente->fresh(['usuario', 'planesCliente']), $data['estado_cliente']);
 
         $nombre = trim(($cliente->usuario?->nombres ?? '').' '.($cliente->usuario?->apellidos ?? ''));
 
@@ -175,6 +188,8 @@ class ClienteController extends Controller
             'asignado_en' => now(),
         ]);
 
+        $this->abrirChatCoachSiAplica($cliente);
+
         return redirect()
             ->route($this->listRouteName($cliente))
             ->with('success', 'Coach asignado al cliente.');
@@ -205,11 +220,15 @@ class ClienteController extends Controller
 
     public function destroy(int $id): RedirectResponse
     {
-        $cliente = Cliente::query()->findOrFail($id);
+        $cliente = Cliente::query()->with(['usuario.roles', 'planesCliente'])->findOrFail($id);
         $modalidad = $cliente->modalidad;
         $cid = $cliente->id_cliente;
+        $idHorario = $cliente->id_horario;
+        $idInstitucion = $cliente->id_institucion;
+        $planIds = $cliente->planesCliente->pluck('id_plan')->unique()->filter()->all();
+        $usuario = $cliente->usuario;
 
-        DB::transaction(function () use ($cliente, $cid) {
+        DB::transaction(function () use ($cliente, $cid, $idHorario, $idInstitucion, $planIds, $usuario) {
             HistorialAsignacionCoach::query()->where('id_cliente', $cid)->delete();
 
             if (Schema::hasTable('carritos') && Schema::hasTable('carrito_items')) {
@@ -251,12 +270,20 @@ class ClienteController extends Controller
                 'consultas_ia_nutricion',
                 'recordatorios',
             ] as $table) {
-                if (Schema::hasTable($table)) {
+                if (Schema::hasTable($table) && Schema::hasColumn($table, 'id_cliente')) {
                     DB::table($table)->where('id_cliente', $cid)->delete();
                 }
             }
 
             $cliente->delete();
+
+            HorarioPresencial::sincronizarCupo($idHorario ? (int) $idHorario : null);
+            Institucion::sincronizarCupos($idInstitucion ? (int) $idInstitucion : null);
+            foreach ($planIds as $planId) {
+                Plan::sincronizarCupos((int) $planId);
+            }
+
+            $this->cerrarCuentaCliente($usuario);
         });
 
         $listRoute = $modalidad === 'PRESENCIAL'
@@ -326,5 +353,92 @@ class ClienteController extends Controller
         return $cliente->modalidad === 'PRESENCIAL'
             ? 'admin.clientes.presenciales'
             : 'admin.clientes.virtuales';
+    }
+
+    private function abrirChatCoachSiAplica(Cliente $cliente): void
+    {
+        $cliente->loadMissing('usuario');
+        if (strtoupper((string) $cliente->modalidad) === 'PRESENCIAL') {
+            return;
+        }
+
+        $this->chats->obtenerOcrearChatCoachCliente($cliente);
+    }
+
+    private function aplicarEfectosEstado(Cliente $cliente, string $estado): void
+    {
+        $estado = strtoupper($estado);
+        $usuario = $cliente->usuario;
+        if (! $usuario) {
+            return;
+        }
+
+        $esStaff = $this->usuarioEsStaff($usuario);
+
+        if (in_array($estado, ['INACTIVO', 'SUSPENDIDO'], true)) {
+            AccesoClienteModulo::query()
+                ->where('id_cliente', $cliente->id_cliente)
+                ->where('estado_acceso', 'ACTIVO')
+                ->update(['estado_acceso' => $estado === 'SUSPENDIDO' ? 'SUSPENDIDO' : 'INACTIVO']);
+
+            PlanCliente::query()
+                ->where('id_cliente', $cliente->id_cliente)
+                ->where('estado_plan_cliente', 'ACTIVO')
+                ->update(['estado_plan_cliente' => $estado === 'SUSPENDIDO' ? 'SUSPENDIDO' : 'INACTIVO']);
+
+            if (! $esStaff) {
+                $cuenta = $estado === 'SUSPENDIDO' ? 'SUSPENDIDO' : 'INACTIVO';
+                $usuario->update(['estado' => $cuenta, 'estado_cuenta' => $cuenta]);
+            }
+
+            foreach ($cliente->planesCliente()->pluck('id_plan') as $planId) {
+                Plan::sincronizarCupos((int) $planId);
+            }
+            HorarioPresencial::sincronizarCupo($cliente->id_horario ? (int) $cliente->id_horario : null);
+
+            return;
+        }
+
+        if (in_array($estado, ['ACTIVO', 'ACTIVA'], true) && ! $esStaff) {
+            if (in_array((string) ($usuario->estado ?: $usuario->estado_cuenta), ['INACTIVO', 'SUSPENDIDO'], true)) {
+                $usuario->update(['estado' => 'ACTIVO', 'estado_cuenta' => 'ACTIVO']);
+            }
+        }
+    }
+
+    private function cerrarCuentaCliente(?User $usuario): void
+    {
+        if (! $usuario) {
+            return;
+        }
+
+        $rolesCliente = Rol::query()
+            ->where(function ($query) {
+                $query->whereIn('codigo', ['CLIENTE', 'CLIENTE_INSTITUCIONAL'])
+                    ->orWhereIn('codigo_rol', ['CLIENTE', 'CLIENTE_INSTITUCIONAL']);
+            })
+            ->pluck('id_rol');
+
+        if ($rolesCliente->isNotEmpty()) {
+            $usuario->roles()->detach($rolesCliente->all());
+        }
+
+        $usuario->load('roles');
+        if ($this->usuarioEsStaff($usuario)) {
+            return;
+        }
+
+        $usuario->update(['estado' => 'INACTIVO', 'estado_cuenta' => 'INACTIVO']);
+    }
+
+    private function usuarioEsStaff(User $usuario): bool
+    {
+        foreach (['ADMIN', 'COACH', 'ASISTENTE_TECNICO', 'RESPONSABLE_INSTITUCIONAL'] as $rol) {
+            if ($usuario->tieneRol($rol)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

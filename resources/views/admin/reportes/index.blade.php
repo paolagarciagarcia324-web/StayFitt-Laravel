@@ -6,7 +6,7 @@
 @section('content')
     <div class="ad-grid-12">
         <div class="ad-col-5">
-            <x-admin.panel title="Generar reporte" subtitle="Elige tipo, filtros y formato">
+            <x-admin.panel title="Generar reporte" subtitle="Elige tipo, filtros y formato de StayFit">
                 <form class="ad-form" method="POST" action="{{ route('admin.reportes.export') }}" id="form-reporte">
                     @csrf
                     <details class="ad-form-section" open>

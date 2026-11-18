@@ -49,7 +49,8 @@ return [
             'url' => env('DB_URL'),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE', 'laravel'),
+            // Wasmer Edge injects DB_NAME; local .env uses DB_DATABASE.
+            'database' => env('DB_DATABASE', env('DB_NAME', 'laravel')),
             'username' => env('DB_USERNAME', 'root'),
             'password' => env('DB_PASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),
@@ -59,9 +60,18 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+            'options' => extension_loaded('pdo_mysql') ? (static function () {
+                $options = [];
+                if ($ca = env('MYSQL_ATTR_SSL_CA')) {
+                    $options[Mysql::ATTR_SSL_CA] = $ca;
+                }
+                // Wasmer managed MySQL uses a private CA.
+                if (! filter_var(env('MYSQL_SSL_VERIFY', true), FILTER_VALIDATE_BOOL)) {
+                    $options[\PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
+                }
+
+                return $options;
+            })() : [],
         ],
 
         'mariadb' => [

@@ -1,0 +1,1717 @@
+[
+    {
+        "methods": "GET|HEAD",
+        "uri": "up",
+        "name": null,
+        "action": "Closure",
+        "middleware": ""
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "\/",
+        "name": "welcome",
+        "action": "App\\Http\\Controllers\\WelcomeController@index",
+        "middleware": "web"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "pre-registro\/{plan}",
+        "name": "pre-registro.create",
+        "action": "App\\Http\\Controllers\\PreRegisterController@create",
+        "middleware": "web"
+    },
+    {
+        "methods": "POST",
+        "uri": "pre-registro\/{plan}",
+        "name": "pre-registro.store",
+        "action": "App\\Http\\Controllers\\PreRegisterController@store",
+        "middleware": "web"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "pre-registro\/exito\/{codigo}",
+        "name": "pre-registro.success",
+        "action": "App\\Http\\Controllers\\PreRegisterController@success",
+        "middleware": "web"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "registro-presencial",
+        "name": "registro-presencial.create",
+        "action": "App\\Http\\Controllers\\RegistroPresencialController@create",
+        "middleware": "web"
+    },
+    {
+        "methods": "POST",
+        "uri": "registro-presencial",
+        "name": "registro-presencial.store",
+        "action": "App\\Http\\Controllers\\RegistroPresencialController@store",
+        "middleware": "web"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "registro-presencial\/pago\/{codigo}",
+        "name": "registro-presencial.checkout",
+        "action": "App\\Http\\Controllers\\RegistroPresencialController@checkout",
+        "middleware": "web"
+    },
+    {
+        "methods": "POST",
+        "uri": "registro-presencial\/pago\/{codigo}",
+        "name": "registro-presencial.pagar",
+        "action": "App\\Http\\Controllers\\RegistroPresencialController@pagar",
+        "middleware": "web"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "registro-presencial\/exito\/{codigo}",
+        "name": "registro-presencial.success",
+        "action": "App\\Http\\Controllers\\RegistroPresencialController@success",
+        "middleware": "web"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "webhooks\/whatsapp",
+        "name": "webhooks.whatsapp.verify",
+        "action": "App\\Http\\Controllers\\Webhooks\\WhatsappWebhookController@verify",
+        "middleware": "web"
+    },
+    {
+        "methods": "POST",
+        "uri": "webhooks\/whatsapp",
+        "name": "webhooks.whatsapp.handle",
+        "action": "App\\Http\\Controllers\\Webhooks\\WhatsappWebhookController@handle",
+        "middleware": "web"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "registro-institucional\/enlace\/{token}",
+        "name": "registro-institucional.enlace",
+        "action": "App\\Http\\Controllers\\RegistroInstitucionalController@showEnlace",
+        "middleware": "web"
+    },
+    {
+        "methods": "POST",
+        "uri": "registro-institucional\/enlace\/{token}",
+        "name": "registro-institucional.enlace.store",
+        "action": "App\\Http\\Controllers\\RegistroInstitucionalController@storeEnlace",
+        "middleware": "web"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "registro-institucional\/invitacion\/{token}",
+        "name": "registro-institucional.invitacion",
+        "action": "App\\Http\\Controllers\\RegistroInstitucionalController@showInvitacion",
+        "middleware": "web"
+    },
+    {
+        "methods": "POST",
+        "uri": "registro-institucional\/invitacion\/{token}",
+        "name": "registro-institucional.invitacion.store",
+        "action": "App\\Http\\Controllers\\RegistroInstitucionalController@storeInvitacion",
+        "middleware": "web"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "dashboard",
+        "name": "dashboard",
+        "action": "Closure",
+        "middleware": "web,auth"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "profile",
+        "name": "profile.edit",
+        "action": "App\\Http\\Controllers\\ProfileController@edit",
+        "middleware": "web,auth"
+    },
+    {
+        "methods": "PATCH",
+        "uri": "profile",
+        "name": "profile.update",
+        "action": "App\\Http\\Controllers\\ProfileController@update",
+        "middleware": "web,auth"
+    },
+    {
+        "methods": "DELETE",
+        "uri": "profile",
+        "name": "profile.destroy",
+        "action": "App\\Http\\Controllers\\ProfileController@destroy",
+        "middleware": "web,auth"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin",
+        "name": "admin.dashboard",
+        "action": "App\\Http\\Controllers\\Admin\\DashboardController@index",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/solicitudes",
+        "name": "admin.solicitudes.index",
+        "action": "App\\Http\\Controllers\\Admin\\SolicitudController@index",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/solicitudes\/{id}",
+        "name": "admin.solicitudes.show",
+        "action": "App\\Http\\Controllers\\Admin\\SolicitudController@show",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "admin\/solicitudes\/{id}\/aprobar",
+        "name": "admin.solicitudes.aprobar",
+        "action": "App\\Http\\Controllers\\Admin\\SolicitudController@aprobar",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "admin\/solicitudes\/{id}\/rechazar",
+        "name": "admin.solicitudes.rechazar",
+        "action": "App\\Http\\Controllers\\Admin\\SolicitudController@rechazar",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "admin\/solicitudes\/{id}\/suspender",
+        "name": "admin.solicitudes.suspender",
+        "action": "App\\Http\\Controllers\\Admin\\SolicitudController@suspender",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/pagos",
+        "name": "admin.pagos.index",
+        "action": "App\\Http\\Controllers\\Admin\\PagoController@index",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/pagos\/{id}",
+        "name": "admin.pagos.show",
+        "action": "App\\Http\\Controllers\\Admin\\PagoController@show",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "admin\/pagos\/{id}",
+        "name": "admin.pagos.update",
+        "action": "App\\Http\\Controllers\\Admin\\PagoController@update",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/planes",
+        "name": "admin.planes.index",
+        "action": "App\\Http\\Controllers\\Admin\\PlanController@index",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/planes\/crear",
+        "name": "admin.planes.create",
+        "action": "App\\Http\\Controllers\\Admin\\PlanController@create",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "admin\/planes",
+        "name": "admin.planes.store",
+        "action": "App\\Http\\Controllers\\Admin\\PlanController@store",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/planes\/{plan}\/editar",
+        "name": "admin.planes.edit",
+        "action": "App\\Http\\Controllers\\Admin\\PlanController@edit",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "admin\/planes\/{plan}",
+        "name": "admin.planes.update",
+        "action": "App\\Http\\Controllers\\Admin\\PlanController@update",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "DELETE",
+        "uri": "admin\/planes\/{plan}",
+        "name": "admin.planes.destroy",
+        "action": "App\\Http\\Controllers\\Admin\\PlanController@destroy",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/propuestas",
+        "name": "admin.propuestas.index",
+        "action": "App\\Http\\Controllers\\Admin\\PropuestaPlanController@index",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/propuestas\/{propuesta}",
+        "name": "admin.propuestas.show",
+        "action": "App\\Http\\Controllers\\Admin\\PropuestaPlanController@show",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/propuestas\/{propuesta}\/publicar",
+        "name": "admin.propuestas.publicar.form",
+        "action": "App\\Http\\Controllers\\Admin\\PropuestaPlanController@publicarForm",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "admin\/propuestas\/{propuesta}\/publicar",
+        "name": "admin.propuestas.publicar",
+        "action": "App\\Http\\Controllers\\Admin\\PropuestaPlanController@publicar",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "admin\/propuestas\/{propuesta}\/rechazar",
+        "name": "admin.propuestas.rechazar",
+        "action": "App\\Http\\Controllers\\Admin\\PropuestaPlanController@rechazar",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS",
+        "uri": "admin\/novedades",
+        "name": "admin.novedades.index",
+        "action": "\\Illuminate\\Routing\\RedirectController",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/cupones",
+        "name": "admin.cupones.index",
+        "action": "App\\Http\\Controllers\\Admin\\CuponController@index",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "admin\/cupones",
+        "name": "admin.cupones.store",
+        "action": "App\\Http\\Controllers\\Admin\\CuponController@store",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "admin\/cupones\/{id}",
+        "name": "admin.cupones.update",
+        "action": "App\\Http\\Controllers\\Admin\\CuponController@update",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "DELETE",
+        "uri": "admin\/cupones\/{id}",
+        "name": "admin.cupones.destroy",
+        "action": "App\\Http\\Controllers\\Admin\\CuponController@destroy",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/cupones\/{id}\/usos",
+        "name": "admin.cupones.usos",
+        "action": "App\\Http\\Controllers\\Admin\\CuponController@usos",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/usuarios",
+        "name": "admin.usuarios.index",
+        "action": "App\\Http\\Controllers\\Admin\\UsuarioController@index",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "admin\/usuarios",
+        "name": "admin.usuarios.store",
+        "action": "App\\Http\\Controllers\\Admin\\UsuarioController@store",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "admin\/usuarios\/{id}",
+        "name": "admin.usuarios.update",
+        "action": "App\\Http\\Controllers\\Admin\\UsuarioController@update",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "admin\/usuarios\/{id}\/reset-password",
+        "name": "admin.usuarios.reset-password",
+        "action": "App\\Http\\Controllers\\Admin\\UsuarioController@resetPassword",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/roles",
+        "name": "admin.roles.index",
+        "action": "App\\Http\\Controllers\\Admin\\RolController@index",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/configuracion",
+        "name": "admin.configuracion.index",
+        "action": "App\\Http\\Controllers\\Admin\\ConfiguracionController@index",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "admin\/configuracion",
+        "name": "admin.configuracion.update",
+        "action": "App\\Http\\Controllers\\Admin\\ConfiguracionController@update",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/clientes",
+        "name": "admin.clientes.index",
+        "action": "App\\Http\\Controllers\\Admin\\ClienteController@index",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/clientes\/virtuales",
+        "name": "admin.clientes.virtuales",
+        "action": "App\\Http\\Controllers\\Admin\\ClienteController@virtuales",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/clientes\/presenciales",
+        "name": "admin.clientes.presenciales",
+        "action": "App\\Http\\Controllers\\Admin\\ClienteController@presenciales",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/clientes\/{id}\/edit",
+        "name": "admin.clientes.edit",
+        "action": "App\\Http\\Controllers\\Admin\\ClienteController@edit",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/clientes\/{id}",
+        "name": "admin.clientes.show",
+        "action": "App\\Http\\Controllers\\Admin\\ClienteController@show",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "admin\/clientes\/{id}",
+        "name": "admin.clientes.update",
+        "action": "App\\Http\\Controllers\\Admin\\ClienteController@update",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "admin\/clientes\/{id}\/completo",
+        "name": "admin.clientes.updateCompleto",
+        "action": "App\\Http\\Controllers\\Admin\\ClienteController@updateCompleto",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "DELETE",
+        "uri": "admin\/clientes\/{id}",
+        "name": "admin.clientes.destroy",
+        "action": "App\\Http\\Controllers\\Admin\\ClienteController@destroy",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "admin\/clientes\/{id}\/coach",
+        "name": "admin.clientes.coach",
+        "action": "App\\Http\\Controllers\\Admin\\ClienteController@asignarCoach",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "admin\/clientes\/{id}\/accesos\/{accesoId}",
+        "name": "admin.clientes.acceso",
+        "action": "App\\Http\\Controllers\\Admin\\ClienteController@updateAcceso",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/coaches",
+        "name": "admin.coaches.index",
+        "action": "App\\Http\\Controllers\\Admin\\CoachController@index",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "admin\/coaches",
+        "name": "admin.coaches.store",
+        "action": "App\\Http\\Controllers\\Admin\\CoachController@store",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "admin\/coaches\/{id}",
+        "name": "admin.coaches.update",
+        "action": "App\\Http\\Controllers\\Admin\\CoachController@update",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "DELETE",
+        "uri": "admin\/coaches\/{id}",
+        "name": "admin.coaches.destroy",
+        "action": "App\\Http\\Controllers\\Admin\\CoachController@destroy",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/asistentes",
+        "name": "admin.asistentes.index",
+        "action": "App\\Http\\Controllers\\Admin\\AsistenteController@index",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "admin\/asistentes",
+        "name": "admin.asistentes.store",
+        "action": "App\\Http\\Controllers\\Admin\\AsistenteController@store",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "admin\/asistentes\/{id}",
+        "name": "admin.asistentes.update",
+        "action": "App\\Http\\Controllers\\Admin\\AsistenteController@update",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "DELETE",
+        "uri": "admin\/asistentes\/{id}",
+        "name": "admin.asistentes.destroy",
+        "action": "App\\Http\\Controllers\\Admin\\AsistenteController@destroy",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/instituciones",
+        "name": "admin.instituciones.index",
+        "action": "App\\Http\\Controllers\\Admin\\InstitucionController@index",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "admin\/instituciones",
+        "name": "admin.instituciones.store",
+        "action": "App\\Http\\Controllers\\Admin\\InstitucionController@store",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "admin\/instituciones\/{id}",
+        "name": "admin.instituciones.update",
+        "action": "App\\Http\\Controllers\\Admin\\InstitucionController@update",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "DELETE",
+        "uri": "admin\/instituciones\/{id}",
+        "name": "admin.instituciones.destroy",
+        "action": "App\\Http\\Controllers\\Admin\\InstitucionController@destroy",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "admin\/instituciones\/{id}\/vincular",
+        "name": "admin.instituciones.vincular",
+        "action": "App\\Http\\Controllers\\Admin\\InstitucionController@vincularCliente",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "admin\/instituciones\/{id}\/enlaces",
+        "name": "admin.instituciones.enlaces",
+        "action": "App\\Http\\Controllers\\Admin\\InstitucionController@storeEnlace",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "DELETE",
+        "uri": "admin\/instituciones\/{id}\/enlaces\/{enlaceId}",
+        "name": "admin.instituciones.enlaces.destroy",
+        "action": "App\\Http\\Controllers\\Admin\\InstitucionController@destroyEnlace",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/horarios",
+        "name": "admin.horarios.index",
+        "action": "App\\Http\\Controllers\\Admin\\HorarioPresencialController@index",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "admin\/horarios",
+        "name": "admin.horarios.store",
+        "action": "App\\Http\\Controllers\\Admin\\HorarioPresencialController@store",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "admin\/horarios\/{id}",
+        "name": "admin.horarios.update",
+        "action": "App\\Http\\Controllers\\Admin\\HorarioPresencialController@update",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "DELETE",
+        "uri": "admin\/horarios\/{id}",
+        "name": "admin.horarios.destroy",
+        "action": "App\\Http\\Controllers\\Admin\\HorarioPresencialController@destroy",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/pasarelas",
+        "name": "admin.pasarelas.index",
+        "action": "App\\Http\\Controllers\\Admin\\PasarelaController@index",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "admin\/pasarelas\/{id}",
+        "name": "admin.pasarelas.update",
+        "action": "App\\Http\\Controllers\\Admin\\PasarelaController@update",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/tienda",
+        "name": "admin.tienda.index",
+        "action": "App\\Http\\Controllers\\Admin\\TiendaController@index",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "admin\/tienda",
+        "name": "admin.tienda.store",
+        "action": "App\\Http\\Controllers\\Admin\\TiendaController@store",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "admin\/tienda\/ordenes\/{id}",
+        "name": "admin.tienda.orden",
+        "action": "App\\Http\\Controllers\\Admin\\TiendaController@updateOrden",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "admin\/tienda\/{id}",
+        "name": "admin.tienda.update",
+        "action": "App\\Http\\Controllers\\Admin\\TiendaController@update",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "DELETE",
+        "uri": "admin\/tienda\/{id}",
+        "name": "admin.tienda.destroy",
+        "action": "App\\Http\\Controllers\\Admin\\TiendaController@destroy",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/whatsapp",
+        "name": "admin.whatsapp.index",
+        "action": "App\\Http\\Controllers\\Admin\\WhatsappController@index",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "admin\/whatsapp",
+        "name": "admin.whatsapp.update",
+        "action": "App\\Http\\Controllers\\Admin\\WhatsappController@update",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "admin\/whatsapp\/grupos",
+        "name": "admin.whatsapp.grupos",
+        "action": "App\\Http\\Controllers\\Admin\\WhatsappController@storeGrupo",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "admin\/whatsapp\/grupos\/{id}",
+        "name": "admin.whatsapp.grupos.update",
+        "action": "App\\Http\\Controllers\\Admin\\WhatsappController@updateGrupo",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "DELETE",
+        "uri": "admin\/whatsapp\/grupos\/{id}",
+        "name": "admin.whatsapp.grupos.destroy",
+        "action": "App\\Http\\Controllers\\Admin\\WhatsappController@destroyGrupo",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/eventos",
+        "name": "admin.eventos.index",
+        "action": "App\\Http\\Controllers\\Admin\\EventoController@index",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "admin\/eventos",
+        "name": "admin.eventos.store",
+        "action": "App\\Http\\Controllers\\Admin\\EventoController@store",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "admin\/eventos\/{id}",
+        "name": "admin.eventos.update",
+        "action": "App\\Http\\Controllers\\Admin\\EventoController@update",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "DELETE",
+        "uri": "admin\/eventos\/{id}",
+        "name": "admin.eventos.destroy",
+        "action": "App\\Http\\Controllers\\Admin\\EventoController@destroy",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/calendario",
+        "name": "admin.calendario.index",
+        "action": "App\\Http\\Controllers\\Admin\\CalendarioController@index",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "admin\/calendario\/sesiones",
+        "name": "admin.calendario.sesiones.store",
+        "action": "App\\Http\\Controllers\\Admin\\CalendarioController@store",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "admin\/calendario\/sesiones\/{id}",
+        "name": "admin.calendario.sesiones.update",
+        "action": "App\\Http\\Controllers\\Admin\\CalendarioController@update",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "DELETE",
+        "uri": "admin\/calendario\/sesiones\/{id}",
+        "name": "admin.calendario.sesiones.destroy",
+        "action": "App\\Http\\Controllers\\Admin\\CalendarioController@destroy",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/comunidad",
+        "name": "admin.comunidad.index",
+        "action": "App\\Http\\Controllers\\Admin\\ComunidadController@index",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/comunidad\/{id}",
+        "name": "admin.comunidad.show",
+        "action": "App\\Http\\Controllers\\Admin\\ComunidadController@show",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "admin\/comunidad\/{id}",
+        "name": "admin.comunidad.update",
+        "action": "App\\Http\\Controllers\\Admin\\ComunidadController@updateChat",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "DELETE",
+        "uri": "admin\/comunidad\/{chatId}\/mensajes\/{mensajeId}",
+        "name": "admin.comunidad.mensajes.destroy",
+        "action": "App\\Http\\Controllers\\Admin\\ComunidadController@destroyMensaje",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/analisis",
+        "name": "admin.analisis.index",
+        "action": "App\\Http\\Controllers\\Admin\\AnalisisController@index",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/estadisticas",
+        "name": "admin.estadisticas.index",
+        "action": "App\\Http\\Controllers\\Admin\\EstadisticaController@index",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/reportes",
+        "name": "admin.reportes.index",
+        "action": "App\\Http\\Controllers\\Admin\\ReporteController@index",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "admin\/reportes\/preview",
+        "name": "admin.reportes.preview",
+        "action": "App\\Http\\Controllers\\Admin\\ReporteController@preview",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "admin\/reportes\/export",
+        "name": "admin.reportes.export",
+        "action": "App\\Http\\Controllers\\Admin\\ReporteController@export",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "admin\/reportes\/{id}\/download",
+        "name": "admin.reportes.download",
+        "action": "App\\Http\\Controllers\\Admin\\ReporteController@download",
+        "middleware": "web,auth,role:ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "coach",
+        "name": "coach.dashboard",
+        "action": "App\\Http\\Controllers\\Coach\\DashboardController@index",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "coach\/perfil",
+        "name": "coach.perfil.show",
+        "action": "App\\Http\\Controllers\\Coach\\PerfilController@show",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "coach\/perfil",
+        "name": "coach.perfil.update",
+        "action": "App\\Http\\Controllers\\Coach\\PerfilController@update",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "coach\/clientes",
+        "name": "coach.clientes.index",
+        "action": "App\\Http\\Controllers\\Coach\\ClienteController@index",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "coach\/clientes\/{id}",
+        "name": "coach.clientes.show",
+        "action": "App\\Http\\Controllers\\Coach\\ClienteController@show",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "coach\/entrenamiento",
+        "name": "coach.entrenamiento.index",
+        "action": "App\\Http\\Controllers\\Coach\\EntrenamientoController@index",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "coach\/entrenamiento\/planes",
+        "name": "coach.entrenamiento.planes.store",
+        "action": "App\\Http\\Controllers\\Coach\\EntrenamientoController@storePlan",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "coach\/entrenamiento\/{id}",
+        "name": "coach.entrenamiento.show",
+        "action": "App\\Http\\Controllers\\Coach\\EntrenamientoController@show",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "coach\/entrenamiento\/{id}\/rutinas",
+        "name": "coach.entrenamiento.rutinas.store",
+        "action": "App\\Http\\Controllers\\Coach\\EntrenamientoController@storeRutina",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "coach\/entrenamiento\/{planId}\/rutinas\/{rutinaId}",
+        "name": "coach.entrenamiento.rutinas.update",
+        "action": "App\\Http\\Controllers\\Coach\\EntrenamientoController@updateRutina",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "coach\/videos",
+        "name": "coach.videos.index",
+        "action": "App\\Http\\Controllers\\Coach\\VideoBibliotecaController@index",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "coach\/videos",
+        "name": "coach.videos.store",
+        "action": "App\\Http\\Controllers\\Coach\\VideoBibliotecaController@store",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "coach\/videos\/{id}",
+        "name": "coach.videos.update",
+        "action": "App\\Http\\Controllers\\Coach\\VideoBibliotecaController@update",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "coach\/agenda",
+        "name": "coach.agenda.index",
+        "action": "App\\Http\\Controllers\\Coach\\AgendaController@index",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "coach\/agenda",
+        "name": "coach.agenda.store",
+        "action": "App\\Http\\Controllers\\Coach\\AgendaController@store",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "coach\/propuestas",
+        "name": "coach.propuestas.index",
+        "action": "App\\Http\\Controllers\\Coach\\PropuestaPlanController@index",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "coach\/propuestas\/crear",
+        "name": "coach.propuestas.create",
+        "action": "App\\Http\\Controllers\\Coach\\PropuestaPlanController@create",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "coach\/propuestas",
+        "name": "coach.propuestas.store",
+        "action": "App\\Http\\Controllers\\Coach\\PropuestaPlanController@store",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "coach\/propuestas\/{propuesta}\/entrenamiento",
+        "name": "coach.propuestas.entrenamiento",
+        "action": "App\\Http\\Controllers\\Coach\\PropuestaPlanController@entrenamiento",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "coach\/propuestas\/{propuesta}\/nutricion",
+        "name": "coach.propuestas.nutricion",
+        "action": "App\\Http\\Controllers\\Coach\\PropuestaPlanController@nutricion",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "coach\/propuestas\/{propuesta}\/resumen",
+        "name": "coach.propuestas.resumen",
+        "action": "App\\Http\\Controllers\\Coach\\PropuestaPlanController@resumen",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "coach\/propuestas\/{propuesta}\/enviar",
+        "name": "coach.propuestas.enviar",
+        "action": "App\\Http\\Controllers\\Coach\\PropuestaPlanController@enviar",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "coach\/propuestas\/{propuesta}\/meta",
+        "name": "coach.propuestas.meta",
+        "action": "App\\Http\\Controllers\\Coach\\PropuestaPlanController@updateMeta",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "coach\/propuestas\/{propuesta}\/videos",
+        "name": "coach.propuestas.videos.store",
+        "action": "App\\Http\\Controllers\\Coach\\VideoClaseController@store",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "coach\/propuestas\/{propuesta}\/videos\/{id}",
+        "name": "coach.propuestas.videos.update",
+        "action": "App\\Http\\Controllers\\Coach\\VideoClaseController@update",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "DELETE",
+        "uri": "coach\/propuestas\/{propuesta}\/videos\/{id}",
+        "name": "coach.propuestas.videos.destroy",
+        "action": "App\\Http\\Controllers\\Coach\\VideoClaseController@destroy",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "coach\/propuestas\/{propuesta}\/nutricion",
+        "name": "coach.propuestas.nutricion.update",
+        "action": "App\\Http\\Controllers\\Coach\\NutricionPropuestaController@update",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "coach\/propuestas\/{propuesta}\/comidas",
+        "name": "coach.propuestas.comidas.store",
+        "action": "App\\Http\\Controllers\\Coach\\NutricionPropuestaController@storeComida",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "coach\/propuestas\/{propuesta}\/comidas\/{comida}",
+        "name": "coach.propuestas.comidas.update",
+        "action": "App\\Http\\Controllers\\Coach\\NutricionPropuestaController@updateComida",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "DELETE",
+        "uri": "coach\/propuestas\/{propuesta}\/comidas\/{comida}",
+        "name": "coach.propuestas.comidas.destroy",
+        "action": "App\\Http\\Controllers\\Coach\\NutricionPropuestaController@destroyComida",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "coach\/comunicacion",
+        "name": "coach.comunicacion.index",
+        "action": "App\\Http\\Controllers\\Coach\\ComunicacionController@index",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "coach\/comunicacion\/{id}",
+        "name": "coach.comunicacion.show",
+        "action": "App\\Http\\Controllers\\Coach\\ComunicacionController@show",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "coach\/comunicacion\/{id}\/mensajes",
+        "name": "coach.comunicacion.mensajes.store",
+        "action": "App\\Http\\Controllers\\Coach\\ComunicacionController@store",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "coach\/reportes\/progreso",
+        "name": "coach.reportes.progreso",
+        "action": "App\\Http\\Controllers\\Coach\\ReporteProgresoController@index",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "coach\/reportes\/progreso\/export",
+        "name": "coach.reportes.progreso.export",
+        "action": "App\\Http\\Controllers\\Coach\\ReporteProgresoController@export",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "coach\/reportes\/progreso\/observacion",
+        "name": "coach.reportes.progreso.observacion",
+        "action": "App\\Http\\Controllers\\Coach\\ReporteProgresoController@observacion",
+        "middleware": "web,auth,role:COACH,ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "staff",
+        "name": "staff.dashboard",
+        "action": "App\\Http\\Controllers\\Staff\\DashboardController@index",
+        "middleware": "web,auth,role:ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "staff\/perfil",
+        "name": "staff.perfil.show",
+        "action": "App\\Http\\Controllers\\Staff\\PerfilController@show",
+        "middleware": "web,auth,role:ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "staff\/perfil",
+        "name": "staff.perfil.update",
+        "action": "App\\Http\\Controllers\\Staff\\PerfilController@update",
+        "middleware": "web,auth,role:ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "staff\/coach-context",
+        "name": "staff.coach-context.update",
+        "action": "App\\Http\\Controllers\\Staff\\CoachContextController@update",
+        "middleware": "web,auth,role:ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "staff\/clientes",
+        "name": "staff.clientes.index",
+        "action": "App\\Http\\Controllers\\Staff\\ClienteController@index",
+        "middleware": "web,auth,role:ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "staff\/clientes\/{id}",
+        "name": "staff.clientes.show",
+        "action": "App\\Http\\Controllers\\Staff\\ClienteController@show",
+        "middleware": "web,auth,role:ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "staff\/clientes\/observacion",
+        "name": "staff.clientes.observacion",
+        "action": "App\\Http\\Controllers\\Staff\\ClienteController@observacion",
+        "middleware": "web,auth,role:ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "staff\/rutinas",
+        "name": "staff.rutinas.index",
+        "action": "App\\Http\\Controllers\\Staff\\RutinaController@index",
+        "middleware": "web,auth,role:ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "staff\/rutinas\/borrador",
+        "name": "staff.rutinas.borrador.store",
+        "action": "App\\Http\\Controllers\\Staff\\RutinaController@storeBorrador",
+        "middleware": "web,auth,role:ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "staff\/propuestas",
+        "name": "staff.propuestas.index",
+        "action": "App\\Http\\Controllers\\Staff\\PropuestaController@index",
+        "middleware": "web,auth,role:ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "staff\/videos",
+        "name": "staff.videos.index",
+        "action": "App\\Http\\Controllers\\Staff\\VideoBibliotecaController@index",
+        "middleware": "web,auth,role:ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "staff\/videos",
+        "name": "staff.videos.store",
+        "action": "App\\Http\\Controllers\\Staff\\VideoBibliotecaController@store",
+        "middleware": "web,auth,role:ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "staff\/comunicacion",
+        "name": "staff.comunicacion.index",
+        "action": "App\\Http\\Controllers\\Staff\\ComunicacionController@index",
+        "middleware": "web,auth,role:ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "staff\/comunicacion\/nota",
+        "name": "staff.comunicacion.nota",
+        "action": "App\\Http\\Controllers\\Staff\\ComunicacionController@nota",
+        "middleware": "web,auth,role:ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "staff\/novedades",
+        "name": "staff.novedades.index",
+        "action": "App\\Http\\Controllers\\Staff\\NovedadWelcomeController@index",
+        "middleware": "web,auth,role:ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "staff\/novedades\/crear",
+        "name": "staff.novedades.create",
+        "action": "App\\Http\\Controllers\\Staff\\NovedadWelcomeController@create",
+        "middleware": "web,auth,role:ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "staff\/novedades",
+        "name": "staff.novedades.store",
+        "action": "App\\Http\\Controllers\\Staff\\NovedadWelcomeController@store",
+        "middleware": "web,auth,role:ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "staff\/novedades\/{novedad}\/editar",
+        "name": "staff.novedades.edit",
+        "action": "App\\Http\\Controllers\\Staff\\NovedadWelcomeController@edit",
+        "middleware": "web,auth,role:ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "staff\/novedades\/{novedad}",
+        "name": "staff.novedades.update",
+        "action": "App\\Http\\Controllers\\Staff\\NovedadWelcomeController@update",
+        "middleware": "web,auth,role:ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "DELETE",
+        "uri": "staff\/novedades\/{novedad}",
+        "name": "staff.novedades.destroy",
+        "action": "App\\Http\\Controllers\\Staff\\NovedadWelcomeController@destroy",
+        "middleware": "web,auth,role:ASISTENTE_TECNICO,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "institucional",
+        "name": "institucional.dashboard",
+        "action": "App\\Http\\Controllers\\Institucional\\DashboardController@index",
+        "middleware": "web,auth,role:RESPONSABLE_INSTITUCIONAL,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "institucional\/perfil",
+        "name": "institucional.perfil.show",
+        "action": "App\\Http\\Controllers\\Institucional\\PerfilController@show",
+        "middleware": "web,auth,role:RESPONSABLE_INSTITUCIONAL,ADMIN"
+    },
+    {
+        "methods": "PUT",
+        "uri": "institucional\/perfil",
+        "name": "institucional.perfil.update",
+        "action": "App\\Http\\Controllers\\Institucional\\PerfilController@update",
+        "middleware": "web,auth,role:RESPONSABLE_INSTITUCIONAL,ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "institucional\/contexto",
+        "name": "institucional.contexto.update",
+        "action": "App\\Http\\Controllers\\Institucional\\InstitucionContextController@update",
+        "middleware": "web,auth,role:RESPONSABLE_INSTITUCIONAL,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "institucional\/usuarios",
+        "name": "institucional.usuarios.index",
+        "action": "App\\Http\\Controllers\\Institucional\\UsuarioController@index",
+        "middleware": "web,auth,role:RESPONSABLE_INSTITUCIONAL,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "institucional\/usuarios\/{id}",
+        "name": "institucional.usuarios.show",
+        "action": "App\\Http\\Controllers\\Institucional\\UsuarioController@show",
+        "middleware": "web,auth,role:RESPONSABLE_INSTITUCIONAL,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "institucional\/invitaciones",
+        "name": "institucional.invitaciones.index",
+        "action": "App\\Http\\Controllers\\Institucional\\InvitacionController@index",
+        "middleware": "web,auth,role:RESPONSABLE_INSTITUCIONAL,ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "institucional\/invitaciones",
+        "name": "institucional.invitaciones.store",
+        "action": "App\\Http\\Controllers\\Institucional\\InvitacionController@storeInvitacion",
+        "middleware": "web,auth,role:RESPONSABLE_INSTITUCIONAL,ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "institucional\/invitaciones\/enlace",
+        "name": "institucional.invitaciones.enlace",
+        "action": "App\\Http\\Controllers\\Institucional\\InvitacionController@storeEnlace",
+        "middleware": "web,auth,role:RESPONSABLE_INSTITUCIONAL,ADMIN"
+    },
+    {
+        "methods": "DELETE",
+        "uri": "institucional\/invitaciones\/{id}",
+        "name": "institucional.invitaciones.destroy",
+        "action": "App\\Http\\Controllers\\Institucional\\InvitacionController@destroyInvitacion",
+        "middleware": "web,auth,role:RESPONSABLE_INSTITUCIONAL,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "institucional\/plan",
+        "name": "institucional.plan.index",
+        "action": "App\\Http\\Controllers\\Institucional\\PlanController@index",
+        "middleware": "web,auth,role:RESPONSABLE_INSTITUCIONAL,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "institucional\/reportes",
+        "name": "institucional.reportes.index",
+        "action": "App\\Http\\Controllers\\Institucional\\ReporteController@index",
+        "middleware": "web,auth,role:RESPONSABLE_INSTITUCIONAL,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "institucional\/reportes\/export",
+        "name": "institucional.reportes.export",
+        "action": "App\\Http\\Controllers\\Institucional\\ReporteController@export",
+        "middleware": "web,auth,role:RESPONSABLE_INSTITUCIONAL,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "institucional\/comunicacion",
+        "name": "institucional.comunicacion.index",
+        "action": "App\\Http\\Controllers\\Institucional\\ComunicacionController@index",
+        "middleware": "web,auth,role:RESPONSABLE_INSTITUCIONAL,ADMIN"
+    },
+    {
+        "methods": "POST",
+        "uri": "institucional\/comunicacion",
+        "name": "institucional.comunicacion.store",
+        "action": "App\\Http\\Controllers\\Institucional\\ComunicacionController@store",
+        "middleware": "web,auth,role:RESPONSABLE_INSTITUCIONAL,ADMIN"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "cliente",
+        "name": "cliente.dashboard",
+        "action": "App\\Http\\Controllers\\Cliente\\DashboardController@index",
+        "middleware": "web,auth,role:CLIENTE"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "cliente\/perfil",
+        "name": "cliente.perfil.edit",
+        "action": "App\\Http\\Controllers\\Cliente\\PerfilController@edit",
+        "middleware": "web,auth,role:CLIENTE"
+    },
+    {
+        "methods": "PUT",
+        "uri": "cliente\/perfil",
+        "name": "cliente.perfil.update",
+        "action": "App\\Http\\Controllers\\Cliente\\PerfilController@update",
+        "middleware": "web,auth,role:CLIENTE"
+    },
+    {
+        "methods": "PUT",
+        "uri": "cliente\/perfil\/password",
+        "name": "cliente.perfil.password",
+        "action": "App\\Http\\Controllers\\Cliente\\PerfilController@updatePassword",
+        "middleware": "web,auth,role:CLIENTE"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "cliente\/presencial",
+        "name": "cliente.presencial.perfil",
+        "action": "App\\Http\\Controllers\\Cliente\\PerfilPresencialController@show",
+        "middleware": "web,auth,role:CLIENTE"
+    },
+    {
+        "methods": "POST",
+        "uri": "cliente\/presencial\/asistencia",
+        "name": "cliente.presencial.checkin",
+        "action": "App\\Http\\Controllers\\Cliente\\PerfilPresencialController@checkin",
+        "middleware": "web,auth,role:CLIENTE"
+    },
+    {
+        "methods": "PUT",
+        "uri": "cliente\/presencial",
+        "name": "cliente.presencial.update",
+        "action": "App\\Http\\Controllers\\Cliente\\PerfilPresencialController@update",
+        "middleware": "web,auth,role:CLIENTE"
+    },
+    {
+        "methods": "PUT",
+        "uri": "cliente\/presencial\/password",
+        "name": "cliente.presencial.password",
+        "action": "App\\Http\\Controllers\\Cliente\\PerfilPresencialController@updatePassword",
+        "middleware": "web,auth,role:CLIENTE"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "cliente\/mi-plan",
+        "name": "cliente.plan.index",
+        "action": "App\\Http\\Controllers\\Cliente\\PlanController@index",
+        "middleware": "web,auth,role:CLIENTE"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "cliente\/pagos",
+        "name": "cliente.pagos.index",
+        "action": "App\\Http\\Controllers\\Cliente\\PagoController@index",
+        "middleware": "web,auth,role:CLIENTE"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "cliente\/analisis",
+        "name": "cliente.analisis.index",
+        "action": "App\\Http\\Controllers\\Cliente\\AnalisisController@index",
+        "middleware": "web,auth,role:CLIENTE"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "cliente\/novedades",
+        "name": "cliente.novedades.index",
+        "action": "App\\Http\\Controllers\\Cliente\\NovedadController@index",
+        "middleware": "web,auth,role:CLIENTE"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "cliente\/comercial\/planes",
+        "name": "cliente.comercial.planes",
+        "action": "App\\Http\\Controllers\\Cliente\\ComercialController@planes",
+        "middleware": "web,auth,role:CLIENTE"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "cliente\/comercial\/planes\/{id}",
+        "name": "cliente.comercial.planes.show",
+        "action": "App\\Http\\Controllers\\Cliente\\ComercialController@planShow",
+        "middleware": "web,auth,role:CLIENTE"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "cliente\/comercial\/solicitudes",
+        "name": "cliente.comercial.solicitudes",
+        "action": "App\\Http\\Controllers\\Cliente\\ComercialController@solicitudes",
+        "middleware": "web,auth,role:CLIENTE"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "cliente\/comercial\/cupones",
+        "name": "cliente.comercial.cupones",
+        "action": "App\\Http\\Controllers\\Cliente\\ComercialController@cupones",
+        "middleware": "web,auth,role:CLIENTE"
+    },
+    {
+        "methods": "POST",
+        "uri": "cliente\/comercial\/cupones\/validar",
+        "name": "cliente.comercial.cupones.validar",
+        "action": "App\\Http\\Controllers\\Cliente\\ComercialController@validarCupon",
+        "middleware": "web,auth,role:CLIENTE"
+    },
+    {
+        "methods": "POST",
+        "uri": "cliente\/comunicacion\/whatsapp\/{id}\/aceptar",
+        "name": "cliente.comunicacion.whatsapp.aceptar",
+        "action": "App\\Http\\Controllers\\Cliente\\ComunicacionController@aceptarWhatsapp",
+        "middleware": "web,auth,role:CLIENTE"
+    },
+    {
+        "methods": "POST",
+        "uri": "cliente\/comunicacion\/whatsapp\/{id}\/cerrar",
+        "name": "cliente.comunicacion.whatsapp.cerrar",
+        "action": "App\\Http\\Controllers\\Cliente\\ComunicacionController@cerrarWhatsapp",
+        "middleware": "web,auth,role:CLIENTE"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "cliente\/comunicacion",
+        "name": "cliente.comunicacion.index",
+        "action": "App\\Http\\Controllers\\Cliente\\ComunicacionController@index",
+        "middleware": "web,auth,role:CLIENTE,modulo:COMUNICACION"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "cliente\/comunicacion\/{id}",
+        "name": "cliente.comunicacion.show",
+        "action": "App\\Http\\Controllers\\Cliente\\ComunicacionController@show",
+        "middleware": "web,auth,role:CLIENTE,modulo:COMUNICACION"
+    },
+    {
+        "methods": "POST",
+        "uri": "cliente\/comunicacion\/{id}\/mensajes",
+        "name": "cliente.comunicacion.mensajes.store",
+        "action": "App\\Http\\Controllers\\Cliente\\ComunicacionController@store",
+        "middleware": "web,auth,role:CLIENTE,modulo:COMUNICACION"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "cliente\/entrenamiento",
+        "name": "cliente.entrenamiento.index",
+        "action": "App\\Http\\Controllers\\Cliente\\EntrenamientoController@index",
+        "middleware": "web,auth,role:CLIENTE,modulo:ENTRENAMIENTO"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "cliente\/entrenamiento\/rutinas\/{id}",
+        "name": "cliente.entrenamiento.rutina",
+        "action": "App\\Http\\Controllers\\Cliente\\EntrenamientoController@showRutina",
+        "middleware": "web,auth,role:CLIENTE,modulo:ENTRENAMIENTO"
+    },
+    {
+        "methods": "POST",
+        "uri": "cliente\/entrenamiento\/rutinas\/{id}\/completar",
+        "name": "cliente.entrenamiento.completar",
+        "action": "App\\Http\\Controllers\\Cliente\\EntrenamientoController@completarRutina",
+        "middleware": "web,auth,role:CLIENTE,modulo:ENTRENAMIENTO"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "cliente\/nutricion",
+        "name": "cliente.nutricion.index",
+        "action": "App\\Http\\Controllers\\Cliente\\NutricionController@index",
+        "middleware": "web,auth,role:CLIENTE,modulo:NUTRICION"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "cliente\/nutricion\/{id}",
+        "name": "cliente.nutricion.show",
+        "action": "App\\Http\\Controllers\\Cliente\\NutricionController@show",
+        "middleware": "web,auth,role:CLIENTE,modulo:NUTRICION"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "cliente\/contenido",
+        "name": "cliente.contenido.index",
+        "action": "App\\Http\\Controllers\\Cliente\\ContenidoController@index",
+        "middleware": "web,auth,role:CLIENTE,modulo:CONTENIDO_VIRTUAL"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "cliente\/contenido\/{id}",
+        "name": "cliente.contenido.show",
+        "action": "App\\Http\\Controllers\\Cliente\\ContenidoController@show",
+        "middleware": "web,auth,role:CLIENTE,modulo:CONTENIDO_VIRTUAL"
+    },
+    {
+        "methods": "POST",
+        "uri": "cliente\/contenido\/{id}\/completar",
+        "name": "cliente.contenido.completar",
+        "action": "App\\Http\\Controllers\\Cliente\\ContenidoController@completar",
+        "middleware": "web,auth,role:CLIENTE,modulo:CONTENIDO_VIRTUAL"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "cliente\/progreso",
+        "name": "cliente.progreso.index",
+        "action": "App\\Http\\Controllers\\Cliente\\ProgresoController@index",
+        "middleware": "web,auth,role:CLIENTE,modulo:PROGRESO"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "cliente\/progreso\/nuevo",
+        "name": "cliente.progreso.create",
+        "action": "App\\Http\\Controllers\\Cliente\\ProgresoController@create",
+        "middleware": "web,auth,role:CLIENTE,modulo:PROGRESO"
+    },
+    {
+        "methods": "POST",
+        "uri": "cliente\/progreso",
+        "name": "cliente.progreso.store",
+        "action": "App\\Http\\Controllers\\Cliente\\ProgresoController@store",
+        "middleware": "web,auth,role:CLIENTE,modulo:PROGRESO"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "cliente\/agenda",
+        "name": "cliente.agenda.index",
+        "action": "App\\Http\\Controllers\\Cliente\\AgendaController@index",
+        "middleware": "web,auth,role:CLIENTE,modulo:AGENDA"
+    },
+    {
+        "methods": "POST",
+        "uri": "cliente\/agenda\/{id}\/inscribir",
+        "name": "cliente.agenda.inscribir",
+        "action": "App\\Http\\Controllers\\Cliente\\AgendaController@inscribir",
+        "middleware": "web,auth,role:CLIENTE,modulo:AGENDA"
+    },
+    {
+        "methods": "POST",
+        "uri": "cliente\/agenda\/{id}\/cancelar",
+        "name": "cliente.agenda.cancelar",
+        "action": "App\\Http\\Controllers\\Cliente\\AgendaController@cancelar",
+        "middleware": "web,auth,role:CLIENTE,modulo:AGENDA"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "cliente\/tienda",
+        "name": "cliente.tienda.index",
+        "action": "App\\Http\\Controllers\\Cliente\\TiendaController@index",
+        "middleware": "web,auth,role:CLIENTE,modulo:TIENDA"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "cliente\/tienda\/carrito",
+        "name": "cliente.tienda.carrito",
+        "action": "App\\Http\\Controllers\\Cliente\\TiendaController@carrito",
+        "middleware": "web,auth,role:CLIENTE,modulo:TIENDA"
+    },
+    {
+        "methods": "POST",
+        "uri": "cliente\/tienda\/{id}\/agregar",
+        "name": "cliente.tienda.agregar",
+        "action": "App\\Http\\Controllers\\Cliente\\TiendaController@agregar",
+        "middleware": "web,auth,role:CLIENTE,modulo:TIENDA"
+    },
+    {
+        "methods": "PUT",
+        "uri": "cliente\/tienda\/items\/{id}",
+        "name": "cliente.tienda.items.update",
+        "action": "App\\Http\\Controllers\\Cliente\\TiendaController@actualizarItem",
+        "middleware": "web,auth,role:CLIENTE,modulo:TIENDA"
+    },
+    {
+        "methods": "POST",
+        "uri": "cliente\/tienda\/checkout",
+        "name": "cliente.tienda.checkout",
+        "action": "App\\Http\\Controllers\\Cliente\\TiendaController@checkout",
+        "middleware": "web,auth,role:CLIENTE,modulo:TIENDA"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "cliente\/tienda\/ordenes",
+        "name": "cliente.tienda.ordenes",
+        "action": "App\\Http\\Controllers\\Cliente\\TiendaController@ordenes",
+        "middleware": "web,auth,role:CLIENTE,modulo:TIENDA"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "cliente\/notificaciones",
+        "name": "cliente.notificaciones.index",
+        "action": "App\\Http\\Controllers\\Cliente\\NotificacionController@index",
+        "middleware": "web,auth,role:CLIENTE"
+    },
+    {
+        "methods": "POST",
+        "uri": "cliente\/notificaciones\/{id}\/leida",
+        "name": "cliente.notificaciones.leida",
+        "action": "App\\Http\\Controllers\\Cliente\\NotificacionController@marcarLeida",
+        "middleware": "web,auth,role:CLIENTE"
+    },
+    {
+        "methods": "POST",
+        "uri": "cliente\/notificaciones\/leidas",
+        "name": "cliente.notificaciones.todas",
+        "action": "App\\Http\\Controllers\\Cliente\\NotificacionController@marcarTodas",
+        "middleware": "web,auth,role:CLIENTE"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "register",
+        "name": "register",
+        "action": "App\\Http\\Controllers\\Auth\\RegisteredUserController@create",
+        "middleware": "web,guest"
+    },
+    {
+        "methods": "POST",
+        "uri": "register",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Auth\\RegisteredUserController@store",
+        "middleware": "web,guest"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "login",
+        "name": "login",
+        "action": "App\\Http\\Controllers\\Auth\\AuthenticatedSessionController@create",
+        "middleware": "web,guest"
+    },
+    {
+        "methods": "POST",
+        "uri": "login",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Auth\\AuthenticatedSessionController@store",
+        "middleware": "web,guest"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "forgot-password",
+        "name": "password.request",
+        "action": "App\\Http\\Controllers\\Auth\\PasswordResetLinkController@create",
+        "middleware": "web,guest"
+    },
+    {
+        "methods": "POST",
+        "uri": "forgot-password",
+        "name": "password.email",
+        "action": "App\\Http\\Controllers\\Auth\\PasswordResetLinkController@store",
+        "middleware": "web,guest"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "reset-password\/{token}",
+        "name": "password.reset",
+        "action": "App\\Http\\Controllers\\Auth\\NewPasswordController@create",
+        "middleware": "web,guest"
+    },
+    {
+        "methods": "POST",
+        "uri": "reset-password",
+        "name": "password.store",
+        "action": "App\\Http\\Controllers\\Auth\\NewPasswordController@store",
+        "middleware": "web,guest"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "verify-email",
+        "name": "verification.notice",
+        "action": "App\\Http\\Controllers\\Auth\\EmailVerificationPromptController",
+        "middleware": "web,auth"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "verify-email\/{id}\/{hash}",
+        "name": "verification.verify",
+        "action": "App\\Http\\Controllers\\Auth\\VerifyEmailController",
+        "middleware": "web,auth,signed,throttle:6,1"
+    },
+    {
+        "methods": "POST",
+        "uri": "email\/verification-notification",
+        "name": "verification.send",
+        "action": "App\\Http\\Controllers\\Auth\\EmailVerificationNotificationController@store",
+        "middleware": "web,auth,throttle:6,1"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "confirm-password",
+        "name": "password.confirm",
+        "action": "App\\Http\\Controllers\\Auth\\ConfirmablePasswordController@show",
+        "middleware": "web,auth"
+    },
+    {
+        "methods": "POST",
+        "uri": "confirm-password",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Auth\\ConfirmablePasswordController@store",
+        "middleware": "web,auth"
+    },
+    {
+        "methods": "PUT",
+        "uri": "password",
+        "name": "password.update",
+        "action": "App\\Http\\Controllers\\Auth\\PasswordController@update",
+        "middleware": "web,auth"
+    },
+    {
+        "methods": "POST",
+        "uri": "logout",
+        "name": "logout",
+        "action": "App\\Http\\Controllers\\Auth\\AuthenticatedSessionController@destroy",
+        "middleware": "web,auth"
+    },
+    {
+        "methods": "GET|HEAD",
+        "uri": "storage\/{path}",
+        "name": "storage.local",
+        "action": "Closure",
+        "middleware": ""
+    },
+    {
+        "methods": "PUT",
+        "uri": "storage\/{path}",
+        "name": "storage.local.upload",
+        "action": "Closure",
+        "middleware": ""
+    }
+]

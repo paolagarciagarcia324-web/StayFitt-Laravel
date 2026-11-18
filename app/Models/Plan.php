@@ -101,4 +101,23 @@ class Plan extends Model
     {
         return 'slug';
     }
+
+    public static function sincronizarCupos(?int $idPlan): void
+    {
+        if (! $idPlan) {
+            return;
+        }
+
+        $plan = static::query()->find($idPlan);
+        if (! $plan) {
+            return;
+        }
+
+        $ocupados = PlanCliente::query()
+            ->where('id_plan', $idPlan)
+            ->where('estado_plan_cliente', 'ACTIVO')
+            ->count();
+
+        $plan->update(['cupos_ocupados' => $ocupados]);
+    }
 }

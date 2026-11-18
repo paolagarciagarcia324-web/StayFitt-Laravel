@@ -13,6 +13,60 @@
 @endsection
 
 @section('content')
+    @php
+        $hActivos = $horarios->where('activo', true)->count();
+        $hCupo = (int) $horarios->sum('cupo_ocupado');
+        $hMax = max(1, (int) $horarios->sum('cupo_maximo'));
+        $hPct = (int) round(($hCupo / $hMax) * 100);
+    @endphp
+    <div class="ad-horario-kpis ad-stagger">
+        <article class="ad-horario-kpi is-cyan">
+            <div class="ad-horario-kpi-orb" aria-hidden="true">
+                <i>@include('partials.admin-icon', ['icon' => 'horarios'])</i>
+            </div>
+            <div>
+                <strong data-count="{{ $horarios->count() }}">{{ $horarios->count() }}</strong>
+                <span>Horarios</span>
+                <em>Franjas L–V</em>
+            </div>
+        </article>
+        <article class="ad-horario-kpi is-mint">
+            <div class="ad-horario-kpi-orb" aria-hidden="true">
+                <i>@include('partials.admin-icon', ['icon' => 'clientes'])</i>
+            </div>
+            <div>
+                <strong data-count="{{ $hActivos }}">{{ $hActivos }}</strong>
+                <span>Activos en registro</span>
+                <em>Visibles al público</em>
+            </div>
+        </article>
+        <article class="ad-horario-kpi is-pink">
+            <div class="ad-horario-kpi-orb" aria-hidden="true">
+                <i>@include('partials.admin-icon', ['icon' => 'cupo'])</i>
+            </div>
+            <div>
+                <strong>{{ $hCupo }}/{{ $hMax }}</strong>
+                <span>Cupo ocupado</span>
+                <em>{{ $hPct }}% de la sala</em>
+            </div>
+            <div class="ad-horario-kpi-bar" aria-hidden="true"><i style="width: {{ $hPct }}%"></i></div>
+        </article>
+        <article class="ad-horario-kpi is-violet">
+            <div class="ad-horario-kpi-orb" aria-hidden="true">
+                <i>@include('partials.admin-icon', ['icon' => 'pagos'])</i>
+            </div>
+            <div>
+                <strong data-count="{{ $hPct }}" data-suffix="%">{{ $hPct }}%</strong>
+                <span>Ocupación sala</span>
+                <em>En vivo</em>
+            </div>
+            <svg class="ad-horario-kpi-ring" viewBox="0 0 36 36" aria-hidden="true">
+                <circle cx="18" cy="18" r="15" pathLength="100"/>
+                <circle cx="18" cy="18" r="15" pathLength="100" style="--p: {{ max(2, $hPct) }}"/>
+            </svg>
+        </article>
+    </div>
+
     <section class="ad-horario-board">
         @forelse ($horarios as $horario)
             @php
@@ -95,15 +149,17 @@
         @endforelse
     </section>
 
-    <div class="ad-modal" data-horario-modal hidden>
-        <div class="ad-modal-card">
+    <div class="ad-modal ad-horario-modal" data-horario-modal hidden>
+        <div class="ad-modal-card ad-horario-modal-card">
+            <div class="ad-horario-modal-glow" aria-hidden="true"></div>
             <header class="ad-modal-head">
                 <div>
+                    <p class="ad-horario-modal-kicker">Sala presencial</p>
                     <h2 data-horario-title>Editar horario</h2>
                 </div>
                 <button type="button" class="ad-modal-close" data-close-horario aria-label="Cerrar">×</button>
             </header>
-            <form class="ad-form" method="POST" data-horario-form>
+            <form class="ad-form ad-horario-form" method="POST" data-horario-form>
                 @csrf
                 <input type="hidden" name="_method" value="PUT" data-horario-method>
                 <div class="ad-horario-identity-fields" data-identity-fields>
@@ -142,9 +198,9 @@
                 <p class="ad-page-intro-note" data-create-hint hidden style="margin:0 0 8px">
                     Si lo dejas activo, se mostrará al instante en el registro presencial.
                 </p>
-                <div class="ad-modal-actions">
-                    <button class="ad-btn ad-btn-ghost" type="button" data-close-horario>Cancelar</button>
-                    <button class="ad-btn" type="submit" data-horario-submit>Guardar</button>
+                <div class="ad-modal-actions ad-horario-modal-actions">
+                    <button class="ad-pend-btn is-menta" type="button" data-close-horario>Cancelar</button>
+                    <button class="ad-pend-btn is-fucsia" type="submit" data-horario-submit>Guardar</button>
                 </div>
             </form>
         </div>
@@ -226,9 +282,9 @@
                 form.querySelector('[data-field="link"]').value = '';
                 form.querySelector('[data-field="cupo"]').value = '18';
                 if (activoInput) activoInput.checked = true;
-                form.querySelector('[data-field="dias"]').value = 'Lun · Mié · Vie';
-                form.querySelector('[data-field="hora_inicio"]').value = '06:00';
-                form.querySelector('[data-field="hora_fin"]').value = '07:00';
+                form.querySelector('[data-field="dias"]').value = 'Lun · Mar · Mié · Jue · Vie';
+                form.querySelector('[data-field="hora_inicio"]').value = '05:30';
+                form.querySelector('[data-field="hora_fin"]').value = '06:30';
                 syncActivoUi();
                 modal.hidden = false;
                 modal.classList.add('is-open');

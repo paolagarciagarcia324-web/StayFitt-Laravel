@@ -79,6 +79,21 @@ class Institucion extends Model
         return $this->belongsTo(Plan::class, 'id_plan_contratado', 'id_plan');
     }
 
+    public static function sincronizarCupos(?int $idInstitucion): void
+    {
+        if (! $idInstitucion) {
+            return;
+        }
+
+        $institucion = static::query()->find($idInstitucion);
+        if (! $institucion) {
+            return;
+        }
+
+        $usados = Cliente::query()->where('id_institucion', $idInstitucion)->count();
+        $institucion->update(['cupos_usados' => $usados]);
+    }
+
     public function cuposDisponibles(): int
     {
         $totales = (int) $this->cupos_totales;

@@ -1,14 +1,15 @@
 :root {
     --pink: #ff2d78;
     --cyan: #2ef5e6;
-    --bg: #0a0e17;
-    --sidebar: #0c1220;
-    --header: rgba(10, 14, 23, 0.88);
-    --panel: #121a2b;
-    --muted: rgba(255, 255, 255, 0.58);
-    --line: rgba(255, 255, 255, 0.08);
-    --glow-pink: rgba(255, 45, 120, 0.18);
-    --glow-cyan: rgba(46, 245, 230, 0.12);
+    /* Negro → morado sutil (premium, sin saturación) */
+    --bg: #0e0b12;
+    --sidebar: #120e18;
+    --header: rgba(14, 11, 18, 0.88);
+    --panel: #17131f;
+    --muted: rgba(255, 255, 255, 0.62);
+    --line: rgba(255, 255, 255, 0.1);
+    --glow-pink: rgba(255, 45, 120, 0.16);
+    --glow-cyan: rgba(46, 245, 230, 0.1);
 }
 
 * { box-sizing: border-box; }
@@ -16,22 +17,21 @@
 [hidden] { display: none !important; }
 
 body.ad-body {
+    --ad-side-w: 248px;
     margin: 0;
     min-height: 100vh;
-    display: grid;
-    grid-template-columns: 248px 1fr;
+    display: block;
     font-family: "Montserrat", system-ui, sans-serif;
-    color: #e9edf5;
+    color: #eeeaf4;
     background:
-        radial-gradient(900px 420px at 12% -8%, var(--glow-pink), transparent 55%),
-        radial-gradient(780px 380px at 92% 8%, var(--glow-cyan), transparent 50%),
-        radial-gradient(700px 500px at 70% 100%, rgba(255, 45, 120, 0.06), transparent 55%),
-        var(--bg);
-    transition: grid-template-columns 0.25s ease;
+        radial-gradient(960px 460px at 8% -10%, rgba(255, 45, 120, 0.18), transparent 58%),
+        radial-gradient(860px 420px at 96% 4%, rgba(46, 245, 230, 0.12), transparent 56%),
+        radial-gradient(720px 480px at 70% 108%, rgba(120, 70, 160, 0.1), transparent 60%),
+        linear-gradient(168deg, #14101a 0%, #0e0b12 52%, #0b0910 100%);
 }
 
 body.ad-body:has(.ad-nav-check:not(:checked)) {
-    grid-template-columns: 1fr;
+    --ad-side-w: 0px;
 }
 
 a { color: inherit; text-decoration: none; }
@@ -41,23 +41,25 @@ a { color: inherit; text-decoration: none; }
 .ad-sidebar {
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    position: sticky;
-    top: 0;
-    padding: 14px 10px;
-    background:
-        linear-gradient(180deg, rgba(18, 26, 43, 0.96), rgba(12, 18, 32, 0.98)),
-        var(--sidebar);
-    border-right: 1px solid var(--line);
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: 248px;
+    z-index: 30;
+    padding: 14px 22px 14px 10px;
+    /* Glass fundido: sin borde, sin blur rectangular que genera el corte */
+    background: linear-gradient(
+        90deg,
+        rgba(28, 20, 40, 0.55) 0%,
+        rgba(20, 14, 30, 0.28) 58%,
+        rgba(14, 11, 18, 0) 100%
+    );
+    border: 0;
+    box-shadow: none;
     overflow: hidden;
     transition: transform 0.25s ease, opacity 0.2s ease;
 }
 
 .ad-nav-check:not(:checked) ~ .ad-sidebar {
-    position: fixed;
-    inset: 0 auto 0 0;
-    z-index: 50;
-    width: min(248px, 86vw);
     transform: translateX(-105%);
     pointer-events: none;
 }
@@ -68,7 +70,7 @@ a { color: inherit; text-decoration: none; }
     gap: 12px;
     margin: 2px 6px 14px;
     padding: 8px 8px 12px;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .ad-brand-mark {
@@ -215,7 +217,7 @@ a { color: inherit; text-decoration: none; }
 .ad-nav a.is-active,
 .ad-nav-link.is-active {
     color: #fff;
-    background: rgba(255, 45, 120, 0.16);
+    background: rgba(255, 45, 120, 0.14);
 }
 
 .ad-nav a.is-active .ad-nav-orb,
@@ -341,7 +343,7 @@ a { color: inherit; text-decoration: none; }
 .ad-sidebar-foot {
     margin-top: auto;
     padding-top: 14px;
-    border-top: 1px solid var(--line);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .ad-sidebar-foot button,
@@ -370,10 +372,10 @@ a { color: inherit; text-decoration: none; }
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background:
-        radial-gradient(720px 360px at 80% -10%, var(--glow-cyan), transparent 55%),
-        radial-gradient(640px 420px at 10% 30%, var(--glow-pink), transparent 60%),
-        transparent;
+    margin-left: var(--ad-side-w);
+    width: calc(100% - var(--ad-side-w));
+    background: transparent;
+    transition: margin-left 0.25s ease, width 0.25s ease;
 }
 
 .ad-header {
@@ -383,9 +385,10 @@ a { color: inherit; text-decoration: none; }
     gap: 14px;
     min-height: 60px;
     padding: 0 22px;
-    backdrop-filter: blur(10px);
-    background: var(--header);
-    border-bottom: 1px solid var(--line);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: linear-gradient(180deg, rgba(24, 18, 32, 0.92), rgba(14, 11, 18, 0.88));
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .ad-nav-burger {
@@ -420,9 +423,9 @@ a { color: inherit; text-decoration: none; }
     max-width: 420px;
     padding: 0 12px;
     height: 40px;
-    border-radius: 8px;
-    background: #0e1016;
-    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     color: var(--muted);
 }
 
@@ -1107,7 +1110,7 @@ html.ad-theme-light .ad-users-total-badge strong { color: #171922; }
     height: auto;
     max-height: 85vh;
     object-fit: contain;
-    background: #0a0e17;
+    background: #0e0b12;
 }
 
 .ad-lightbox-close {
@@ -1690,22 +1693,23 @@ html.ad-theme-light .ad-cal-rem-count strong { color: #171922; }
 }
 
 @media (max-width: 1000px) {
-    body.ad-body,
-    body.ad-body:has(.ad-nav-check:checked) {
-        grid-template-columns: 1fr;
+    body.ad-body {
+        --ad-side-w: 0px;
     }
-    .ad-sidebar,
-    .ad-nav-check:checked ~ .ad-sidebar {
-        position: fixed;
-        inset: 0 auto 0 0;
+    .ad-sidebar {
         z-index: 50;
         width: min(268px, 86vw);
         transform: translateX(-105%);
         pointer-events: none;
+        background: linear-gradient(180deg, rgba(22, 16, 32, 0.94), rgba(14, 11, 18, 0.96));
     }
     .ad-nav-check:checked ~ .ad-sidebar {
         transform: translateX(0);
         pointer-events: auto;
+    }
+    .ad-wrap {
+        margin-left: 0;
+        width: 100%;
     }
     .ad-kpis, .ad-split, .ad-triple { grid-template-columns: 1fr; }
     .ad-users-kpis { grid-template-columns: 1fr 1fr; }

@@ -174,6 +174,11 @@ class AsistenteController extends Controller
             $usuario->roles()->detach($rol->id_rol);
         }
 
+        $usuario->load('roles');
+        if ($usuario->roles->isEmpty()) {
+            $usuario->update(['estado' => 'INACTIVO', 'estado_cuenta' => 'INACTIVO']);
+        }
+
         return redirect()
             ->route('admin.asistentes.index', $request->only('q'))
             ->with('asistente_ok', ['accion' => 'eliminado']);

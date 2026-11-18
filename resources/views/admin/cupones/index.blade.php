@@ -8,68 +8,57 @@
 @endsection
 
 @section('content')
-    <x-admin.panel title="Cupones activos y vigentes" subtitle="Descuentos aplicables a planes" flush>
-        <div class="ad-table-wrap">
-        <table class="ad-table ad-users-table">
-            <thead>
-                <tr>
-                    <th>Código</th>
-                    <th>Tipo</th>
-                    <th>Valor</th>
-                    <th>Plan</th>
-                    <th>Vigencia</th>
-                    <th>Usos</th>
-                    <th>Estado</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($cupones as $cupon)
-                    <tr>
-                        <td><strong>{{ $cupon->codigo }}</strong></td>
-                        <td>{{ $cupon->tipo ?: $cupon->tipo_descuento }}</td>
-                        <td>{{ $cupon->valor }}{{ ($cupon->tipo ?: $cupon->tipo_descuento) === 'PORCENTAJE' ? '%' : ' COP' }}</td>
-                        <td>{{ $cupon->plan?->nombre ?: 'Todos' }}</td>
-                        <td>{{ optional($cupon->fecha_inicio)->format('d/m/Y') }} – {{ optional($cupon->fecha_fin)->format('d/m/Y') }}</td>
-                        <td>{{ $cupon->usos_actuales }}/{{ $cupon->usos_maximos ?: $cupon->uso_maximo ?: '∞' }}</td>
-                        <td><span class="ad-badge {{ ($cupon->estado ?: $cupon->estado_cupon) === 'ACTIVO' ? 'ad-badge-ok' : 'ad-badge-bad' }}">{{ $cupon->estado ?: $cupon->estado_cupon }}</span></td>
-                        <td>
-                            <a class="ad-link" href="{{ route('admin.cupones.usos', $cupon->id_descuento) }}">Usos</a>
-                            <button class="ad-btn ad-btn-ghost" type="button"
-                                data-open-cupon-edit
-                                data-id="{{ $cupon->id_descuento }}"
-                                data-valor="{{ $cupon->valor }}"
-                                data-inicio="{{ optional($cupon->fecha_inicio)->format('Y-m-d\\TH:i') }}"
-                                data-fin="{{ optional($cupon->fecha_fin)->format('Y-m-d\\TH:i') }}"
-                                data-usos="{{ $cupon->usos_maximos ?: $cupon->uso_maximo }}"
-                                data-estado="{{ $cupon->estado ?: $cupon->estado_cupon }}">Editar</button>
-                            @if (($cupon->estado ?: $cupon->estado_cupon) === 'ACTIVO')
-                                <form method="POST" action="{{ route('admin.cupones.destroy', $cupon->id_descuento) }}" style="display:inline" onsubmit="return confirm('¿Desactivar este cupón?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="ad-btn ad-btn-ghost" type="submit">Desactivar</button>
-                                </form>
-                            @endif
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="8">
-                            <div class="ad-empty-hero">
-                                <span class="ad-empty-orb">@include('partials.admin-icon', ['icon' => 'planes'])</span>
-                                <strong>Sin cupones</strong>
-                                <button class="ad-btn" type="button" data-open-cupon-form>Crear cupón</button>
-                            </div>
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-        </div>
-        <div class="ad-panel__foot" style="justify-content:center">
-            {{ $cupones->links() }}
-        </div>
-    </x-admin.panel>
+    <div class="ad-carousel" data-carousel>
+        <button class="ad-carousel-btn" type="button" data-carousel-dir="prev" aria-label="Anterior">‹</button>
+    <div class="ad-catalog">
+        @forelse ($cupones as $cupon)
+            @php
+                $tipo = $cupon->tipo ?: $cupon->tipo_descuento;
+                $estado = $cupon->estado ?: $cupon->estado_cupon;
+                $valor = $tipo === 'PORCENTAJE' ? ((int) $cupon->valor).'%' : '$'.number_format((float) $cupon->valor, 0, ',', '.');
+            @endphp
+            <article class="ad-catalog-card">
+                <div class="ad-cat-cover ad-coupon-cover">
+                    <strong>{{ $valor }}</strong>
+                    <span>{{ $tipo === 'PORCENTAJE' ? 'Porcentaje' : 'Monto fijo' }}</span>
+                </div>
+                <div class="ad-cat-body">
+                    <span class="ad-badge {{ $estado === 'ACTIVO' ? 'ad-badge-ok' : 'ad-badge-bad' }}">{{ $estado }}</span>
+                    <strong>{{ $cupon->codigo }}</strong>
+                    <em class="ad-user-mail">{{ $cupon->plan?->nombre ?: 'Todos los planes' }}</em>
+                    <p class="ad-user-mail">{{ optional($cupon->fecha_inicio)->format('d/m/Y') }} – {{ optional($cupon->fecha_fin)->format('d/m/Y') }}</p>
+                    <p class="ad-user-mail">Usos {{ $cupon->usos_actuales }}/{{ $cupon->usos_maximos ?: $cupon->uso_maximo ?: '∞' }}</p>
+                    <div class="ad-people-actions">
+                        <a class="ad-btn ad-btn-ghost" href="{{ route('admin.cupones.usos', $cupon->id_descuento) }}">Usos</a>
+                        <button class="ad-btn" type="button"
+                            data-open-cupon-edit
+                            data-id="{{ $cupon->id_descuento }}"
+                            data-valor="{{ $cupon->valor }}"
+                            data-inicio="{{ optional($cupon->fecha_inicio)->format('Y-m-d\\TH:i') }}"
+                            data-fin="{{ optional($cupon->fecha_fin)->format('Y-m-d\\TH:i') }}"
+                            data-usos="{{ $cupon->usos_maximos ?: $cupon->uso_maximo }}"
+                            data-estado="{{ $estado }}">Editar</button>
+                        @if ($estado === 'ACTIVO')
+                            <form method="POST" action="{{ route('admin.cupones.destroy', $cupon->id_descuento) }}" onsubmit="return confirm('¿Desactivar este cupón?')">
+                                @csrf
+                                @method('DELETE')
+                                <button class="ad-btn ad-btn-ghost" type="submit">Desactivar</button>
+                            </form>
+                        @endif
+                    </div>
+                </div>
+            </article>
+        @empty
+            <div class="ad-empty-hero">
+                <span class="ad-empty-orb">@include('partials.admin-icon', ['icon' => 'planes'])</span>
+                <strong>Sin cupones</strong>
+                <button class="ad-btn" type="button" data-open-cupon-form>Crear cupón</button>
+            </div>
+            @endforelse
+    </div>
+        <button class="ad-carousel-btn" type="button" data-carousel-dir="next" aria-label="Siguiente">›</button>
+    </div>
+    <div class="ad-pagination" style="margin-top:16px">{{ $cupones->links() }}</div>
 
     <div class="ad-modal" data-cupon-modal hidden>
         <div class="ad-modal-card">
@@ -156,7 +145,7 @@
             var modal = document.querySelector('[data-cupon-modal]');
             function open() { if (modal) { modal.hidden = false; modal.classList.add('is-open'); } }
             function close() { if (modal) { modal.hidden = true; modal.classList.remove('is-open'); } }
-            document.querySelector('[data-open-cupon-form]')?.addEventListener('click', open);
+            document.querySelectorAll('[data-open-cupon-form]').forEach(function (b) { b.addEventListener('click', open); });
             document.querySelectorAll('[data-close-cupon-form]').forEach(function (b) { b.addEventListener('click', close); });
             modal?.addEventListener('click', function (e) { if (e.target === modal) close(); });
 

@@ -1,0 +1,135 @@
+{
+    "at": "2026-08-27T08:33:54+00:00",
+    "database": "stayfit",
+    "checks": [
+        {
+            "id": "DB-001",
+            "desc": "Conexión MySQL",
+            "status": "APROBADO",
+            "detail": "stayfit"
+        },
+        {
+            "id": "DB-002",
+            "desc": "Tabla instituciones existe",
+            "status": "APROBADO",
+            "detail": ""
+        },
+        {
+            "id": "DB-003",
+            "desc": "Columna id_user_responsable",
+            "status": "APROBADO",
+            "detail": ""
+        },
+        {
+            "id": "DB-004",
+            "desc": "Tabla invitaciones_institucionales",
+            "status": "APROBADO",
+            "detail": ""
+        },
+        {
+            "id": "DB-005",
+            "desc": "Tabla comunicados_institucionales",
+            "status": "APROBADO",
+            "detail": ""
+        },
+        {
+            "id": "DB-006",
+            "desc": "Rol RESPONSABLE_INSTITUCIONAL",
+            "status": "APROBADO",
+            "detail": [
+                "ADMIN",
+                "ASISTENTE_TECNICO",
+                "CLIENTE",
+                "CLIENTE_INSTITUCIONAL",
+                "COACH",
+                "RESPONSABLE_INSTITUCIONAL"
+            ]
+        },
+        {
+            "id": "DB-007",
+            "desc": "Usuario responsable demo",
+            "status": "APROBADO",
+            "detail": 8
+        },
+        {
+            "id": "DB-008",
+            "desc": "Rol asignado a RRHH",
+            "status": "APROBADO",
+            "detail": ""
+        },
+        {
+            "id": "DB-009",
+            "desc": "Institución vinculada a RRHH",
+            "status": "APROBADO",
+            "detail": "Colegio Campoalegre"
+        },
+        {
+            "id": "DB-010",
+            "desc": "Admin demo",
+            "status": "APROBADO",
+            "detail": ""
+        },
+        {
+            "id": "DB-011",
+            "desc": "Coach demo",
+            "status": "APROBADO",
+            "detail": ""
+        },
+        {
+            "id": "DB-012",
+            "desc": "Staff demo",
+            "status": "APROBADO",
+            "detail": ""
+        },
+        {
+            "id": "DB-013",
+            "desc": "Cliente virtual demo",
+            "status": "APROBADO",
+            "detail": ""
+        },
+        {
+            "id": "DB-014",
+            "desc": "Cliente presencial demo",
+            "status": "APROBADO",
+            "detail": ""
+        },
+        {
+            "id": "DB-015",
+            "desc": "Cliente institucional demo",
+            "status": "APROBADO",
+            "detail": ""
+        },
+        {
+            "id": "DB-016",
+            "desc": "Plan QA creado por E2E (si ya corrió)",
+            "status": "APROBADO",
+            "detail": "Plan QA Automático QA083330"
+        },
+        {
+            "id": "DB-017",
+            "desc": "Producto QA creado por E2E (si ya corrió)",
+            "status": "APROBADO",
+            "detail": "QA-SKU-083331"
+        },
+        {
+            "id": "DB-018",
+            "desc": "≥2 instituciones para aislamiento",
+            "status": "APROBADO",
+            "detail": 3
+        },
+        {
+            "id": "DB-019",
+            "desc": "Invitaciones institucionales >0",
+            "status": "APROBADO",
+            "detail": 3
+        },
+        {
+            "id": "DB-020",
+            "desc": "Sin clientes compartidos entre 2 instituciones",
+            "status": "APROBADO",
+            "detail": 0
+        }
+    ],
+    "aprobados": 20,
+    "fallidos": 0
+}

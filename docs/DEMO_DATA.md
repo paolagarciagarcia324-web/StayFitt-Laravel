@@ -16,8 +16,7 @@ C:\php83\php.exe artisan db:seed
 
 | Rol | Correo | Contraseña | Entrada |
 |---|---|---|---|
-| Administrador | `admin@figuefit.com` | `Admin123!` | `/admin` |
-| Admin existente | `paola@correo.com` | (la tuya) | `/admin` |
+| Administrador | `paola@correo.com` | `paola12345` | `/admin` |
 | Cliente virtual | `valen.gomez@demo.figuefit.test` | `demo12345` | `/cliente` |
 | Cliente virtual (manual) | `cliente.virtual@figuefit.test` | `Virtual123!` | `/cliente` |
 | Coach | `laura.coach@demo.figuefit.test` | `demo12345` | `/coach` |

@@ -1,182 +1,113 @@
 @extends('layouts.admin')
 
-@section('title', 'WhatsApp')
-@section('subtitle', 'Configuración Business, grupos e invitaciones')
+@section('title', 'Chats')
+@section('subtitle', 'Grupos WhatsApp, invitaciones y atajo al chat Business')
+
+@php
+    $waDigits = preg_replace('/\D+/', '', (string) ($config?->numero_business ?? ''));
+    $waUrl = $waDigits !== '' ? 'https://wa.me/'.$waDigits : 'https://web.whatsapp.com/';
+    $grupoActivo = $grupos->firstWhere('estado', 'ACTIVO') ?? $grupos->first();
+    $invRecientes = $historial->take(8);
+@endphp
 
 @section('actions')
     <span class="ad-chip {{ ($config?->activa ?? false) ? 'is-ok' : 'is-off' }}">
-        {{ ($config?->activa ?? false) ? 'Conexión activa' : 'Configuración inactiva' }}
+        {{ ($config?->activa ?? false) ? 'Canal activo' : 'Canal inactivo' }}
     </span>
+    <a class="ad-btn" href="{{ $waUrl }}" target="_blank" rel="noopener">Abrir WhatsApp</a>
 @endsection
 
 @section('content')
-    <div class="ad-status-rail">
-        <x-admin.stat label="Número Business" :value="$config?->numero_business ?: '—'" tone="cyan" />
-        <x-admin.stat label="Grupos" :value="$grupos->count()" tone="pink" />
-        <x-admin.stat label="Invitaciones" :value="$historial->count()" />
-        <x-admin.stat
-            label="Estado"
-            :value="($config?->activa ?? false) ? 'ACTIVA' : 'OFF'"
-            :tone="($config?->activa ?? false) ? 'cyan' : 'pink'"
-        />
-    </div>
+    <section class="ad-chat-shell">
+        <aside class="ad-chat-side">
+            <input type="search" placeholder="Buscar grupo o cliente…" oninput="var q=this.value.toLowerCase(); this.parentElement.querySelectorAll('.ad-chat-item').forEach(function(el){el.hidden=q && el.textContent.toLowerCase().indexOf(q)<0})">
+            <h4>Grupos</h4>
+            <div class="ad-chat-list">
+                @forelse ($grupos as $grupo)
+                    <article class="ad-chat-item {{ $grupoActivo && $grupo->id_grupo_wa === $grupoActivo->id_grupo_wa ? 'is-on' : '' }}">
+                        <strong>{{ $grupo->nombre }}</strong>
+                        <em class="ad-user-mail">{{ $grupo->tipo }} · {{ $grupo->criterio ?: 'General' }}</em>
+                    </article>
+                @empty
+                    <p class="ad-empty">Sin grupos. Guarda primero la configuración.</p>
+                @endforelse
+            </div>
+            <h4>Clientes</h4>
+            <div class="ad-chat-list">
+                @forelse ($invRecientes as $inv)
+                    <article class="ad-chat-item">
+                        <strong>{{ trim(($inv->cliente?->usuario?->nombres).' '.($inv->cliente?->usuario?->apellidos)) ?: 'Cliente' }}</strong>
+                        <em class="ad-user-mail">{{ $inv->aceptada_en ? 'Aceptó' : ($inv->cerrada_sin_aceptar ? 'Cerró' : 'Pendiente') }} · {{ optional($inv->mostrada_en)->format('d/m H:i') }}</em>
+                    </article>
+                @empty
+                    <p class="ad-empty">Aún no hay invitaciones.</p>
+                @endforelse
+            </div>
+        </aside>
+        <div class="ad-chat-main">
+            <header class="ad-chat-head">
+                <div>
+                    <strong>{{ $grupoActivo?->nombre ?? 'StayFit Business' }}</strong>
+                    <em class="ad-user-mail">{{ $config?->horario_atencion ?: 'Horario de atención no definido' }}</em>
+                </div>
+                <div class="ad-chat-tools">
+                    <a class="ad-btn ad-btn-ghost" href="{{ $waUrl }}" target="_blank" rel="noopener">Abrir WhatsApp</a>
+                    @if ($grupoActivo?->link_invitacion)
+                        <a class="ad-btn" href="{{ $grupoActivo->link_invitacion }}" target="_blank" rel="noopener">Entrar al grupo</a>
+                    @endif
+                </div>
+            </header>
+            <div class="ad-chat-bubbles">
+                @if ($config?->mensaje_bienvenida)
+                    <div class="ad-bubble out">{{ $config->mensaje_bienvenida }}</div>
+                @endif
+                @forelse ($invRecientes as $inv)
+                    <div class="ad-bubble {{ $inv->aceptada_en ? 'in' : 'out' }}">
+                        <strong>{{ $inv->cliente?->usuario?->nombres }} {{ $inv->cliente?->usuario?->apellidos }}</strong>
+                        <span>{{ $inv->aceptada_en ? 'aceptó' : ($inv->cerrada_sin_aceptar ? 'cerró' : 'vio') }} la invitación {{ $inv->grupoWa?->nombre ?: 'directa' }} · {{ optional($inv->mostrada_en)->format('d/m H:i') }}</span>
+                    </div>
+                @empty
+                    <div class="ad-bubble in">Cuando un cliente reciba el enlace de grupo, la actividad aparecerá aquí.</div>
+                @endforelse
+            </div>
+            <form class="ad-chat-compose" action="{{ $waUrl }}" method="GET" target="_blank">
+                <input type="text" name="text" placeholder="Escribe un mensaje para abrir WhatsApp…" style="flex:1">
+                <button class="ad-btn" type="submit">Enviar en WhatsApp</button>
+            </form>
+        </div>
+    </section>
 
-    <div class="ad-grid-12">
-        <div class="ad-col-7">
-            <x-admin.panel title="Configuración general" subtitle="Datos del canal Business y atención">
+    <details class="ad-glass-card" style="margin-top:16px">
+        <summary style="cursor:pointer;font-weight:600">Configuración Business y grupos</summary>
+        <div class="ad-grid-12" style="margin-top:16px">
+            <div class="ad-col-7">
                 <form class="ad-form" method="POST" action="{{ route('admin.whatsapp.update') }}">
                     @csrf
                     @method('PUT')
-
-                    <details class="ad-form-section" open>
-                        <summary>Información principal</summary>
-                        <div class="ad-form-section__body">
-                            <div class="ad-form-row">
-                                <label><span>Número Business *</span><input type="text" name="numero_business" value="{{ old('numero_business', $config?->numero_business) }}" required></label>
-                                <label><span>Horario de atención</span><input type="text" name="horario_atencion" value="{{ old('horario_atencion', $config?->horario_atencion) }}" placeholder="Lun–Vie 8:00–18:00"></label>
-                            </div>
-                            <label class="ad-check">
-                                <input type="checkbox" name="activa" value="1" @checked(old('activa', $config?->activa ?? true))>
-                                <span>Configuración activa</span>
-                            </label>
-                        </div>
-                    </details>
-
-                    <details class="ad-form-section" open>
-                        <summary>Grupo principal y bienvenida</summary>
-                        <div class="ad-form-section__body">
-                            <label><span>Link grupo principal</span><input type="url" name="link_grupo_principal" value="{{ old('link_grupo_principal', $config?->link_grupo_principal) }}"></label>
-                            <label><span>Mensaje de bienvenida</span><textarea name="mensaje_bienvenida" rows="3">{{ old('mensaje_bienvenida', $config?->mensaje_bienvenida) }}</textarea></label>
-                        </div>
-                    </details>
-
-                    <details class="ad-form-section">
-                        <summary>Integración y automatizaciones</summary>
-                        <div class="ad-form-section__body">
-                            <label>
-                                <span>API token (webhook Meta)</span>
-                                <input type="password" name="api_token" placeholder="{{ $config?->tieneApiToken() ? '•••••••• (dejar vacío para no cambiar)' : 'Token verify / app secret' }}" autocomplete="new-password">
-                            </label>
-                            <label>
-                                <span>Respuestas automáticas (JSON)</span>
-                                <textarea name="respuestas_automaticas" rows="4" placeholder='[{"trigger":"hola","respuesta":"¡Bienvenido a FigueFit!"}]'>{{ old('respuestas_automaticas', $config?->respuestas_automaticas ? json_encode($config->respuestas_automaticas, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) : '') }}</textarea>
-                            </label>
-                        </div>
-                    </details>
-
+                    <div class="ad-form-row">
+                        <label><span>Número Business *</span><input type="text" name="numero_business" value="{{ old('numero_business', $config?->numero_business) }}" required></label>
+                        <label><span>Horario de atención</span><input type="text" name="horario_atencion" value="{{ old('horario_atencion', $config?->horario_atencion) }}" placeholder="Lun–Vie 8:00–18:00"></label>
+                    </div>
+                    <label class="ad-check">
+                        <input type="checkbox" name="activa" value="1" @checked(old('activa', $config?->activa ?? true))>
+                        <span>Configuración activa</span>
+                    </label>
+                    <label><span>Link grupo principal</span><input type="url" name="link_grupo_principal" value="{{ old('link_grupo_principal', $config?->link_grupo_principal) }}"></label>
+                    <label><span>Mensaje de bienvenida</span><textarea name="mensaje_bienvenida" rows="3">{{ old('mensaje_bienvenida', $config?->mensaje_bienvenida) }}</textarea></label>
+                    <label>
+                        <span>API token (webhook Meta)</span>
+                        <input type="password" name="api_token" placeholder="{{ $config?->tieneApiToken() ? '•••••••• (dejar vacío para no cambiar)' : 'Token verify / app secret' }}" autocomplete="new-password">
+                    </label>
+                    <label>
+                        <span>Respuestas automáticas (JSON)</span>
+                        <textarea name="respuestas_automaticas" rows="4" placeholder='[{"trigger":"hola","respuesta":"¡Bienvenido a StayFit!"}]'>{{ old('respuestas_automaticas', $config?->respuestas_automaticas ? json_encode($config->respuestas_automaticas, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) : '') }}</textarea>
+                    </label>
                     <div class="ad-form-actions">
                         <button class="ad-btn" type="submit">Guardar configuración</button>
                     </div>
                 </form>
-            </x-admin.panel>
-        </div>
-
-        <div class="ad-col-5">
-            <x-admin.panel title="Actividad reciente" subtitle="Últimas invitaciones registradas" flush>
-                <div class="ad-table-wrap">
-                    <table class="ad-table ad-users-table ad-table-compact">
-                        <thead>
-                            <tr>
-                                <th>Cliente</th>
-                                <th>Estado</th>
-                                <th>Fecha</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($historial->take(8) as $inv)
-                                <tr>
-                                    <td>
-                                        <strong>{{ $inv->cliente?->usuario?->nombres }} {{ $inv->cliente?->usuario?->apellidos }}</strong>
-                                        <em class="ad-user-mail">{{ $inv->grupoWa?->nombre ?: 'Link directo' }}</em>
-                                    </td>
-                                    <td>
-                                        @if ($inv->aceptada_en)
-                                            <span class="ad-badge ad-badge-ok">Aceptada</span>
-                                        @elseif ($inv->cerrada_sin_aceptar)
-                                            <span class="ad-badge">Cerrada</span>
-                                        @else
-                                            <span class="ad-badge ad-badge-bad">Pendiente</span>
-                                        @endif
-                                    </td>
-                                    <td>{{ optional($inv->mostrada_en)->format('d/m H:i') }}</td>
-                                </tr>
-                            @empty
-                                <tr><td colspan="3" class="ad-empty">Sin invitaciones aún.</td></tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </x-admin.panel>
-        </div>
-    </div>
-
-    <div class="ad-grid-12">
-        <div class="ad-col-8">
-            <x-admin.panel title="Grupos WhatsApp" subtitle="Horario / plan / general" flush>
-                <div class="ad-table-wrap">
-                    <table class="ad-table ad-users-table">
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Tipo</th>
-                                <th>Criterio</th>
-                                <th>Estado</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($grupos as $grupo)
-                                <tr>
-                                    <td>
-                                        <strong>{{ $grupo->nombre }}</strong>
-                                        <em class="ad-user-mail"><a class="ad-link" href="{{ $grupo->link_invitacion }}" target="_blank" rel="noopener">Invitación</a></em>
-                                    </td>
-                                    <td>{{ $grupo->tipo }}</td>
-                                    <td>{{ $grupo->criterio ?: '—' }}</td>
-                                    <td><span class="ad-badge {{ $grupo->estado === 'ACTIVO' ? 'ad-badge-ok' : 'ad-badge-bad' }}">{{ $grupo->estado }}</span></td>
-                                    <td>
-                                        <div class="ad-row-actions">
-                                            @if ($grupo->estado === 'ACTIVO')
-                                                <details>
-                                                    <summary class="ad-link" style="cursor:pointer">Editar</summary>
-                                                    <form class="ad-form" method="POST" action="{{ route('admin.whatsapp.grupos.update', $grupo->id_grupo_wa) }}" style="margin-top:8px;min-width:220px">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <input type="text" name="nombre" value="{{ $grupo->nombre }}" required>
-                                                        <input type="text" name="criterio" value="{{ $grupo->criterio }}">
-                                                        <input type="url" name="link_invitacion" value="{{ $grupo->link_invitacion }}" required>
-                                                        <select name="tipo" required>
-                                                            <option value="HORARIO" @selected($grupo->tipo === 'HORARIO')>HORARIO</option>
-                                                            <option value="PLAN" @selected($grupo->tipo === 'PLAN')>PLAN</option>
-                                                            <option value="GENERAL" @selected($grupo->tipo === 'GENERAL')>GENERAL</option>
-                                                        </select>
-                                                        <select name="estado" required>
-                                                            <option value="ACTIVO" @selected($grupo->estado === 'ACTIVO')>ACTIVO</option>
-                                                            <option value="INACTIVO" @selected($grupo->estado === 'INACTIVO')>INACTIVO</option>
-                                                        </select>
-                                                        <button class="ad-btn ad-btn-ghost" type="submit">Guardar</button>
-                                                    </form>
-                                                </details>
-                                                <form method="POST" action="{{ route('admin.whatsapp.grupos.destroy', $grupo->id_grupo_wa) }}" onsubmit="return confirm('¿Desactivar grupo?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button class="ad-btn ad-btn-ghost" type="submit">Desactivar</button>
-                                                </form>
-                                            @endif
-                                        </div>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr><td colspan="5" class="ad-empty">Sin grupos. Guarda primero la configuración.</td></tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </x-admin.panel>
-        </div>
-
-        <div class="ad-col-4">
-            <x-admin.panel title="Nuevo grupo" subtitle="Alta rápida">
+            </div>
+            <div class="ad-col-5">
                 @if ($config)
                     <form class="ad-form" method="POST" action="{{ route('admin.whatsapp.grupos') }}">
                         @csrf
@@ -203,42 +134,25 @@
                 @else
                     <p class="ad-empty">Guarda la configuración Business para habilitar grupos.</p>
                 @endif
-            </x-admin.panel>
-        </div>
-    </div>
 
-    <x-admin.panel title="Historial completo de invitaciones" subtitle="Auditoría de enlaces mostrados a clientes" flush>
-        <div class="ad-table-wrap">
-            <table class="ad-table ad-users-table">
-                <thead>
-                    <tr>
-                        <th>Cliente</th>
-                        <th>Grupo</th>
-                        <th>Mostrada</th>
-                        <th>Estado</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($historial as $inv)
-                        <tr>
-                            <td>{{ $inv->cliente?->usuario?->nombres }} {{ $inv->cliente?->usuario?->apellidos }}</td>
-                            <td>{{ $inv->grupoWa?->nombre ?: 'Link directo' }}</td>
-                            <td>{{ optional($inv->mostrada_en)->format('d/m/Y H:i') }}</td>
-                            <td>
-                                @if ($inv->aceptada_en)
-                                    <span class="ad-badge ad-badge-ok">Aceptada</span>
-                                @elseif ($inv->cerrada_sin_aceptar)
-                                    <span class="ad-badge">Cerrada</span>
-                                @else
-                                    <span class="ad-badge ad-badge-bad">Pendiente</span>
-                                @endif
-                            </td>
-                        </tr>
-                    @empty
-                        <tr><td colspan="4" class="ad-empty">Sin invitaciones registradas.</td></tr>
-                    @endforelse
-                </tbody>
-            </table>
+                <div class="ad-up-list" style="margin-top:16px">
+                    @foreach ($grupos as $grupo)
+                        <article class="ad-up-item">
+                            <div>
+                                <strong>{{ $grupo->nombre }}</strong>
+                                <em class="ad-user-mail">{{ $grupo->tipo }} · {{ $grupo->estado }}</em>
+                            </div>
+                            @if ($grupo->estado === 'ACTIVO')
+                                <form method="POST" action="{{ route('admin.whatsapp.grupos.destroy', $grupo->id_grupo_wa) }}" onsubmit="return confirm('¿Desactivar grupo?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="ad-btn ad-btn-ghost" type="submit">Desactivar</button>
+                                </form>
+                            @endif
+                        </article>
+                    @endforeach
+                </div>
+            </div>
         </div>
-    </x-admin.panel>
+    </details>
 @endsection

@@ -38,14 +38,25 @@ class LoginUsuarioService
             return true;
         }
 
-        $documento = trim((string) ($user->documento_identidad ?? ''));
-        if ($documento !== '' && hash_equals($documento, $password)) {
-            return true;
+        // Acceso con documento permitido únicamente en el primer ingreso
+        // (usuarios registrados por pago o creados como coach que aún no tienen último acceso registrado)
+        if ($this->esPrimerIngreso($user)) {
+            $documento = trim((string) ($user->documento_identidad ?? ''));
+            if ($documento !== '' && hash_equals($documento, $password)) {
+                return true;
+            }
+
+            $user->loadMissing('cliente');
+            $docCliente = trim((string) ($user->cliente?->documento ?? ''));
+
+            return $docCliente !== '' && hash_equals($docCliente, $password);
         }
 
-        $user->loadMissing('cliente');
-        $docCliente = trim((string) ($user->cliente?->documento ?? ''));
+        return false;
+    }
 
-        return $docCliente !== '' && hash_equals($docCliente, $password);
+    public function esPrimerIngreso(User $user): bool
+    {
+        return empty($user->ultimo_acceso_en) && empty($user->ultimo_acceso);
     }
 }

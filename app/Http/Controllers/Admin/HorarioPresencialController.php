@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Cliente;
 use App\Models\HorarioPresencial;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,7 +14,12 @@ class HorarioPresencialController extends Controller
 {
     public function index(): View
     {
-        $horarios = HorarioPresencial::query()->orderBy('orden')->get();
+        HorarioPresencial::asegurarFranjasSala();
+
+        $horarios = HorarioPresencial::query()
+            ->where('activo', true)
+            ->orderBy('orden')
+            ->get();
 
         return view('admin.horarios.index', compact('horarios'));
     }
@@ -99,6 +105,16 @@ class HorarioPresencialController extends Controller
     public function destroy(int $id): RedirectResponse
     {
         $horario = HorarioPresencial::query()->findOrFail($id);
+
+        if (Cliente::query()->where('id_horario', $horario->id_horario)->exists()) {
+            $horario->update(['activo' => false]);
+
+            return back()->with('horario_ok', [
+                'accion' => 'desactivado',
+                'activo' => false,
+            ]);
+        }
+
         $horario->delete();
 
         return back()->with('horario_ok', [

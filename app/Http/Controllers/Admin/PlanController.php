@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class PlanController extends Controller
@@ -66,7 +67,7 @@ class PlanController extends Controller
 
     public function update(Request $request, Plan $plan): RedirectResponse
     {
-        $data = $this->validated($request);
+        $data = $this->validated($request, $plan);
         $data['caracteristicas_json'] = $this->parseFeatures($request->input('caracteristicas'));
         $data['imagen_url'] = $this->resolveMedia($request, 'imagen', 'planes', 'imagen_url', $plan->imagen_url);
         $plan->update($data);
@@ -98,10 +99,15 @@ class PlanController extends Controller
             ->with('plan_ok', ['accion' => 'eliminado']);
     }
 
-    private function validated(Request $request): array
+    private function validated(Request $request, ?Plan $plan = null): array
     {
         $data = $request->validate([
-            'codigo' => ['nullable', 'string', 'max:40'],
+            'codigo' => [
+                'nullable',
+                'string',
+                'max:40',
+                Rule::unique('planes', 'codigo')->ignore($plan?->id_plan, 'id_plan'),
+            ],
             'nombre' => ['required', 'string', 'max:150'],
             'descripcion' => ['nullable', 'string'],
             'imagen_url' => ['nullable', 'string', 'max:500'],
@@ -125,6 +131,10 @@ class PlanController extends Controller
             'popular' => ['nullable', 'boolean'],
             'destacado' => ['nullable', 'boolean'],
         ]);
+
+        if (($data['codigo'] ?? '') === '') {
+            $data['codigo'] = null;
+        }
 
         return $data + [
             'requiere_coach' => $request->boolean('requiere_coach'),

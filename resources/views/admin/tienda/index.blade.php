@@ -8,9 +8,15 @@
 @endsection
 
 @section('content')
-    <div class="ad-tienda-layout">
+    <div class="ad-tienda-layout ad-shop">
         <section class="ad-card ad-ml-catalog">
-            <div class="ad-card-head"><h2>Catálogo</h2></div>
+            <div class="ad-shop-head">
+                <div>
+                    <h2 style="margin:0">Catálogo presencial</h2>
+                    <small class="ad-user-mail">Mostrando {{ $productos->count() }} de {{ $productos->total() }} productos</small>
+                </div>
+                <button class="ad-btn ad-btn-add" type="button" data-open-product-form>+ Crear producto</button>
+            </div>
 
             @if ($productos->isEmpty())
                 <div class="ad-empty-hero">
@@ -92,7 +98,7 @@
                             @csrf
                             @method('PUT')
                             <select name="estado_orden">
-                                @foreach (['PENDIENTE_PAGO','PAGADA','PREPARADA','ENVIADA','ENTREGADA','CANCELADA'] as $estado)
+                                @foreach (['PENDIENTE','PENDIENTE_PAGO','PAGADA','PREPARADA','PREPARANDO','ENVIADA','DESPACHADA','ENTREGADA','CANCELADA'] as $estado)
                                     <option value="{{ $estado }}" @selected($orden->estado_orden === $estado)>{{ $estado }}</option>
                                 @endforeach
                             </select>

@@ -1,0 +1,38 @@
+[
+    {
+        "id_rol": 1,
+        "codigo": "ADMIN",
+        "nombre": "Administrador",
+        "estado": "ACTIVO"
+    },
+    {
+        "id_rol": 2,
+        "codigo": "COACH",
+        "nombre": "Coach",
+        "estado": "ACTIVO"
+    },
+    {
+        "id_rol": 3,
+        "codigo": "ASISTENTE_TECNICO",
+        "nombre": "Asistente Técnico de Coach",
+        "estado": "ACTIVO"
+    },
+    {
+        "id_rol": 4,
+        "codigo": "CLIENTE",
+        "nombre": "Cliente Individual",
+        "estado": "ACTIVO"
+    },
+    {
+        "id_rol": 5,
+        "codigo": "CLIENTE_INSTITUCIONAL",
+        "nombre": "Cliente Institucional",
+        "estado": "ACTIVO"
+    },
+    {
+        "id_rol": 6,
+        "codigo": "RESPONSABLE_INSTITUCIONAL",
+        "nombre": "Responsable Institucional",
+        "estado": "ACTIVO"
+    }
+]

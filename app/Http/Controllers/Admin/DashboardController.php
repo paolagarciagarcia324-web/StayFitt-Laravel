@@ -32,7 +32,7 @@ class DashboardController extends Controller
             ->sum('cantidad');
 
         $ordenes = OrdenTienda::query()
-            ->with('cliente.usuario')
+            ->with(['cliente.usuario', 'detalles.producto'])
             ->orderByDesc('creado_en')
             ->limit(6)
             ->get();

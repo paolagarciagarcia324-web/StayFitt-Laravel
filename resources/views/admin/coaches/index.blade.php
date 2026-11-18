@@ -27,68 +27,50 @@
             <button class="ad-btn ad-btn-add" type="button" data-open-coach-form>+ Crear coach</button>
         </div>
 
-        <table class="ad-table ad-users-table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Perfil</th>
-                    <th>Coach</th>
-                    <th>Especialidad</th>
-                    <th>Clientes</th>
-                    <th>Valoración</th>
-                    <th>Estado</th>
-                    <th>Último acceso</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($coaches as $index => $c)
-                    @php
-                        $u = $c->usuario;
-                        $nombre = trim(($u?->nombres).' '.($u?->apellidos)) ?: 'Coach';
-                        $searchBlob = mb_strtolower(trim($nombre.' '.($u?->correo ?? '').' '.($c->especialidad ?? '')));
-                    @endphp
-                    <tr data-search="{{ $searchBlob }}">
-                        <td>{{ $coaches->firstItem() + $index }}</td>
-                        <td>@include('partials.admin-avatar', ['user' => $u, 'zoomable' => true])</td>
-                        <td>
-                            <strong>{{ $u?->nombres }} {{ $u?->apellidos }}</strong>
-                            <em class="ad-user-mail">{{ $u?->correo }}</em>
-                        </td>
-                        <td>{{ $c->especialidad ?: '—' }}</td>
-                        <td>{{ $c->clientes->count() }}</td>
-                        <td>{{ number_format((float) $c->calificacion_promedio, 1) }} ★</td>
-                        <td><span class="ad-badge {{ $c->estado_coach === 'ACTIVO' ? 'ad-badge-ok' : ($c->estado_coach === 'VACACIONES' ? 'ad-badge-pendiente' : 'ad-badge-bad') }}">{{ $c->estado_coach }}</span></td>
-                        <td>{{ $u?->ultimo_acceso_en ? $u->ultimo_acceso_en->diffForHumans() : '—' }}</td>
-                        <td>
-                            <div class="ad-row-actions">
-                                <button class="ad-icon-btn" type="button"
-                                    title="Editar"
-                                    aria-label="Editar coach"
-                                    data-open-coach-edit
-                                    data-id="{{ $c->id_coach }}"
-                                    data-especialidad="{{ $c->especialidad }}"
-                                    data-biografia="{{ $c->biografia }}"
-                                    data-certificaciones="{{ $c->certificaciones }}"
-                                    data-estado="{{ $c->estado_coach }}"
-                                    data-telefono="{{ $u?->telefono }}">
-                                    @include('partials.admin-icon', ['icon' => 'edit'])
-                                </button>
-                                @if ($c->estado_coach === 'ACTIVO')
-                                    <form method="POST" action="{{ route('admin.coaches.destroy', $c->id_coach) }}" style="display:inline" onsubmit="return confirm('¿Desactivar este coach?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="ad-icon-btn" type="submit" title="Desactivar" aria-label="Desactivar coach">×</button>
-                                    </form>
-                                @endif
-                            </div>
-                        </td>
-                    </tr>
-                @empty
-                    <tr><td colspan="9" class="ad-empty">No hay coaches registrados.</td></tr>
-                @endforelse
-            </tbody>
-        </table>
+        <div class="ad-people-grid">
+            @forelse ($coaches as $index => $c)
+                @php
+                    $u = $c->usuario;
+                    $nombre = trim(($u?->nombres).' '.($u?->apellidos)) ?: 'Coach';
+                    $searchBlob = mb_strtolower(trim($nombre.' '.($u?->correo ?? '').' '.($c->especialidad ?? '')));
+                @endphp
+                <article class="ad-people-card" data-inst-card data-search="{{ $searchBlob }}">
+                    <span class="ad-people-status {{ $c->estado_coach === 'ACTIVO' ? 'is-ok' : ($c->estado_coach === 'VACACIONES' ? 'is-wait' : 'is-off') }}">{{ $c->estado_coach }}</span>
+                    <header>
+                        @include('partials.admin-avatar', ['user' => $u, 'zoomable' => true])
+                        <div>
+                            <strong>{{ $nombre }}</strong>
+                            <em class="ad-user-mail">{{ $c->especialidad ?: 'Coach StayFit' }}</em>
+                        </div>
+                    </header>
+                    <div class="ad-people-meta">
+                        <span><em>Correo</em> {{ $u?->correo ?: '—' }}</span>
+                        <span><em>Teléfono</em> {{ $u?->telefono ?: '—' }}</span>
+                        <span><em>Clientes</em> {{ $c->clientes->count() }}</span>
+                        <span><em>Alta</em> {{ optional($c->creado_en)->format('d M Y') ?: '—' }}</span>
+                    </div>
+                    <div class="ad-people-actions">
+                        <button class="ad-btn" type="button"
+                            data-open-coach-edit
+                            data-id="{{ $c->id_coach }}"
+                            data-especialidad="{{ $c->especialidad }}"
+                            data-biografia="{{ $c->biografia }}"
+                            data-certificaciones="{{ $c->certificaciones }}"
+                            data-estado="{{ $c->estado_coach }}"
+                            data-telefono="{{ $u?->telefono }}">Editar</button>
+                        @if ($c->estado_coach === 'ACTIVO')
+                            <form method="POST" action="{{ route('admin.coaches.destroy', $c->id_coach) }}" onsubmit="return confirm('¿Desactivar este coach?')">
+                                @csrf
+                                @method('DELETE')
+                                <button class="ad-btn ad-btn-ghost" type="submit">Desactivar</button>
+                            </form>
+                        @endif
+                    </div>
+                </article>
+            @empty
+                <p class="ad-empty">No hay coaches registrados.</p>
+            @endforelse
+        </div>
         <p class="ad-live-search-empty" data-live-search-empty hidden>Ningún coach coincide con esa búsqueda.</p>
         <div class="ad-pagination">{{ $coaches->links() }}</div>
     </section>

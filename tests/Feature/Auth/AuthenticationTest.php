@@ -8,6 +8,18 @@ test('login screen can be rendered', function () {
     $response->assertStatus(200);
 });
 
+test('login screen renders password visibility toggle button with accessibility attributes', function () {
+    $response = $this->get('/login');
+
+    $response->assertStatus(200)
+        ->assertSee('class="lg-toggle-password"', false)
+        ->assertSee('data-target="password"', false)
+        ->assertSee('aria-controls="password"', false)
+        ->assertSee('aria-label="Mostrar contraseña"', false)
+        ->assertSee('lg-icon-eye', false)
+        ->assertSee('lg-icon-eye-off', false);
+});
+
 test('users can authenticate using the login screen', function () {
     $user = User::factory()->create();
 

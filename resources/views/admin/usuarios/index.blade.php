@@ -9,35 +9,26 @@
 @endsection
 
 @section('content')
-    <div class="ad-kpis ad-users-kpis">
-        <a class="ad-kpi accent-cyan" href="{{ route('admin.clientes.virtuales') }}">
-            <span class="ad-kpi-ico">@include('partials.admin-icon', ['icon' => 'clientes-virtual'])</span>
-            <div class="ad-kpi-copy">
-                <strong>{{ $kpis['virtuales'] ?? 0 }}</strong>
-                <span>Virtuales</span>
-            </div>
-        </a>
-        <a class="ad-kpi accent-pink" href="{{ route('admin.clientes.presenciales') }}">
-            <span class="ad-kpi-ico">@include('partials.admin-icon', ['icon' => 'clientes-presencial'])</span>
-            <div class="ad-kpi-copy">
-                <strong>{{ $kpis['presenciales'] ?? 0 }}</strong>
-                <span>Presenciales</span>
-            </div>
-        </a>
-        <a class="ad-kpi accent-cyan" href="{{ route('admin.coaches.index') }}">
-            <span class="ad-kpi-ico">@include('partials.admin-icon', ['icon' => 'coaches'])</span>
-            <div class="ad-kpi-copy">
-                <strong>{{ $kpis['coaches'] ?? 0 }}</strong>
-                <span>Coaches</span>
-            </div>
-        </a>
-        <a class="ad-kpi accent-pink" href="{{ route('admin.asistentes.index') }}">
-            <span class="ad-kpi-ico">@include('partials.admin-icon', ['icon' => 'personas'])</span>
-            <div class="ad-kpi-copy">
-                <strong>{{ $kpis['asistentes'] ?? 0 }}</strong>
-                <span>Asistentes</span>
-            </div>
-        </a>
+    <div class="ad-kpi-soft ad-stagger">
+        @php
+            $kpiItems = [
+                ['key' => 'total', 'delta' => 'delta_total', 'label' => 'Total usuarios', 'icon' => 'personas', 'tone' => 'is-cyan'],
+                ['key' => 'activos', 'delta' => 'delta_activos', 'label' => 'Activos', 'icon' => 'clientes', 'tone' => 'is-ok'],
+                ['key' => 'inactivos', 'delta' => 'delta_inactivos', 'label' => 'Inactivos', 'icon' => 'alerta', 'tone' => 'is-warn'],
+                ['key' => 'admins', 'delta' => 'delta_admins', 'label' => 'Administradores', 'icon' => 'coaches', 'tone' => 'is-pink'],
+            ];
+        @endphp
+        @foreach ($kpiItems as $item)
+            @php $delta = (int) ($kpis[$item['delta']] ?? 0); @endphp
+            <article>
+                <i class="{{ $item['tone'] }}">@include('partials.admin-icon', ['icon' => $item['icon']])</i>
+                <div>
+                    <strong data-count="{{ $kpis[$item['key']] ?? 0 }}">{{ $kpis[$item['key']] ?? 0 }}</strong>
+                    <span class="ad-user-mail">{{ $item['label'] }}</span>
+                    <span class="ad-kpi-delta {{ $delta >= 0 ? 'is-up' : 'is-down' }}">{{ $delta >= 0 ? '▲' : '▼' }} {{ abs($delta) }}% vs mes anterior</span>
+                </div>
+            </article>
+        @endforeach
     </div>
 
     <section class="ad-card ad-users">
@@ -54,99 +45,79 @@
             </span>
         </div>
 
-        <table class="ad-table ad-users-table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Perfil</th>
-                    <th>Nombre</th>
-                    <th>Documento</th>
-                    <th>Modalidad</th>
-                    <th>Plan</th>
-                    <th>Días restantes</th>
-                    <th>Nacimiento</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($usuarios as $index => $u)
-                    @php
-                        $cliente = $u->cliente;
-                        $planActivo = $cliente?->planesCliente
-                            ?->where('estado_plan_cliente', 'ACTIVO')
-                            ->sortByDesc('fecha_fin')
-                            ->first();
-                        $fin = $planActivo?->fecha_fin;
-                        $dias = $fin ? (int) now()->startOfDay()->diffInDays($fin, false) : null;
-                        $tipoDoc = $u->Tipo_documento ?: ($cliente?->tipo_documento ?: '');
-                        $numDoc = $u->documento_identidad ?: ($cliente?->documento ?: '');
-                        $docLabel = ($tipoDoc || $numDoc)
-                            ? trim($tipoDoc.' '.$numDoc)
-                            : '—';
-                    @endphp
-                    <tr>
-                        <td>{{ $usuarios->firstItem() + $index }}</td>
-                        <td>@include('partials.admin-avatar', ['user' => $u])</td>
-                        <td>
+        <div class="ad-people-grid">
+            @forelse ($usuarios as $index => $u)
+                @php
+                    $cliente = $u->cliente;
+                    $planActivo = $cliente?->planesCliente
+                        ?->where('estado_plan_cliente', 'ACTIVO')
+                        ->sortByDesc('fecha_fin')
+                        ->first();
+                    $fin = $planActivo?->fecha_fin;
+                    $dias = $fin ? (int) now()->startOfDay()->diffInDays($fin, false) : null;
+                    $tipoDoc = $u->Tipo_documento ?: ($cliente?->tipo_documento ?: '');
+                    $numDoc = $u->documento_identidad ?: ($cliente?->documento ?: '');
+                    $docLabel = ($tipoDoc || $numDoc) ? trim($tipoDoc.' '.$numDoc) : '—';
+                    $estado = $u->estado ?: $u->estado_cuenta ?: 'ACTIVO';
+                    $searchBlob = mb_strtolower(trim(($u->nombres).' '.($u->apellidos).' '.($u->correo).' '.$docLabel));
+                @endphp
+                <article class="ad-people-card" data-inst-card data-search="{{ $searchBlob }}">
+                    <span class="ad-people-status {{ $estado === 'ACTIVO' ? 'is-ok' : 'is-off' }}">{{ $estado }}</span>
+                    <header>
+                        @include('partials.admin-avatar', ['user' => $u])
+                        <div>
                             <strong>{{ $u->nombres }} {{ $u->apellidos }}</strong>
-                            <em class="ad-user-mail">{{ $u->correo }}</em>
-                        </td>
-                        <td>{{ $docLabel }}</td>
-                        <td>
-                            @if ($cliente?->modalidad)
-                                <span class="ad-badge {{ $cliente->modalidad === 'PRESENCIAL' ? 'ad-badge-ok' : 'ad-badge-pendiente' }}">{{ $cliente->modalidad }}</span>
-                            @else
-                                —
-                            @endif
-                        </td>
-                        <td>{{ $planActivo?->plan?->nombre ?? '—' }}</td>
-                        <td>
-                            @if ($dias === null)
-                                —
-                            @elseif ($dias < 0)
-                                <span class="ad-badge ad-badge-bad">Vencido</span>
-                            @else
-                                <span class="ad-pill-days">{{ $dias }} días</span>
-                            @endif
-                        </td>
-                        <td>
-                            @if ($cliente?->fecha_nacimiento)
-                                {{ \Illuminate\Support\Carbon::parse($cliente->fecha_nacimiento)->format('d/m/Y') }}
-                            @else
-                                —
-                            @endif
-                        </td>
-                        <td>
-                            <div class="ad-row-actions">
-                                <button class="ad-icon-btn" type="button"
-                                    title="Editar"
-                                    aria-label="Editar usuario"
-                                    data-open-user-edit
-                                    data-id="{{ $u->id_user }}"
-                                    data-nombres="{{ $u->nombres }}"
-                                    data-apellidos="{{ $u->apellidos }}"
-                                    data-tipo-documento="{{ $tipoDoc ?: 'CC' }}"
-                                    data-documento="{{ $numDoc }}"
-                                    data-correo="{{ $u->correo }}"
-                                    data-telefono="{{ $u->telefono }}"
-                                    data-ciudad="{{ $cliente?->ciudad ?? '' }}"
-                                    data-nacimiento="{{ $cliente?->fecha_nacimiento ? \Illuminate\Support\Carbon::parse($cliente->fecha_nacimiento)->format('Y-m-d') : '' }}"
-                                    data-genero="{{ $cliente?->genero ?: 'FEMENINO' }}"
-                                    data-objetivo="{{ $cliente?->objetivo_principal ?? '' }}"
-                                    data-estado="{{ $u->estado ?: $u->estado_cuenta ?: 'ACTIVO' }}"
-                                    data-roles="{{ $u->roles->pluck('id_rol')->implode(',') }}"
-                                    data-foto="{{ $u->avatarUrl() }}"
-                                    data-foto-url="{{ $u->foto_perfil_url }}">
-                                    @include('partials.admin-icon', ['icon' => 'edit'])
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                @empty
-                    <tr><td colspan="9" class="ad-empty">No hay usuarios con ese nombre o documento.</td></tr>
-                @endforelse
-            </tbody>
-        </table>
+                            <em class="ad-user-mail">{{ $cliente?->modalidad ?: 'Cliente' }} · {{ $planActivo?->plan?->nombre ?? 'Sin plan' }}</em>
+                        </div>
+                    </header>
+                    <div class="ad-people-meta">
+                        <span><em>Documento</em> {{ $docLabel }}</span>
+                        <span><em>Alta</em> {{ optional($u->creado_en)->format('d M Y') ?: '—' }}</span>
+                        <span><em>Correo</em> {{ $u->correo ?: '—' }}</span>
+                        <span><em>Teléfono</em> {{ $u->telefono ?: '—' }}</span>
+                    </div>
+                    <div class="ad-people-actions">
+                        <button class="ad-btn ad-btn-ghost" type="button"
+                            data-open-user-edit
+                            data-id="{{ $u->id_user }}"
+                            data-nombres="{{ $u->nombres }}"
+                            data-apellidos="{{ $u->apellidos }}"
+                            data-tipo-documento="{{ $tipoDoc ?: 'CC' }}"
+                            data-documento="{{ $numDoc }}"
+                            data-correo="{{ $u->correo }}"
+                            data-telefono="{{ $u->telefono }}"
+                            data-ciudad="{{ $cliente?->ciudad ?? '' }}"
+                            data-nacimiento="{{ $cliente?->fecha_nacimiento ? \Illuminate\Support\Carbon::parse($cliente->fecha_nacimiento)->format('Y-m-d') : '' }}"
+                            data-genero="{{ $cliente?->genero ?: 'FEMENINO' }}"
+                            data-objetivo="{{ $cliente?->objetivo_principal ?? '' }}"
+                            data-estado="{{ $estado }}"
+                            data-roles="{{ $u->roles->pluck('id_rol')->implode(',') }}"
+                            data-foto="{{ $u->avatarUrl() }}"
+                            data-foto-url="{{ $u->foto_perfil_url }}">Ver</button>
+                        <button class="ad-btn" type="button"
+                            data-open-user-edit
+                            data-id="{{ $u->id_user }}"
+                            data-nombres="{{ $u->nombres }}"
+                            data-apellidos="{{ $u->apellidos }}"
+                            data-tipo-documento="{{ $tipoDoc ?: 'CC' }}"
+                            data-documento="{{ $numDoc }}"
+                            data-correo="{{ $u->correo }}"
+                            data-telefono="{{ $u->telefono }}"
+                            data-ciudad="{{ $cliente?->ciudad ?? '' }}"
+                            data-nacimiento="{{ $cliente?->fecha_nacimiento ? \Illuminate\Support\Carbon::parse($cliente->fecha_nacimiento)->format('Y-m-d') : '' }}"
+                            data-genero="{{ $cliente?->genero ?: 'FEMENINO' }}"
+                            data-objetivo="{{ $cliente?->objetivo_principal ?? '' }}"
+                            data-estado="{{ $estado }}"
+                            data-roles="{{ $u->roles->pluck('id_rol')->implode(',') }}"
+                            data-foto="{{ $u->avatarUrl() }}"
+                            data-foto-url="{{ $u->foto_perfil_url }}">Editar</button>
+                    </div>
+                </article>
+            @empty
+                <p class="ad-empty">No hay usuarios con ese nombre o documento.</p>
+            @endforelse
+        </div>
+        <p class="ad-live-search-empty" data-live-search-empty hidden>Ningún usuario coincide con esa búsqueda.</p>
         <div class="ad-pagination">{{ $usuarios->links() }}</div>
     </section>
 

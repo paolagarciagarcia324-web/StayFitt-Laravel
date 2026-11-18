@@ -44,8 +44,9 @@
         </header>
 
         <p class="ad-muted-note">
-            La activación normal es automática al confirmar la pasarela. Este expediente está en cola solo por una
-            <strong>novedad</strong> que requiere tu validación (fraude, pago no reflejado u otra incidencia).
+            Si la pasarela simulada ya confirmó el pago, el cliente se activa solo. Si el cobro fue por caja,
+            transferencia o la pasarela no reflejó el pago, <strong>aprueba aquí</strong> para crear o activar
+            la cuenta y sus módulos.
         </p>
 
         <div class="ad-sol-grid">
@@ -121,6 +122,15 @@
             <div class="ad-modal-actions">
                 <a class="ad-btn ad-btn-ghost" href="{{ route('admin.solicitudes.index') }}">Volver</a>
                 @if ($solicitud->estado_solicitud === 'PENDIENTE')
+                    <button
+                        class="ad-btn"
+                        type="button"
+                        data-confirm-action
+                        data-action="{{ route('admin.solicitudes.aprobar', $solicitud->id_solicitud) }}"
+                        data-title="¿Aprobar y activar esta solicitud?"
+                        data-body="Se creará o reactivará el cliente, su plan y los módulos. Si fue un clic accidental, pulsa Cancelar."
+                        data-confirm-label="Sí, aprobar"
+                    >Aprobar y activar</button>
                     <button
                         class="ad-btn ad-btn-ghost"
                         type="button"

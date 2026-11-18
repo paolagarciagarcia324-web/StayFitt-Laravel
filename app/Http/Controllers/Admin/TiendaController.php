@@ -107,13 +107,41 @@ class TiendaController extends Controller
 
     public function updateOrden(Request $request, int $id): RedirectResponse
     {
-        $orden = OrdenTienda::query()->findOrFail($id);
+        $orden = OrdenTienda::query()->with('detalles')->findOrFail($id);
 
         $data = $request->validate([
-            'estado_orden' => ['required', 'in:PENDIENTE_PAGO,PAGADA,PREPARADA,ENVIADA,ENTREGADA,CANCELADA'],
+            'estado_orden' => ['required', 'in:PENDIENTE,PENDIENTE_PAGO,PAGADA,PREPARADA,PREPARANDO,ENVIADA,DESPACHADA,ENTREGADA,CANCELADA'],
             'comprobante_url' => ['nullable', 'string', 'max:500'],
             'comprobante' => ['nullable', 'image', 'max:4096'],
         ]);
+
+        $anterior = strtoupper((string) $orden->estado_orden);
+        $nuevo = strtoupper((string) $data['estado_orden']);
+        $pendientes = ['PENDIENTE', 'PENDIENTE_PAGO'];
+        $enCurso = ['PAGADA', 'PREPARADA', 'PREPARANDO', 'ENVIADA', 'DESPACHADA', 'ENTREGADA'];
+
+        if (in_array($anterior, $pendientes, true) && in_array($nuevo, $enCurso, true)) {
+            foreach ($orden->detalles as $detalle) {
+                $producto = ProductoTienda::query()->find($detalle->id_producto);
+                if ($producto && (int) $producto->stock_total < (int) $detalle->cantidad) {
+                    return back()->withErrors([
+                        'estado_orden' => 'Stock insuficiente para '.$producto->nombre.'.',
+                    ]);
+                }
+            }
+            foreach ($orden->detalles as $detalle) {
+                ProductoTienda::query()
+                    ->where('id_producto', $detalle->id_producto)
+                    ->where('stock_total', '>=', (int) $detalle->cantidad)
+                    ->decrement('stock_total', (int) $detalle->cantidad);
+            }
+        } elseif (in_array($anterior, $enCurso, true) && $nuevo === 'CANCELADA') {
+            foreach ($orden->detalles as $detalle) {
+                ProductoTienda::query()
+                    ->where('id_producto', $detalle->id_producto)
+                    ->increment('stock_total', (int) $detalle->cantidad);
+            }
+        }
 
         $orden->update([
             'estado_orden' => $data['estado_orden'],

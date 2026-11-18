@@ -1,0 +1,42 @@
+[
+    {
+        "id": "EXT-LOGIN",
+        "status": "APROBADO",
+        "detail": "Admin login 302"
+    },
+    {
+        "id": "EXT-CUPONES-GET",
+        "status": "APROBADO",
+        "detail": "GET cupones 200"
+    },
+    {
+        "id": "EXT-CUPONES-STORE",
+        "status": "APROBADO",
+        "detail": "POST cupon 302 http:\/\/127.0.0.1:8000\/admin\/cupones"
+    },
+    {
+        "id": "EXT-CUPONES-LIST",
+        "status": "APROBADO",
+        "detail": "Cupon visible QA165805"
+    },
+    {
+        "id": "EXT-PLANES-GET",
+        "status": "APROBADO",
+        "detail": "GET planes"
+    },
+    {
+        "id": "EXT-CV-PLANES",
+        "status": "APROBADO",
+        "detail": "Cliente ve planes comerciales 200"
+    },
+    {
+        "id": "EXT-CV-SEE-QA",
+        "status": "APROBADO",
+        "detail": "Cliente ve plan QA en listado"
+    },
+    {
+        "id": "EXT-CUPON-MYSQL",
+        "status": "APROBADO",
+        "detail": "MySQL cupon QA165805"
+    }
+]

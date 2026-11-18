@@ -195,6 +195,7 @@
                                 'clientes' => $inst->clientes,
                                 'variant' => 'virtual',
                                 'compact' => true,
+                                'unlinkInstitucion' => $inst->id_institucion,
                                 'emptyMessage' => 'Sin miembros. Usa Vincular o genera un enlace de registro.',
                             ])
                         </div>

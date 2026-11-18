@@ -94,3 +94,55 @@ test('coach no redirige a ruta cliente tras login con url intended', function ()
 
     $this->actingAs($user)->get('/cliente/pagos')->assertForbidden();
 });
+
+test('login con documento solo funciona la primera vez y se bloquea en siguientes accesos', function () {
+    $user = User::factory()->create([
+        'correo' => 'primeringreso@test.local',
+        'email' => 'primeringreso@test.local',
+        'documento_identidad' => '1020304050',
+        'ultimo_acceso_en' => null,
+    ]);
+    $user->assignPassword('randomTempPass123');
+    $user->save();
+
+    $rol = Rol::query()->firstOrCreate(
+        ['codigo' => 'CLIENTE'],
+        ['codigo_rol' => 'CLIENTE', 'nombre' => 'Cliente', 'estado' => 'ACTIVO']
+    );
+    $user->roles()->attach($rol->id_rol);
+
+    // Primer acceso con documento: DEBE funcionar
+    $response = $this->post('/login', [
+        'email' => 'primeringreso@test.local',
+        'password' => '1020304050',
+    ]);
+
+    $response->assertRedirect(route('cliente.dashboard', absolute: false));
+    $this->assertAuthenticatedAs($user);
+
+    $user->refresh();
+    expect($user->ultimo_acceso_en)->not->toBeNull();
+
+    // Logout
+    $this->post('/logout');
+    $this->assertGuest();
+
+    // Segundo intento con documento: DEBE ser rechazado
+    $secondAttempt = $this->post('/login', [
+        'email' => 'primeringreso@test.local',
+        'password' => '1020304050',
+    ]);
+
+    $secondAttempt->assertSessionHasErrors('email');
+    $this->assertGuest();
+});
+
+test('login muestra texto explicativo coherente sobre primer acceso con documento', function () {
+    $response = $this->get('/login');
+
+    $response->assertStatus(200)
+        ->assertSee('Cuenta nueva por pago o alta de coach: la primera vez entra con tu documento.')
+        ->assertDontSee('Si te inscribiste antes de crear contraseña, usa tu número de identificación como contraseña.')
+        ->assertDontSee('Si te registraste por pago de plan o como coach y aún no tienes tu contraseña, puedes ingresar con tu documento solo la primera vez.');
+});
+

@@ -1,0 +1,49 @@
+/* StayFit admin safety — solo evita blank de capa; NO mata gráficas ni motion */
+
+/* Shell siempre visible (sin opacity:0 de entrada en contenedores) */
+.ad-sidebar,
+.ad-wrap,
+.ad-header,
+.ad-main,
+.ad-content,
+.ad-page,
+.ad-top {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.ad-sidebar {
+    background: linear-gradient(
+        90deg,
+        rgba(28, 20, 40, 0.92) 0%,
+        rgba(20, 14, 30, 0.78) 70%,
+        rgba(14, 11, 18, 0.35) 100%
+    ) !important;
+}
+
+.ad-wrap {
+    background: transparent !important;
+}
+
+.ad-header {
+    background: linear-gradient(180deg, rgba(24, 18, 32, 0.92), rgba(14, 11, 18, 0.78)) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* mix-blend en fotos puede tumbar compositor; el resto de motion sí */
+.ad-dash-figure img {
+    mix-blend-mode: normal !important;
+}
+
+/* Tips de gráficas activos */
+.ad-chart-tip {
+    display: block;
+}
+.ad-chart-tip[hidden] {
+    display: none !important;
+}
+
+[hidden] {
+    display: none !important;
+}

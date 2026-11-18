@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminCoachRequest;
+use App\Models\Cliente;
 use App\Models\Coach;
 use App\Models\Rol;
 use App\Models\User;
@@ -103,6 +104,16 @@ class CoachController extends Controller
         $coach = Coach::query()->with('usuario')->findOrFail($id);
 
         $coach->update(['estado_coach' => 'INACTIVO']);
+
+        Cliente::query()
+            ->where(function ($query) use ($coach) {
+                $query->where('id_coach', $coach->id_coach)
+                    ->orWhere('id_coach_asignado', $coach->id_coach);
+            })
+            ->update([
+                'id_coach' => null,
+                'id_coach_asignado' => null,
+            ]);
 
         if ($coach->usuario) {
             $coach->usuario->update(['estado' => 'INACTIVO', 'estado_cuenta' => 'INACTIVO']);

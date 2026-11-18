@@ -70,7 +70,10 @@ class User extends Authenticatable
 
     public function getEmailForPasswordReset(): string
     {
-        return (string) ($this->correo ?: $this->email);
+        $email = trim((string) ($this->attributes['email'] ?? ''));
+        $correo = trim((string) ($this->attributes['correo'] ?? ''));
+
+        return $email !== '' ? $email : $correo;
     }
 
     public function routeNotificationForMail(): string

@@ -56,65 +56,48 @@
             <button class="ad-btn ad-btn-add" type="button" data-open-plan-form>+ Crear plan</button>
         </div>
 
-        <table class="ad-table ad-users-table ad-plan-table">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th>Plan</th>
-                    <th>Precio</th>
-                    <th>Modalidad</th>
-                    <th>Cupos</th>
-                    <th>Estado</th>
-                    <th>Módulos</th>
-                    <th class="ad-cli-col-actions">Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($planes as $plan)
-                    @php
-                        $searchBlob = mb_strtolower(trim(
-                            ($plan->nombre ?? '').' '.
-                            ($plan->codigo ?? '').' '.
-                            ($plan->slug ?? '').' '.
-                            ($plan->modalidad ?? '').' '.
-                            ($plan->estado_plan ?? '').' '.
-                            ($plan->etiqueta ?? '')
-                        ));
-                    @endphp
-                    <tr data-plan-row data-plan-slug="{{ $plan->slug }}" data-search="{{ $searchBlob }}">
-                        <td>@include('partials.admin-media-thumb', ['src' => $plan->imagenSrc(), 'alt' => $plan->nombre, 'icon' => 'planes'])</td>
-                        <td>
-                            <strong>{{ $plan->nombre }}</strong>
-                            <em class="ad-user-mail">{{ $plan->codigo ?: $plan->slug }}</em>
-                        </td>
-                        <td>{{ $plan->precioFormateado() }}</td>
-                        <td>{{ $plan->modalidad }}</td>
-                        <td>
-                            <span class="ad-pill-days">{{ (int) $plan->cupos_ocupados }}/{{ (int) $plan->cupos_totales }}</span>
-                            @if ($plan->cupo_maximo)
-                                <em class="ad-user-mail">máx {{ $plan->cupo_maximo }}</em>
-                            @endif
-                        </td>
-                        <td>
-                            <span class="ad-badge {{ $plan->estado_plan === 'ACTIVO' ? 'ad-badge-ok' : ($plan->estado_plan === 'BORRADOR' ? 'ad-badge-pendiente' : 'ad-badge-bad') }}">{{ $plan->estado_plan }}</span>
-                        </td>
-                        <td>{{ $plan->modulos->count() }}</td>
-                        <td>
-                            <div class="ad-row-actions">
-                                <button class="ad-icon-btn" type="button" title="Editar" aria-label="Editar plan" data-open-plan-edit>
-                                    @include('partials.admin-icon', ['icon' => 'edit'])
-                                </button>
-                                <button class="ad-icon-btn is-danger" type="button" title="Eliminar" aria-label="Eliminar plan" data-open-plan-delete>
-                                    @include('partials.admin-icon', ['icon' => 'trash'])
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                @empty
-                    <tr><td colspan="8" class="ad-empty">No hay planes en el catálogo.</td></tr>
-                @endforelse
-            </tbody>
-        </table>
+        <div class="ad-carousel" data-carousel>
+            <button class="ad-carousel-btn" type="button" data-carousel-dir="prev" aria-label="Anterior">‹</button>
+        <div class="ad-catalog">
+            @forelse ($planes as $plan)
+                @php
+                    $searchBlob = mb_strtolower(trim(
+                        ($plan->nombre ?? '').' '.
+                        ($plan->codigo ?? '').' '.
+                        ($plan->slug ?? '').' '.
+                        ($plan->modalidad ?? '').' '.
+                        ($plan->estado_plan ?? '').' '.
+                        ($plan->etiqueta ?? '')
+                    ));
+                @endphp
+                <article class="ad-catalog-card" data-plan-row data-plan-slug="{{ $plan->slug }}" data-inst-card data-search="{{ $searchBlob }}">
+                    <div class="ad-cat-cover">
+                        <span style="position:absolute;left:16px;top:14px;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase">{{ $plan->modalidad }}</span>
+                    </div>
+                    <div class="ad-cat-photo">
+                        @if ($plan->imagenSrc())
+                            <img src="{{ $plan->imagenSrc() }}" alt="{{ $plan->nombre }}">
+                        @else
+                            @include('partials.admin-icon', ['icon' => 'planes'])
+                        @endif
+                    </div>
+                    <div class="ad-cat-body">
+                        <strong>{{ $plan->nombre }}</strong>
+                        <em class="ad-user-mail">{{ $plan->descripcion ?: ($plan->codigo ?: $plan->slug) }}</em>
+                        <span class="ad-cat-price">{{ $plan->precioFormateado() }}</span>
+                        <span class="ad-user-mail">{{ (int) $plan->cupos_ocupados }}/{{ (int) $plan->cupos_totales }} cupos · {{ $plan->modulos->count() }} módulos</span>
+                        <div class="ad-people-actions">
+                            <button class="ad-btn" type="button" data-open-plan-edit>Editar plan</button>
+                            <button class="ad-btn ad-btn-ghost" type="button" data-open-plan-delete>Quitar</button>
+                        </div>
+                    </div>
+                </article>
+            @empty
+                <p class="ad-empty">No hay planes en el catálogo.</p>
+            @endforelse
+        </div>
+            <button class="ad-carousel-btn" type="button" data-carousel-dir="next" aria-label="Siguiente">›</button>
+        </div>
         <p class="ad-live-search-empty" data-live-search-empty hidden>Ningún plan coincide con esa búsqueda.</p>
     </section>
 

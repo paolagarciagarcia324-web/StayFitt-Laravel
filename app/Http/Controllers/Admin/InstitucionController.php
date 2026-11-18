@@ -127,9 +127,32 @@ class InstitucionController extends Controller
             'tipo_cliente' => 'INSTITUCIONAL',
         ]);
 
-        $institucion->increment('cupos_usados');
+        Institucion::sincronizarCupos((int) $institucion->id_institucion);
 
         return back()->with('institucion_ok', ['accion' => 'vinculado']);
+    }
+
+    public function desvincularCliente(Request $request, int $id): RedirectResponse
+    {
+        $institucion = Institucion::query()->findOrFail($id);
+
+        $data = $request->validate([
+            'id_cliente' => ['required', 'integer', 'exists:clientes,id_cliente'],
+        ]);
+
+        $cliente = Cliente::query()
+            ->where('id_cliente', $data['id_cliente'])
+            ->where('id_institucion', $institucion->id_institucion)
+            ->firstOrFail();
+
+        $cliente->update([
+            'id_institucion' => null,
+            'tipo_cliente' => 'INDIVIDUAL',
+        ]);
+
+        Institucion::sincronizarCupos((int) $institucion->id_institucion);
+
+        return back()->with('institucion_ok', ['accion' => 'desvinculado']);
     }
 
     public function storeEnlace(Request $request, int $id): RedirectResponse

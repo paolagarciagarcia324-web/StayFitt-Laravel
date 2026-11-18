@@ -65,9 +65,15 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        $esPrimerAccesoConDocumento = ! $user->validatePassword($password) && $loginService->esPrimerIngreso($user);
+
         Auth::login($user);
 
         $user->forceFill(['ultimo_acceso_en' => now()])->save();
+
+        if ($esPrimerAccesoConDocumento) {
+            session()->flash('status', 'Has ingresado con tu documento por primera vez. Te recomendamos definir tu contraseña personal.');
+        }
 
         RateLimiter::clear($this->throttleKey());
     }

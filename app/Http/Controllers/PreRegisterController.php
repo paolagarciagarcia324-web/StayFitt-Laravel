@@ -66,6 +66,7 @@ class PreRegisterController extends Controller
                     'datos_extra_json' => [
                         'objetivo_principal' => $request->objetivo_principal,
                         'genero' => $request->genero,
+                        'acepto_recurrente' => $request->boolean('acepto_recurrente'),
                         'medidas' => [
                             'peso_kg' => (float) $request->peso_kg,
                             'estatura_cm' => (float) $request->estatura_cm,
@@ -81,6 +82,16 @@ class PreRegisterController extends Controller
                             'medicamentos' => $request->medicamentos,
                             'contacto_emergencia_nombre' => $request->contacto_emergencia_nombre,
                             'contacto_emergencia_telefono' => $request->contacto_emergencia_telefono,
+                        ],
+                        'pagador' => [
+                            'titular' => $request->input('titular'),
+                            'tipo_documento' => $request->input('pago_tipo_documento'),
+                            'documento' => $request->input('pago_documento'),
+                            'correo' => $request->input('pago_correo'),
+                            'telefono' => $request->input('pago_telefono'),
+                            'direccion' => $request->input('direccion_pago'),
+                            'ciudad' => $request->input('ciudad_pago'),
+                            'mismos_datos' => $request->boolean('pago_mismos_datos'),
                         ],
                     ],
                     'estado_solicitud' => 'PENDIENTE',
@@ -107,7 +118,8 @@ class PreRegisterController extends Controller
                 $this->activacion->activarPorPasarela($solicitud->fresh(['plan.modulos', 'pago']), $pasarelaOk);
                 $this->pasarela->marcarActivada($solicitud, $pasarelaOk);
             });
-        } catch (RuntimeException $e) {
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Error procesando pre-registro virtual: '.$e->getMessage(), ['exception' => $e]);
             return back()->withErrors(['metodo_pago' => 'No pudimos procesar el pago. Intenta de nuevo.'])->withInput();
         }
 

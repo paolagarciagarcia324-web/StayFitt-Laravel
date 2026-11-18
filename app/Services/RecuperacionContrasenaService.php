@@ -6,6 +6,7 @@ use App\Models\TokenRecuperacion;
 use App\Models\User;
 use App\Notifications\RecuperarContrasenaNotification;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class RecuperacionContrasenaService
 {
@@ -24,7 +25,7 @@ class RecuperacionContrasenaService
 
         $token = Str::random(64);
 
-        TokenRecuperacion::query()->create([
+        $registro = TokenRecuperacion::query()->create([
             'id_user' => $user->id_user,
             'token_hash' => hash('sha256', $token),
             'expira_en' => now()->addMinutes(60),
@@ -32,7 +33,16 @@ class RecuperacionContrasenaService
             'creado_en' => now(),
         ]);
 
-        $user->notify(new RecuperarContrasenaNotification($token));
+        try {
+            $user->notify(new RecuperarContrasenaNotification($token));
+        } catch (\Throwable $e) {
+            report($e);
+            $registro->delete();
+
+            throw ValidationException::withMessages([
+                'email' => 'No pudimos enviar el correo de recuperación. Inténtalo de nuevo en unos minutos.',
+            ]);
+        }
     }
 
     public function restablecer(string $token, string $correo, string $password): bool
@@ -54,19 +64,31 @@ class RecuperacionContrasenaService
             return false;
         }
 
-        $user->password_hash = $password;
+        $user->assignPassword($password);
         $user->save();
 
         $registro->update(['usado_en' => now()]);
+
+        TokenRecuperacion::query()
+            ->where('id_user', $user->id_user)
+            ->whereNull('usado_en')
+            ->delete();
 
         return true;
     }
 
     private function buscarUsuario(string $correo): ?User
     {
+        $correo = trim(Str::lower($correo));
+        if ($correo === '') {
+            return null;
+        }
+
         return User::query()
-            ->where('correo', $correo)
-            ->orWhere('email', $correo)
+            ->where(function ($query) use ($correo) {
+                $query->whereRaw('LOWER(correo) = ?', [$correo])
+                    ->orWhereRaw('LOWER(email) = ?', [$correo]);
+            })
             ->first();
     }
 }

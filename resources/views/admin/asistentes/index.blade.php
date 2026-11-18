@@ -9,6 +9,25 @@
 @endsection
 
 @section('content')
+    <div class="ad-kpi-soft">
+        <article>
+            <i class="is-cyan">@include('partials.admin-icon', ['icon' => 'personas'])</i>
+            <div><strong>{{ $total }}</strong><span class="ad-user-mail">Asistentes</span></div>
+        </article>
+        <article>
+            <i class="is-ok">@include('partials.admin-icon', ['icon' => 'clientes'])</i>
+            <div><strong>{{ $asistentes->total() }}</strong><span class="ad-user-mail">En este filtro</span></div>
+        </article>
+        <article>
+            <i class="is-pink">@include('partials.admin-icon', ['icon' => 'coaches'])</i>
+            <div><strong>{{ $asistentes->where('estado', 'ACTIVO')->count() }}</strong><span class="ad-user-mail">Activos en página</span></div>
+        </article>
+        <article>
+            <i class="is-warn">@include('partials.admin-icon', ['icon' => 'alerta'])</i>
+            <div><strong>{{ $asistentes->where('estado', 'INACTIVO')->count() }}</strong><span class="ad-user-mail">Inactivos</span></div>
+        </article>
+    </div>
+
     <section class="ad-card ad-users ad-cli-board ad-asistentes-board">
         <div class="ad-cli-board-toolbar ad-asistentes-toolbar">
             <div class="ad-asistentes-toolbar-left">

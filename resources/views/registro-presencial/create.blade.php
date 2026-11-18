@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro presencial | FigueFit</title>
+    @include('partials.favicon')
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -99,12 +100,12 @@
                             <h2>Medidas iniciales</h2>
                         </header>
                         <div class="ff-reg-grid three">
-                            <label><span>Peso (kg) *</span><input type="number" step="0.01" name="peso_kg" value="{{ old('peso_kg') }}" required></label>
-                            <label><span>Estatura (cm) *</span><input type="number" step="0.01" name="estatura_cm" value="{{ old('estatura_cm') }}" required></label>
-                            <label><span>Cintura (cm) *</span><input type="number" step="0.01" name="cintura_cm" value="{{ old('cintura_cm') }}" required></label>
-                            <label><span>Cadera (cm) *</span><input type="number" step="0.01" name="cadera_cm" value="{{ old('cadera_cm') }}" required></label>
-                            <label><span>Brazo (cm) *</span><input type="number" step="0.01" name="brazo_cm" value="{{ old('brazo_cm') }}" required></label>
-                            <label><span>Pierna (cm) *</span><input type="number" step="0.01" name="pierna_cm" value="{{ old('pierna_cm') }}" required></label>
+                            <label><span>Peso (kg) *</span><input type="number" step="0.01" min="0.1" name="peso_kg" value="{{ old('peso_kg') }}" required></label>
+                            <label><span>Estatura (cm) *</span><input type="number" step="0.01" min="0.1" name="estatura_cm" value="{{ old('estatura_cm') }}" required></label>
+                            <label><span>Cintura (cm) *</span><input type="number" step="0.01" min="0.1" name="cintura_cm" value="{{ old('cintura_cm') }}" required></label>
+                            <label><span>Cadera (cm) *</span><input type="number" step="0.01" min="0.1" name="cadera_cm" value="{{ old('cadera_cm') }}" required></label>
+                            <label><span>Brazo (cm) *</span><input type="number" step="0.01" min="0.1" name="brazo_cm" value="{{ old('brazo_cm') }}" required></label>
+                            <label><span>Pierna (cm) *</span><input type="number" step="0.01" min="0.1" name="pierna_cm" value="{{ old('pierna_cm') }}" required></label>
                         </div>
                     </div>
 
@@ -151,10 +152,16 @@
                             <textarea name="observacion_usuario" rows="2">{{ old('observacion_usuario') }}</textarea>
                         </label>
 
-                        <label class="ff-terms">
-                            <input type="checkbox" name="acepto_terminos" value="1" @checked(old('acepto_terminos')) required>
-                            <span>Acepto los términos y condiciones de FigueFit *</span>
-                        </label>
+                        <div class="ff-terms-card">
+                            <label class="ff-terms-label">
+                                <input type="checkbox" name="acepto_terminos" value="1" @checked(old('acepto_terminos')) required>
+                                <span>Acepto los términos y condiciones de FigueFit *</span>
+                            </label>
+                            <button type="button" class="ff-terms-detail-btn" data-policy-trigger="terminos" aria-haspopup="dialog" aria-label="Ver detalle de términos y condiciones">
+                                <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm0 18a8 8 0 1 1 8-8 8.009 8.009 0 0 1-8 8Zm0-13a1.25 1.25 0 1 0 1.25 1.25A1.25 1.25 0 0 0 12 7Zm1 4h-2a1 1 0 0 0 0 2h1v4a1 1 0 0 0 2 0v-5a1 1 0 0 0-1-1Z"/></svg>
+                                Ver detalle
+                            </button>
+                        </div>
 
                         @include('partials.ff-cta', ['label' => 'CONTINUAR AL PAGO', 'icon' => 'pago', 'class' => 'ff-reg-submit'])
                     </div>
@@ -162,5 +169,7 @@
             </section>
         </div>
     </main>
+
+    @include('partials.modal-terminos-politicas')
 </body>
 </html>

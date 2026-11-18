@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class PropuestaPlanController extends Controller
@@ -154,7 +155,12 @@ class PropuestaPlanController extends Controller
     private function validatedPlan(Request $request): array
     {
         $data = $request->validate([
-            'codigo' => ['nullable', 'string', 'max:40'],
+            'codigo' => [
+                'nullable',
+                'string',
+                'max:40',
+                Rule::unique('planes', 'codigo'),
+            ],
             'nombre' => ['required', 'string', 'max:150'],
             'descripcion' => ['nullable', 'string'],
             'imagen_url' => ['nullable', 'string', 'max:500'],
@@ -179,6 +185,10 @@ class PropuestaPlanController extends Controller
             'destacado' => ['nullable', 'boolean'],
             'notas_admin' => ['nullable', 'string'],
         ]);
+
+        if (($data['codigo'] ?? '') === '') {
+            $data['codigo'] = null;
+        }
 
         return $data + [
             'requiere_coach' => $request->boolean('requiere_coach', true),

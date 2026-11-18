@@ -17,6 +17,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'modulo' => \App\Http\Middleware\EnsureModuloAcceso::class,
         ]);
 
+        // Wasmer Edge / proxies: HTTPS y cookies de sesión correctas.
+        $middleware->trustProxies(at: '*');
+
         // Webhooks externos (Meta WhatsApp) no envían token CSRF de Laravel.
         $middleware->validateCsrfTokens(except: [
             'webhooks/whatsapp',

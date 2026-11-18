@@ -27,7 +27,7 @@
 @endphp
 
 @section('content')
-    <form class="ad-toolbar" method="GET" action="{{ route('admin.estadisticas.index') }}">
+    <form class="ad-toolbar ad-glass-card" method="GET" action="{{ route('admin.estadisticas.index') }}" style="margin-bottom:16px">
         <label><span>Fecha inicio</span><input type="date" name="fecha_inicio" value="{{ $filtro->desde->toDateString() }}"></label>
         <label><span>Fecha fin</span><input type="date" name="fecha_fin" value="{{ $filtro->hasta->toDateString() }}"></label>
         <label><span>Modalidad</span>
@@ -56,10 +56,10 @@
     <div class="ad-tab-panels">
         <div data-panel="resumen">
             <div class="ad-status-rail" style="margin-bottom:16px">
-                <x-admin.stat label="Usuarios activos" :value="$k['usuarios_activos']" tone="cyan" />
-                <x-admin.stat label="Clientes activos" :value="$k['clientes_activos']" tone="pink" />
-                <x-admin.stat label="Ingresos periodo" :value="'$'.number_format($k['ingresos_periodo'], 0, ',', '.')" tone="cyan" />
-                <x-admin.stat label="Mensajes periodo" :value="$k['mensajes_periodo']" tone="pink" />
+                <x-admin.stat label="Usuarios activos" :value="$k['usuarios_activos']" tone="cyan" hint="Cuentas en el periodo" />
+                <x-admin.stat label="Clientes activos" :value="$k['clientes_activos']" tone="pink" hint="Con plan vigente" />
+                <x-admin.stat label="Ingresos periodo" :value="'$'.number_format($k['ingresos_periodo'], 0, ',', '.')" tone="cyan" hint="Pagos validados" />
+                <x-admin.stat label="Mensajes periodo" :value="$k['mensajes_periodo']" tone="pink" hint="Comunidad" />
             </div>
 
             <div class="ad-grid-2">
@@ -67,12 +67,13 @@
                     <canvas id="chartIngresos" height="120"></canvas>
                 </x-admin.panel>
                 <x-admin.panel title="Modalidad clientes">
-                    <div class="ad-donut" style="background: conic-gradient(var(--pink) 0 {{ $pctPresencial }}%, var(--cyan) {{ $pctPresencial }}% 100%);margin:0 auto">
-                        <div>
-                            <strong>{{ $virtuales + $presenciales }}</strong>
-                            <small>clientes</small>
-                        </div>
-                    </div>
+                    @include('partials.admin-ring', [
+                        'pct' => $pctPresencial,
+                        'label' => (string) ($virtuales + $presenciales),
+                        'sub' => 'clientes',
+                        'gid' => 'est-mix',
+                        'size' => 160,
+                    ])
                     <div class="ad-legend" style="justify-content:center;margin-top:12px">
                         <span><i style="background:var(--cyan)"></i> Virtual {{ $virtuales }}</span>
                         <span><i style="background:var(--pink)"></i> Presencial {{ $presenciales }}</span>
@@ -229,13 +230,16 @@
     var pink = '#ff2d78';
     var cyan = '#2ef5e6';
     var grid = 'rgba(255,255,255,.08)';
+    Chart.defaults.animation.duration = 1400;
+    Chart.defaults.animation.easing = 'easeOutQuart';
+    Chart.defaults.font.family = 'Montserrat, system-ui, sans-serif';
 
     function lineChart(id, labels, values, color) {
         var el = document.getElementById(id);
         if (!el) return;
         new Chart(el, {
             type: 'line',
-            data: { labels: labels, datasets: [{ data: values, borderColor: color, backgroundColor: color + '33', fill: true, tension: 0.35, pointRadius: 2 }] },
+            data: { labels: labels, datasets: [{ data: values, borderColor: color, backgroundColor: color + '33', fill: true, tension: 0.45, pointRadius: 3, pointHoverRadius: 6, borderWidth: 3 }] },
             options: {
                 plugins: { legend: { display: false } },
                 scales: {
@@ -250,7 +254,7 @@
         if (!el) return;
         new Chart(el, {
             type: 'bar',
-            data: { labels: labels, datasets: [{ data: values, backgroundColor: color }] },
+            data: { labels: labels, datasets: [{ data: values, backgroundColor: color, borderRadius: 8, borderSkipped: false }] },
             options: {
                 plugins: { legend: { display: false } },
                 scales: {
@@ -265,8 +269,11 @@
         if (!el) return;
         new Chart(el, {
             type: 'doughnut',
-            data: { labels: labels, datasets: [{ data: values, backgroundColor: colors, borderWidth: 0 }] },
-            options: { plugins: { legend: { labels: { color: '#ccc' } } } }
+            data: { labels: labels, datasets: [{ data: values, backgroundColor: colors, borderWidth: 0, hoverOffset: 8 }] },
+            options: {
+                cutout: '68%',
+                plugins: { legend: { labels: { color: '#ccc', padding: 14 } } }
+            }
         });
     }
 

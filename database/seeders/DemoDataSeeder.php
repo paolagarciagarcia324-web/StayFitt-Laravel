@@ -22,11 +22,7 @@ class DemoDataSeeder extends Seeder
 
     public const PASSWORD_DEMO = 'demo12345';
 
-    public const PASSWORD_ADMIN = 'Admin123!';
-
     private string $passwordHash;
-
-    private string $adminPasswordHash;
 
     private int $adminId = 0;
 
@@ -54,7 +50,6 @@ class DemoDataSeeder extends Seeder
     public function run(bool $force = false): void
     {
         $this->passwordHash = Hash::make(self::PASSWORD_DEMO);
-        $this->adminPasswordHash = Hash::make(self::PASSWORD_ADMIN);
 
         if (! $force && $this->bundleYaCargado()) {
             $this->command?->warn('Bundle demodata01 ya está cargado. Usa: php artisan demo:data --force');
@@ -126,23 +121,14 @@ class DemoDataSeeder extends Seeder
 
     private function seedAdmin(): void
     {
-        // Admin principal demodata01
-        $this->adminId = $this->upsertUser([
-            'nombres' => 'Admin',
-            'apellidos' => 'FigueFit',
-            'correo' => 'admin@figuefit.com',
-            'telefono' => '3000000001',
-            'documento' => '1000000001',
-            'rol' => 'ADMIN',
-            'password' => $this->adminPasswordHash,
-            'foto' => 'https://i.pravatar.cc/300?u=admin@figuefit.com',
-        ]);
-
-        // Asegurar Paola también ADMIN si existe
-        $paola = DB::table('usuarios')->where('correo', 'paola@correo.com')->value('id_user');
-        if ($paola) {
-            $this->attachRole((int) $paola, 'ADMIN');
+        $paolaId = (int) DB::table('usuarios')->where('correo', 'paola@correo.com')->value('id_user');
+        if ($paolaId < 1) {
+            throw new \RuntimeException('Falta el administrador paola@correo.com.');
         }
+
+        $this->adminId = $paolaId;
+        $this->attachRole($this->adminId, 'ADMIN');
+        $this->eliminarAdminDemo();
 
         // Asistente técnico demo
         $this->upsertUser([
@@ -154,6 +140,42 @@ class DemoDataSeeder extends Seeder
             'rol' => 'ASISTENTE_TECNICO',
             'password' => $this->passwordHash,
         ]);
+    }
+
+    private function eliminarAdminDemo(): void
+    {
+        $demoId = (int) DB::table('usuarios')->where('correo', 'admin@figuefit.com')->value('id_user');
+        if ($demoId < 1 || $demoId === $this->adminId) {
+            return;
+        }
+
+        $reassign = [
+            'descuentos_cupones' => 'creado_por',
+            'eventos' => 'id_admin',
+            'novedades_welcome' => 'creado_por',
+            'pagos' => 'validado_por',
+            'planes' => 'creado_por',
+            'solicitudes_compra' => 'revisado_por',
+        ];
+
+        foreach ($reassign as $table => $column) {
+            if (Schema::hasTable($table) && Schema::hasColumn($table, $column)) {
+                DB::table($table)->where($column, $demoId)->update([$column => $this->adminId]);
+            }
+        }
+
+        if (Schema::hasTable('notificaciones')) {
+            DB::table('notificaciones')->where('id_user', $demoId)->delete();
+        }
+        if (Schema::hasTable('tokens_recuperacion')) {
+            DB::table('tokens_recuperacion')->where('id_user', $demoId)->delete();
+        }
+        if (Schema::hasTable('sessions') && Schema::hasColumn('sessions', 'user_id')) {
+            DB::table('sessions')->where('user_id', $demoId)->delete();
+        }
+
+        DB::table('user_roles')->where('id_user', $demoId)->delete();
+        DB::table('usuarios')->where('id_user', $demoId)->delete();
     }
 
     private function seedCoaches(): void
@@ -1868,7 +1890,7 @@ class DemoDataSeeder extends Seeder
 
         $this->command?->info('Bundle '.self::BUNDLE_ID.' cargado correctamente.');
         $this->command?->table(['Recurso', 'Total'], collect($counts)->map(fn ($v, $k) => [$k, $v])->values()->all());
-        $this->command?->line('Admin: admin@figuefit.com / '.self::PASSWORD_ADMIN);
+        $this->command?->line('Admin: paola@correo.com');
         $this->command?->line('Demo: *@demo.figuefit.test / '.self::PASSWORD_DEMO);
         $this->command?->line('Institucional B2B: rrhh@campoalegre.demo.figuefit.test / '.self::PASSWORD_DEMO.' → /institucional');
     }

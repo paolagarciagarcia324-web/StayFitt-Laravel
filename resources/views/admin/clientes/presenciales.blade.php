@@ -9,6 +9,25 @@
 @endsection
 
 @section('content')
+    <div class="ad-kpi-soft">
+        <article>
+            <i class="is-cyan">@include('partials.admin-icon', ['icon' => 'clientes'])</i>
+            <div><strong>{{ $clientes->total() }}</strong><span class="ad-user-mail">Presenciales</span></div>
+        </article>
+        <article>
+            <i class="is-ok">@include('partials.admin-icon', ['icon' => 'horarios'])</i>
+            <div><strong>{{ $clientes->filter(fn ($c) => (bool) $c->id_horario)->count() }}</strong><span class="ad-user-mail">Con horario</span></div>
+        </article>
+        <article>
+            <i class="is-pink">@include('partials.admin-icon', ['icon' => 'planes'])</i>
+            <div><strong>{{ $clientes->filter(fn ($c) => (bool) $c->planActivo())->count() }}</strong><span class="ad-user-mail">Con plan activo</span></div>
+        </article>
+        <article>
+            <i class="is-warn">@include('partials.admin-icon', ['icon' => 'alerta'])</i>
+            <div><strong>{{ $clientes->filter(fn ($c) => ($c->diasRestantesPlan() ?? 1) < 0)->count() }}</strong><span class="ad-user-mail">Plan vencido</span></div>
+        </article>
+    </div>
+
     <section class="ad-card ad-users ad-cli-board">
         <div class="ad-cli-board-toolbar">
             <div class="ad-cli-board-toolbar-copy">

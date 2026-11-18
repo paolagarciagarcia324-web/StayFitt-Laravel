@@ -1,8 +1,12 @@
 @php
     $variant = $variant ?? 'virtual';
     $compact = $compact ?? false;
+    $asCards = $asCards ?? ! $compact;
     $cols = $compact ? 6 : ($variant === 'virtual' ? 10 : 10);
 @endphp
+@if ($asCards)
+    @include('partials.admin-client-cards', ['clientes' => $clientes, 'variant' => $variant, 'emptyMessage' => $emptyMessage ?? null])
+@else
 <table class="ad-table ad-users-table ad-cli-table {{ $compact ? 'ad-table-compact' : '' }} {{ $variant === 'virtual' ? 'is-virtual' : 'is-presencial' }}">
     <colgroup>
         @unless ($compact)
@@ -95,6 +99,13 @@
                     <div class="ad-cli-cell">
                         <strong class="ad-cli-cell-name" title="{{ $nombre }}">{{ $u?->nombres }} {{ $u?->apellidos }}</strong>
                         <em class="ad-cli-cell-mail" title="{{ $u?->correo }}">{{ $u?->correo }}</em>
+                        @if (! empty($unlinkInstitucion))
+                            <form class="ad-inline-form" method="POST" action="{{ route('admin.instituciones.desvincular', $unlinkInstitucion) }}" onsubmit="return confirm('¿Quitar a este miembro de la institución?');">
+                                @csrf
+                                <input type="hidden" name="id_cliente" value="{{ $c->id_cliente }}">
+                                <button class="ad-btn ad-btn-ghost" type="submit">Quitar</button>
+                            </form>
+                        @endif
                         <div class="ad-cli-cell-tags">
                             @if (! $compact && $variant === 'virtual' && $c->tipo_cliente)
                                 <span class="ad-cli-type">{{ $c->tipo_cliente }}</span>
@@ -210,4 +221,5 @@
 <p class="ad-live-search-empty" data-live-search-empty hidden>Ningún cliente coincide con esa búsqueda.</p>
 @if (isset($clientes) && method_exists($clientes, 'links') && ! $compact)
     <div class="ad-pagination">{{ $clientes->links() }}</div>
+@endif
 @endif

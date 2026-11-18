@@ -1,0 +1,36 @@
+kind: wasmer.io/App.v0
+name: stayfit
+owner: paolagarciagarcia324
+package: .
+debug: true
+app_id: da_Ra7IetdUkpGm
+
+scaling:
+  mode: single_concurrency
+
+locality:
+  regions:
+    - fr-roub1
+
+capabilities:
+  database:
+    engine: mysql
+
+env:
+  APP_NAME: StayFit
+  APP_ENV: production
+  APP_DEBUG: "false"
+  APP_URL: https://stayfit.wasmer.app
+  APP_LOCALE: es
+  APP_FALLBACK_LOCALE: es
+  LOG_CHANNEL: stderr
+  LOG_LEVEL: error
+  DB_CONNECTION: mysql
+  MYSQL_SSL_VERIFY: "false"
+  SESSION_DRIVER: database
+  SESSION_TABLE: sessions
+  SESSION_SECURE_COOKIE: "true"
+  CACHE_STORE: database
+  QUEUE_CONNECTION: sync
+  FILESYSTEM_DISK: local
+  BROADCAST_CONNECTION: log

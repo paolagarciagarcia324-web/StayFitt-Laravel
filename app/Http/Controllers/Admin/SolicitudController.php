@@ -20,19 +20,33 @@ class SolicitudController extends Controller
 
     public function index(): View
     {
-        $pendientes = SolicitudCompra::with(['plan', 'pago'])
+        $pendientesQuery = SolicitudCompra::with(['plan', 'pago'])
             ->where('estado_solicitud', 'PENDIENTE')
-            ->orderByDesc('creado_en')
-            ->paginate(10, ['*'], 'pendientes')
-            ->withQueryString();
+            ->orderByDesc('creado_en');
 
-        $historial = SolicitudCompra::with('plan')
-            ->whereIn('estado_solicitud', ['VALIDADA', 'RECHAZADA', 'CANCELADA'])
+        $pendientesTotal = (clone $pendientesQuery)->count();
+        $pendientes = (clone $pendientesQuery)->limit(36)->get();
+
+        $historialBase = SolicitudCompra::with('plan')
+            ->whereIn('estado_solicitud', ['VALIDADA', 'RECHAZADA', 'CANCELADA']);
+
+        $historialTotal = (clone $historialBase)->count();
+        $validadasTotal = (clone $historialBase)->where('estado_solicitud', 'VALIDADA')->count();
+        $rechazadasTotal = (clone $historialBase)->whereIn('estado_solicitud', ['RECHAZADA', 'CANCELADA'])->count();
+
+        $historial = (clone $historialBase)
             ->orderByDesc('fecha_revision')
-            ->paginate(10, ['*'], 'historial')
+            ->paginate(8, ['*'], 'historial')
             ->withQueryString();
 
-        return view('admin.solicitudes.index', compact('pendientes', 'historial'));
+        return view('admin.solicitudes.index', compact(
+            'pendientes',
+            'historial',
+            'pendientesTotal',
+            'historialTotal',
+            'validadasTotal',
+            'rechazadasTotal',
+        ));
     }
 
     public function show(int $id): View
@@ -79,7 +93,9 @@ class SolicitudController extends Controller
 
     public function suspender(Request $request, int $id): RedirectResponse
     {
-        $solicitud = SolicitudCompra::query()->findOrFail($id);
+        $solicitud = SolicitudCompra::query()
+            ->whereNotIn('estado_solicitud', ['RECHAZADA', 'CANCELADA'])
+            ->findOrFail($id);
         $this->service->suspenderPorFraude($solicitud, $request->input('observacion_admin'));
 
         return redirect()

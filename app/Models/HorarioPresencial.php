@@ -94,6 +94,25 @@ class HorarioPresencial extends Model
         return (int) $this->cupo_ocupado < (int) $this->cupo_maximo;
     }
 
+    public static function sincronizarCupo(?int $idHorario): void
+    {
+        if (! $idHorario) {
+            return;
+        }
+
+        $horario = static::query()->find($idHorario);
+        if (! $horario) {
+            return;
+        }
+
+        $ocupado = Cliente::query()
+            ->where('id_horario', $idHorario)
+            ->whereIn('estado_cliente', ['ACTIVO', 'ACTIVA'])
+            ->count();
+
+        $horario->update(['cupo_ocupado' => $ocupado]);
+    }
+
     public static function codigoDesdeHora(string $horaInicio): string
     {
         try {
@@ -104,6 +123,57 @@ class HorarioPresencial extends Model
 
         $prefijo = ((int) $c->format('H')) < 12 ? 'AM' : 'PM';
 
-        return $prefijo.'-'.$c->format('H');
+        return $prefijo.'-'.$c->format('Hi');
+    }
+
+    /** Franjas oficiales Lunes–Viernes de la sala. */
+    public static function franjasSala(): array
+    {
+        $dias = 'Lun · Mar · Mié · Jue · Vie';
+
+        return [
+            ['codigo' => 'AM-0530', 'nombre' => 'Mañana temprano', 'dias' => $dias, 'hora_inicio' => '05:30:00', 'hora_fin' => '06:30:00', 'cupo_maximo' => 18, 'orden' => 1],
+            ['codigo' => 'AM-0730', 'nombre' => 'Mañana mid', 'dias' => $dias, 'hora_inicio' => '07:30:00', 'hora_fin' => '08:30:00', 'cupo_maximo' => 18, 'orden' => 2],
+            ['codigo' => 'AM-0830', 'nombre' => 'Mañana funcional', 'dias' => $dias, 'hora_inicio' => '08:30:00', 'hora_fin' => '09:30:00', 'cupo_maximo' => 18, 'orden' => 3],
+            ['codigo' => 'PM-1700', 'nombre' => 'Tarde fuerza', 'dias' => $dias, 'hora_inicio' => '17:00:00', 'hora_fin' => '18:00:00', 'cupo_maximo' => 20, 'orden' => 4],
+            ['codigo' => 'PM-1800', 'nombre' => 'Tarde community', 'dias' => $dias, 'hora_inicio' => '18:00:00', 'hora_fin' => '19:00:00', 'cupo_maximo' => 20, 'orden' => 5],
+            ['codigo' => 'PM-2000', 'nombre' => 'Noche club', 'dias' => $dias, 'hora_inicio' => '20:00:00', 'hora_fin' => '21:00:00', 'cupo_maximo' => 22, 'orden' => 6],
+        ];
+    }
+
+    /** Upsert de franjas L–V y desactiva las que no estén en la lista. */
+    public static function asegurarFranjasSala(): void
+    {
+        $codigos = [];
+        foreach (self::franjasSala() as $franja) {
+            $codigos[] = $franja['codigo'];
+            $inicio = Carbon::parse($franja['hora_inicio']);
+            $grupo = 'FigueFit CLUB '.self::formatoHora12($franja['hora_inicio']);
+
+            $existente = static::query()->where('codigo', $franja['codigo'])->first();
+            $payload = [
+                'nombre' => $franja['nombre'],
+                'dias' => $franja['dias'],
+                'hora_inicio' => $franja['hora_inicio'],
+                'hora_fin' => $franja['hora_fin'],
+                'cupo_maximo' => $franja['cupo_maximo'],
+                'link_whatsapp' => $grupo,
+                'activo' => true,
+                'orden' => $franja['orden'],
+            ];
+
+            if ($existente) {
+                $existente->update($payload);
+            } else {
+                static::query()->create($payload + [
+                    'codigo' => $franja['codigo'],
+                    'cupo_ocupado' => 0,
+                ]);
+            }
+        }
+
+        static::query()
+            ->whereNotIn('codigo', $codigos)
+            ->update(['activo' => false]);
     }
 }

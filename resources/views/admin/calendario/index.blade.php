@@ -22,7 +22,109 @@
 @endsection
 
 @section('content')
-    <section class="ad-cal-layout">
+    @php
+        $anchor = $mes->isSameMonth(now()) ? now() : $mes->copy()->startOfMonth();
+        $semanaCeldas = collect($celdas)->filter(fn ($c) => $c['fecha']->isSameWeek($anchor, \Illuminate\Support\Carbon::MONDAY))->values();
+        if ($semanaCeldas->isEmpty()) {
+            $semanaCeldas = collect($celdas)->take(7)->values();
+        }
+        $horasTf = ['06:00', '07:00', '08:00', '09:00', '10:00', '16:00', '17:00', '18:00'];
+        $sesionesHoy = $sesiones->filter(function ($s) {
+            $f = $s->fecha instanceof \Illuminate\Support\Carbon ? $s->fecha : \Illuminate\Support\Carbon::parse($s->fecha);
+            return $f->isToday();
+        });
+    @endphp
+
+    <div class="ad-k-bot" style="margin-bottom:16px;align-items:center">
+        <div class="ad-seg">
+            <button type="button" data-cal-switch="day">Día</button>
+            <button type="button" class="is-on" data-cal-switch="week">Semana</button>
+            <button type="button" data-cal-switch="month">Mes</button>
+        </div>
+        <div class="ad-dash-hero-metrics">
+            <div class="ad-dash-metric">
+                <strong data-count="{{ $sesionesHoy->count() }}">{{ $sesionesHoy->count() }}</strong>
+                <span>Sesiones hoy</span>
+            </div>
+            <div class="ad-dash-metric">
+                <strong data-count="{{ $sesiones->count() }}">{{ $sesiones->count() }}</strong>
+                <span>Sesiones del mes</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="ad-tf" data-cal-view="week">
+        <aside class="ad-tf-side">
+            <section class="ad-glass-card">
+                <strong>{{ $mes->locale('es')->translatedFormat('F Y') }}</strong>
+                <div class="ad-tf-mini">
+                    @foreach (['L','M','X','J','V','S','D'] as $d)
+                        <em>{{ $d }}</em>
+                    @endforeach
+                    @foreach ($celdas as $celda)
+                        <button type="button"
+                            class="{{ $celda['hoy'] ? 'is-today' : '' }} {{ $celda['enMes'] ? '' : 'is-muted' }} {{ ! empty($celda['hasItems']) ? 'has-events' : '' }}"
+                            data-open-sesion-day
+                            data-fecha="{{ $celda['fecha']->toDateString() }}">
+                            {{ $celda['fecha']->day }}
+                        </button>
+                    @endforeach
+                </div>
+            </section>
+            <section class="ad-glass-card">
+                <strong>Hoy en sala</strong>
+                <div class="ad-check-list">
+                    @forelse ($sesionesHoy as $sesion)
+                        <label><input type="checkbox" disabled checked> {{ $sesion->horaInicioCorta() }} · {{ $sesion->titulo }}</label>
+                    @empty
+                        <p class="ad-user-mail">Sin sesiones hoy. Clic en un día para fijar una.</p>
+                    @endforelse
+                </div>
+            </section>
+        </aside>
+        <section class="ad-glass-card ad-tf-week">
+            <header class="ad-tf-week-head">
+                <strong>Semana {{ $semanaCeldas->first()['fecha']->format('d') }} – {{ $semanaCeldas->last()['fecha']->format('d M') }}</strong>
+                <em class="ad-user-mail">Clic en un bloque o en el mini calendario para crear sesión</em>
+            </header>
+            <div class="ad-tf-grid">
+                <span></span>
+                @foreach ($semanaCeldas as $dia)
+                    <strong class="{{ $dia['hoy'] ? 'is-today' : '' }}">{{ $dia['fecha']->locale('es')->isoFormat('ddd DD') }}</strong>
+                @endforeach
+                @foreach ($horasTf as $hora)
+                    <em>{{ \App\Models\HorarioPresencial::formatoHora12($hora) }}</em>
+                    @foreach ($semanaCeldas as $dia)
+                        @php
+                            $items = $dia['sesiones']->filter(fn ($s) => substr((string) $s->hora_inicio, 0, 5) === $hora)
+                                ->merge($dia['eventos']->filter(fn ($e) => $e->fecha_inicio && $e->fecha_inicio->format('H:i') === $hora));
+                        @endphp
+                        <button type="button" class="ad-tf-cell {{ $items->isNotEmpty() ? 'has-item' : '' }}"
+                            data-open-sesion-day
+                            data-fecha="{{ $dia['fecha']->toDateString() }}">
+                            @foreach ($items->take(2) as $item)
+                                <span>{{ $item->titulo ?? $item->nombre }}</span>
+                            @endforeach
+                        </button>
+                    @endforeach
+                @endforeach
+            </div>
+        </section>
+    </div>
+
+    <div hidden data-cal-view="day" class="ad-glass-card" style="margin-bottom:16px">
+        <h3>Hoy {{ now()->locale('es')->isoFormat('dddd D [de] MMMM') }}</h3>
+        @forelse ($sesionesHoy as $sesion)
+            <div class="ad-up-item">
+                <span>{{ $sesion->horaInicioCorta() }} · {{ $sesion->titulo }}</span>
+                <em>{{ $sesion->modalidad }}</em>
+            </div>
+        @empty
+            <p class="ad-empty">Nada programado hoy.</p>
+        @endforelse
+    </div>
+
+    <section class="ad-cal-layout" style="margin-top:16px" data-cal-view="month" hidden>
         <section class="ad-card ad-users">
             <div class="ad-cal-legend">
                 <span><i class="is-evento"></i> Evento</span>

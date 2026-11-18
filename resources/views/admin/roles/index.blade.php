@@ -1,37 +1,28 @@
 @extends('layouts.admin')
 
 @section('title', 'Roles')
-@section('subtitle', 'Catálogo de roles del sistema (solo lectura)')
+@section('subtitle', 'Quién puede entrar a cada panel. La asignación se hace en Usuarios.')
 
 @section('content')
-    <x-admin.panel title="Roles disponibles" subtitle="La asignación a usuarios se gestiona desde Personas → Usuarios. El rol ADMIN no se asigna desde esa pantalla." flush>
-        <div class="ad-table-wrap">
-            <table class="ad-table ad-users-table">
-                <thead>
-                    <tr>
-                        <th>Código</th>
-                        <th>Nombre</th>
-                        <th>Descripción</th>
-                        <th>Usuarios</th>
-                        <th>Estado</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($roles as $rol)
-                        <tr>
-                            <td><strong>{{ $rol->codigoDisplay() }}</strong></td>
-                            <td>{{ $rol->nombreDisplay() }}</td>
-                            <td class="ad-user-mail">{{ $rol->descripcion ?: '—' }}</td>
-                            <td>{{ $rol->usuarios_count }}</td>
-                            <td>
-                                <span class="ad-badge {{ ($rol->estado ?? 'ACTIVO') === 'ACTIVO' ? 'ad-badge-ok' : 'ad-badge-bad' }}">
-                                    {{ $rol->estado ?? 'ACTIVO' }}
-                                </span>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    </x-admin.panel>
+    <div class="ad-role-grid">
+        @foreach ($roles as $rol)
+            @php
+                $n = (int) $rol->usuarios_count;
+                $pct = min(100, $n * 12);
+                $tone = str_contains(strtoupper((string) $rol->codigoDisplay()), 'ADMIN') ? 'var(--pink)' : 'var(--cyan)';
+            @endphp
+            <article class="ad-role-card">
+                <span class="ad-chip {{ ($rol->estado ?? 'ACTIVO') === 'ACTIVO' ? 'is-ok' : 'is-off' }}">{{ $rol->estado ?? 'ACTIVO' }}</span>
+                @include('partials.admin-ring', [
+                    'pct' => $pct,
+                    'count' => $n,
+                    'sub' => 'personas',
+                    'gid' => 'rol-'.$rol->id_rol,
+                    'size' => 120,
+                ])
+                <h3>{{ $rol->nombreDisplay() }}</h3>
+                <p class="ad-user-mail">{{ $rol->codigoDisplay() }}</p>
+            </article>
+        @endforeach
+    </div>
 @endsection

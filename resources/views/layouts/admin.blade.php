@@ -4,12 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Admin') | FigueFit</title>
+    <title>@yield('title', 'Admin') | StayFit</title>
+    @include('partials.favicon')
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/admin-ds.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin.css') }}?v={{ @filemtime(public_path('css/admin.css')) ?: time() }}">
+    <link rel="stylesheet" href="{{ asset('css/admin-ds.css') }}?v={{ @filemtime(public_path('css/admin-ds.css')) ?: time() }}">
+    <link rel="stylesheet" href="{{ asset('css/admin-fx.css') }}?v={{ @filemtime(public_path('css/admin-fx.css')) ?: time() }}">
+    <link rel="stylesheet" href="{{ asset('css/admin-sol.css') }}?v={{ @filemtime(public_path('css/admin-sol.css')) ?: time() }}">
+    <link rel="stylesheet" href="{{ asset('css/admin-safe.css') }}?v={{ @filemtime(public_path('css/admin-safe.css')) ?: time() }}">
+    <style>
+        /* Shell visible; las animaciones de gráficas viven en admin-fx */
+        .ad-sidebar, .ad-wrap, .ad-header, .ad-main, .ad-content, .ad-page, .ad-top {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+    </style>
     <script>
         (function () {
             try {
@@ -29,49 +40,21 @@
                 <img src="{{ asset('images/admin/figuefit-logo-circle.png') }}" alt="FigueFit">
             </div>
             <div class="ad-brand-copy">
-                <strong>FigueFit</strong>
-                <small>Studio</small>
+                <strong>StayFit</strong>
+                <small>Admin</small>
             </div>
         </div>
 
-        <nav class="ad-nav" data-admin-nav>
+        <nav class="ad-nav ad-nav-flat" data-admin-nav>
             @php
-                $pend = (int) ($navSolicitudesPendientes ?? 0);
                 $pendLatest = $navSolicitudesLatestAt ?? null;
-                $opOpen = request()->routeIs('admin.solicitudes.*', 'admin.pagos.*', 'admin.horarios.*', 'admin.eventos.*', 'admin.calendario.*');
-                $perOpen = request()->routeIs('admin.usuarios.*', 'admin.clientes.*', 'admin.instituciones.*', 'admin.coaches.*', 'admin.asistentes.*', 'admin.roles.*', 'admin.configuracion.*');
-                $cliOpen = request()->routeIs('admin.clientes.*');
-                $comOpen = request()->routeIs('admin.planes.*', 'admin.propuestas.*', 'admin.cupones.*', 'admin.tienda.*', 'admin.pasarelas.*', 'admin.novedades.*', 'staff.novedades.*');
-                $comuOpen = request()->routeIs('admin.whatsapp.*', 'admin.comunidad.*');
-                $anOpen = request()->routeIs('admin.analisis.*', 'admin.estadisticas.*', 'admin.reportes.*');
-                $onSolicitudes = request()->routeIs('admin.solicitudes.*');
-                $navPropuestasPendientes = (int) (\App\Models\PropuestaPlan::query()
-                    ->where('estado', \App\Models\PropuestaPlan::ESTADO_PENDIENTE_REVISION)
-                    ->count());
+                $pend = (int) ($navSolicitudesPendientes ?? 0);
             @endphp
-
-            <a href="{{ route('admin.dashboard') }}" class="ad-nav-link {{ request()->routeIs('admin.dashboard') ? 'is-active' : '' }}">
-                <span class="ad-nav-orb is-pink">@include('partials.admin-icon', ['icon' => 'dashboard'])</span>
-                Dashboard
-            </a>
-
-            <details class="ad-nav-group {{ $opOpen ? 'is-route-active' : '' }}" data-nav-group="operacion" @if ($opOpen) open @endif>
-                <summary>
-                    <span class="ad-nav-orb is-cyan">@include('partials.admin-icon', ['icon' => 'pagos'])</span>
-                    <span class="ad-nav-group-title">Operación</span>
-                    <span
-                        class="ad-nav-badge"
-                        data-seen-badge="solicitudes"
-                        data-latest="{{ $pendLatest }}"
-                        data-count="{{ $pend }}"
-                        @if ($pend < 1) hidden @endif
-                    >{{ $pend }}</span>
-                    <span class="ad-nav-chevron" aria-hidden="true"></span>
-                </summary>
-                <div class="ad-nav-children">
-                    <a href="{{ route('admin.solicitudes.index') }}" class="ad-nav-link {{ request()->routeIs('admin.solicitudes.*') ? 'is-active' : '' }}">
-                        <span class="ad-nav-dot"></span>
-                        Solicitudes
+            @foreach (($modules ?? []) as $key => $mod)
+                <a href="{{ $mod['href'] }}" class="ad-nav-link {{ ! empty($mod['active']) ? 'is-active' : '' }}">
+                    <span class="ad-nav-orb is-{{ $mod['tone'] }}">@include('partials.admin-icon', ['icon' => $mod['icon']])</span>
+                    {{ $mod['label'] }}
+                    @if ($key === 'operacion')
                         <span
                             class="ad-nav-badge"
                             data-seen-badge="solicitudes"
@@ -79,154 +62,25 @@
                             data-count="{{ $pend }}"
                             @if ($pend < 1) hidden @endif
                         >{{ $pend }}</span>
-                    </a>
-                    <a href="{{ route('admin.pagos.index') }}" class="ad-nav-link {{ request()->routeIs('admin.pagos.*') ? 'is-active' : '' }}">
-                        <span class="ad-nav-dot"></span>
-                        Pagos
-                    </a>
-                    <a href="{{ route('admin.horarios.index') }}" class="ad-nav-link {{ request()->routeIs('admin.horarios.*') ? 'is-active' : '' }}">
-                        <span class="ad-nav-dot"></span>
-                        Horarios
-                    </a>
-                    <a href="{{ route('admin.eventos.index') }}" class="ad-nav-link {{ request()->routeIs('admin.eventos.*') ? 'is-active' : '' }}">
-                        <span class="ad-nav-dot"></span>
-                        Eventos
-                    </a>
-                    <a href="{{ route('admin.calendario.index') }}" class="ad-nav-link {{ request()->routeIs('admin.calendario.*') ? 'is-active' : '' }}">
-                        <span class="ad-nav-dot"></span>
-                        Calendario
-                    </a>
-                </div>
-            </details>
-
-            <details class="ad-nav-group {{ $perOpen ? 'is-route-active' : '' }}" data-nav-group="personas" @if ($perOpen) open @endif>
-                <summary>
-                    <span class="ad-nav-orb is-pink">@include('partials.admin-icon', ['icon' => 'personas'])</span>
-                    <span class="ad-nav-group-title">Personas</span>
-                    <span class="ad-nav-chevron" aria-hidden="true"></span>
-                </summary>
-                <div class="ad-nav-children">
-                    <a href="{{ route('admin.usuarios.index') }}" class="ad-nav-link {{ request()->routeIs('admin.usuarios.*') ? 'is-active' : '' }}">
-                        <span class="ad-nav-dot"></span>
-                        Usuarios
-                    </a>
-
-                    <details class="ad-nav-sub {{ $cliOpen ? 'is-route-active' : '' }}" data-nav-group="clientes" @if ($cliOpen) open @endif>
-                        <summary>
-                            <span class="ad-nav-dot is-accent"></span>
-                            <span class="ad-nav-group-title">Clientes</span>
-                            <span class="ad-nav-chevron" aria-hidden="true"></span>
-                        </summary>
-                        <div class="ad-nav-children">
-                            <a href="{{ route('admin.clientes.virtuales') }}" class="ad-nav-link {{ request()->routeIs('admin.clientes.virtuales') ? 'is-active' : '' }}">
-                                Virtuales
-                            </a>
-                            <a href="{{ route('admin.clientes.presenciales') }}" class="ad-nav-link {{ request()->routeIs('admin.clientes.presenciales') ? 'is-active' : '' }}">
-                                Presenciales
-                            </a>
-                        </div>
-                    </details>
-
-                    <a href="{{ route('admin.instituciones.index') }}" class="ad-nav-link {{ request()->routeIs('admin.instituciones.*') ? 'is-active' : '' }}">
-                        <span class="ad-nav-dot"></span>
-                        Instituciones
-                    </a>
-                    <a href="{{ route('admin.coaches.index') }}" class="ad-nav-link {{ request()->routeIs('admin.coaches.*') ? 'is-active' : '' }}">
-                        <span class="ad-nav-dot"></span>
-                        Coaches
-                    </a>
-                    <a href="{{ route('admin.asistentes.index') }}" class="ad-nav-link {{ request()->routeIs('admin.asistentes.*') ? 'is-active' : '' }}">
-                        <span class="ad-nav-dot"></span>
-                        Asistentes
-                    </a>
-                    <a href="{{ route('admin.roles.index') }}" class="ad-nav-link {{ request()->routeIs('admin.roles.*') ? 'is-active' : '' }}">
-                        <span class="ad-nav-dot"></span>
-                        Roles
-                    </a>
-                    <a href="{{ route('admin.configuracion.index') }}" class="ad-nav-link {{ request()->routeIs('admin.configuracion.*') ? 'is-active' : '' }}">
-                        <span class="ad-nav-dot"></span>
-                        Configuración
-                    </a>
-                </div>
-            </details>
-
-            <details class="ad-nav-group {{ $comOpen ? 'is-route-active' : '' }}" data-nav-group="comercial" @if ($comOpen) open @endif>
-                <summary>
-                    <span class="ad-nav-orb is-cyan">@include('partials.admin-icon', ['icon' => 'planes'])</span>
-                    <span class="ad-nav-group-title">Comercial</span>
-                    <span class="ad-nav-chevron" aria-hidden="true"></span>
-                </summary>
-                <div class="ad-nav-children">
-                    <a href="{{ route('admin.planes.index') }}" class="ad-nav-link {{ request()->routeIs('admin.planes.*') ? 'is-active' : '' }}">
-                        <span class="ad-nav-dot"></span>
-                        Planes
-                    </a>
-                    <a href="{{ route('admin.propuestas.index') }}" class="ad-nav-link {{ request()->routeIs('admin.propuestas.*') ? 'is-active' : '' }}">
-                        <span class="ad-nav-dot"></span>
-                        Propuestas
-                        @if ($navPropuestasPendientes > 0)
-                            <span class="ad-nav-badge">{{ $navPropuestasPendientes }}</span>
-                        @endif
-                    </a>
-                    <a href="{{ route('staff.novedades.index') }}" class="ad-nav-link {{ request()->routeIs('staff.novedades.*', 'admin.novedades.*') ? 'is-active' : '' }}">
-                        <span class="ad-nav-dot"></span>
-                        Novedades
-                    </a>
-                    <a href="{{ route('admin.cupones.index') }}" class="ad-nav-link {{ request()->routeIs('admin.cupones.*') ? 'is-active' : '' }}">
-                        <span class="ad-nav-dot"></span>
-                        Cupones
-                    </a>
-                    <a href="{{ route('admin.tienda.index') }}" class="ad-nav-link {{ request()->routeIs('admin.tienda.*') ? 'is-active' : '' }}">
-                        <span class="ad-nav-dot"></span>
-                        Tienda
-                    </a>
-                    <a href="{{ route('admin.pasarelas.index') }}" class="ad-nav-link {{ request()->routeIs('admin.pasarelas.*') ? 'is-active' : '' }}">
-                        <span class="ad-nav-dot"></span>
-                        Pasarelas
-                    </a>
-                </div>
-            </details>
-
-            <details class="ad-nav-group {{ $comuOpen ? 'is-route-active' : '' }}" data-nav-group="comunicacion" @if ($comuOpen) open @endif>
-                <summary>
-                    <span class="ad-nav-orb is-pink">@include('partials.admin-icon', ['icon' => 'comunidad'])</span>
-                    <span class="ad-nav-group-title">Comunicación</span>
-                    <span class="ad-nav-chevron" aria-hidden="true"></span>
-                </summary>
-                <div class="ad-nav-children">
-                    <a href="{{ route('admin.whatsapp.index') }}" class="ad-nav-link {{ request()->routeIs('admin.whatsapp.*') ? 'is-active' : '' }}">
-                        <span class="ad-nav-dot"></span>
-                        WhatsApp
-                    </a>
-                    <a href="{{ route('admin.comunidad.index') }}" class="ad-nav-link {{ request()->routeIs('admin.comunidad.*') ? 'is-active' : '' }}">
-                        <span class="ad-nav-dot"></span>
-                        Comunidad
-                    </a>
-                </div>
-            </details>
-
-            <details class="ad-nav-group {{ $anOpen ? 'is-route-active' : '' }}" data-nav-group="analisis" @if ($anOpen) open @endif>
-                <summary>
-                    <span class="ad-nav-orb is-cyan">@include('partials.admin-icon', ['icon' => 'estadisticas'])</span>
-                    <span class="ad-nav-group-title">Análisis</span>
-                    <span class="ad-nav-chevron" aria-hidden="true"></span>
-                </summary>
-                <div class="ad-nav-children">
-                    <a href="{{ route('admin.analisis.index') }}" class="ad-nav-link {{ request()->routeIs('admin.analisis.*') ? 'is-active' : '' }}">
-                        <span class="ad-nav-dot"></span>
-                        Resumen
-                    </a>
-                    <a href="{{ route('admin.estadisticas.index') }}" class="ad-nav-link {{ request()->routeIs('admin.estadisticas.*') ? 'is-active' : '' }}">
-                        <span class="ad-nav-dot"></span>
-                        Estadísticas
-                    </a>
-                    <a href="{{ route('admin.reportes.index') }}" class="ad-nav-link {{ request()->routeIs('admin.reportes.*') ? 'is-active' : '' }}">
-                        <span class="ad-nav-dot"></span>
-                        Reportes
-                    </a>
-                </div>
-            </details>
+                    @elseif (! empty($mod['badge']))
+                        <span class="ad-nav-badge">{{ $mod['badge'] }}</span>
+                    @endif
+                </a>
+            @endforeach
         </nav>
+
+        <div class="ad-dock">
+            <article class="ad-dock-card">
+                <span>Solicitudes</span>
+                <strong data-count="{{ $pend }}">{{ $pend }}</strong>
+                <em>en cola humana</em>
+            </article>
+            <article class="ad-dock-card">
+                <span>Ocupación sala</span>
+                <strong data-count="{{ (int) ($navOcupacionPct ?? 0) }}" data-suffix="%">{{ (int) ($navOcupacionPct ?? 0) }}%</strong>
+                <div class="ad-dock-bar"><i style="--w: {{ (int) ($navOcupacionPct ?? 0) }}%"></i></div>
+            </article>
+        </div>
 
         <div class="ad-sidebar-foot">
             <form method="POST" action="{{ route('logout') }}">
@@ -260,6 +114,19 @@
                     @yield('actions')
                 </div>
             </header>
+
+            @if (! empty($currentTabs ?? []))
+                <nav class="ad-mod-tabs" aria-label="Secciones del módulo">
+                    @foreach ($currentTabs as $tab)
+                        <a href="{{ $tab['href'] }}" class="ad-mod-tab {{ ! empty($tab['active']) ? 'is-active' : '' }}">
+                            {{ $tab['label'] }}
+                            @if (! empty($tab['badge']))
+                                <span class="ad-mod-tab-badge">{{ $tab['badge'] }}</span>
+                            @endif
+                        </a>
+                    @endforeach
+                </nav>
+            @endif
 
             @hasSection('flash')
                 @yield('flash')
@@ -407,6 +274,49 @@
                 syncHeaderDots();
             }
 
+            document.querySelectorAll('.ad-stagger').forEach(function (box) {
+                Array.prototype.forEach.call(box.children, function (child, i) {
+                    child.style.setProperty('--d', (80 + i * 90) + 'ms');
+                    child.classList.add('ad-rise');
+                });
+            });
+
+            document.querySelectorAll('[data-count]').forEach(function (el) {
+                var target = parseFloat(el.getAttribute('data-count'));
+                if (isNaN(target)) return;
+                var prefix = el.getAttribute('data-prefix') || '';
+                var suffix = el.getAttribute('data-suffix') || '';
+                var start = performance.now();
+                function tick(now) {
+                    var t = Math.min(1, (now - start) / 1100);
+                    var eased = 1 - Math.pow(1 - t, 3);
+                    el.textContent = prefix + Math.round(target * eased).toLocaleString('es-CO') + suffix;
+                    if (t < 1) requestAnimationFrame(tick);
+                }
+                requestAnimationFrame(tick);
+            });
+
+            document.querySelectorAll('[data-carousel]').forEach(function (wrap) {
+                var scroller = wrap.querySelector('.ad-catalog');
+                if (!scroller) return;
+                wrap.querySelectorAll('[data-carousel-dir]').forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        var dir = btn.getAttribute('data-carousel-dir') === 'prev' ? -1 : 1;
+                        scroller.scrollBy({ left: dir * (scroller.clientWidth * 0.7), behavior: 'smooth' });
+                    });
+                });
+            });
+
+            document.querySelectorAll('[data-cal-switch]').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var view = btn.getAttribute('data-cal-switch');
+                    document.querySelectorAll('[data-cal-switch]').forEach(function (b) { b.classList.toggle('is-on', b === btn); });
+                    document.querySelectorAll('[data-cal-view]').forEach(function (panel) {
+                        panel.toggleAttribute('hidden', panel.getAttribute('data-cal-view') !== view);
+                    });
+                });
+            });
+
             syncSolicitudesBadges();
             syncHeaderDots();
             @if (!empty($onSolicitudes) && $onSolicitudes)
@@ -420,8 +330,8 @@
                 var live = form.hasAttribute('data-admin-search-live');
                 var lastSubmitted = input.value;
                 var timer = null;
-                var board = form.closest('.ad-cli-board, .ad-users, .ad-inst-board') || form.parentElement;
-                var surface = board ? board.querySelector('.ad-cli-board-surface, .ad-inst-grid, table.ad-table') : null;
+                var board = form.closest('.ad-cli-board, .ad-users, .ad-inst-board, .ad-pay-detail, [data-pay-board]') || form.parentElement;
+                var surface = board ? board.querySelector('.ad-cli-board-surface, .ad-inst-grid, .ad-pay-cards, table.ad-table') : null;
 
                 function syncClear() {
                     var has = !!(input.value && String(input.value).trim());
@@ -457,6 +367,20 @@
                         if (surface) surface.classList.toggle('is-filtering', !!q);
                         return;
                     }
+                    var payCards = board.querySelectorAll('[data-pay-card]');
+                    if (payCards.length) {
+                        var visiblePay = 0;
+                        payCards.forEach(function (card) {
+                            var hay = normalize(card.getAttribute('data-search') || card.textContent || '');
+                            var show = !q || hay.indexOf(q) !== -1;
+                            card.hidden = !show;
+                            if (show) visiblePay++;
+                        });
+                        var emptyPay = board.querySelector('[data-pay-search-empty]');
+                        if (emptyPay) emptyPay.hidden = !(q && visiblePay === 0);
+                        if (surface) surface.classList.toggle('is-filtering', !!q);
+                        return;
+                    }
                     var rows = board.querySelectorAll('table.ad-table tbody tr');
                     if (!rows.length) return;
                     var visibleRows = 0;
@@ -487,8 +411,8 @@
                     if (!live) return;
                     filterLocalRows(input.value);
                     clearTimeout(timer);
-                    /* Tarjetas de Instituciones: filtro local instantáneo (sin recarga). */
-                    if (board && board.querySelector('[data-inst-card]')) return;
+                    /* Instituciones / pagos: filtro local instantáneo (sin recarga). */
+                    if (board && (board.querySelector('[data-inst-card]') || board.querySelector('[data-pay-card]'))) return;
                     timer = setTimeout(submitSearch, 380);
                 });
 

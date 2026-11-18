@@ -32,7 +32,7 @@ class PasswordResetLinkController extends Controller
         );
 
         return redirect()
-            ->route('login')
-            ->with('status', 'Si el correo está registrado, te enviamos un enlace para recuperar tu contraseña. Revisa tu bandeja e ingresa de nuevo cuando la hayas actualizado.');
+            ->route('password.request')
+            ->with('recuperacion_enviada', true);
     }
 }

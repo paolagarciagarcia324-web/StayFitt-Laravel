@@ -26,6 +26,7 @@ class PlanCliente extends Model
         'fecha_inicio',
         'fecha_fin',
         'estado_plan_cliente',
+        'renovacion_automatica',
         'dias_gracia',
     ];
 
@@ -34,6 +35,7 @@ class PlanCliente extends Model
         return [
             'fecha_inicio' => 'date',
             'fecha_fin' => 'date',
+            'renovacion_automatica' => 'boolean',
         ];
     }
 

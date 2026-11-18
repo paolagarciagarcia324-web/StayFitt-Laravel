@@ -236,11 +236,46 @@ class UsuarioController extends Controller
                 ->orWhereIn('codigo_rol', ['CLIENTE', 'CLIENTE_INSTITUCIONAL']);
         };
 
+        $baseClientes = User::query()
+            ->whereHas('cliente')
+            ->whereDoesntHave('roles', $sinAdmin);
+
+        $total = (clone $baseClientes)->count();
+        $activos = (clone $baseClientes)->where(function ($q) {
+            $q->whereIn('estado', ['ACTIVO', 'ACTIVA'])->orWhereIn('estado_cuenta', ['ACTIVO', 'ACTIVA']);
+        })->count();
+        $inactivos = (clone $baseClientes)->where(function ($q) {
+            $q->whereIn('estado', ['INACTIVO', 'SUSPENDIDO', 'BLOQUEADO'])
+                ->orWhereIn('estado_cuenta', ['INACTIVO', 'SUSPENDIDO', 'BLOQUEADO']);
+        })->count();
+        $admins = User::query()
+            ->whereHas('roles', fn ($q) => $q->where('codigo', 'ADMIN')->orWhere('codigo_rol', 'ADMIN'))
+            ->count();
+
+        $mes = now()->startOfMonth();
+        $delta = function (int $nowCount, $query) use ($mes): int {
+            $antes = (clone $query)->where('creado_en', '<', $mes)->count();
+            if ($antes < 1) {
+                return $nowCount > 0 ? 100 : 0;
+            }
+
+            return (int) round((($nowCount - $antes) / max(1, $antes)) * 100);
+        };
+
         return [
-            'total' => User::query()
-                ->whereHas('cliente')
-                ->whereDoesntHave('roles', $sinAdmin)
-                ->count(),
+            'total' => $total,
+            'activos' => $activos,
+            'inactivos' => $inactivos,
+            'admins' => $admins,
+            'delta_total' => $delta($total, $baseClientes),
+            'delta_activos' => $delta($activos, (clone $baseClientes)->where(function ($q) {
+                $q->whereIn('estado', ['ACTIVO', 'ACTIVA'])->orWhereIn('estado_cuenta', ['ACTIVO', 'ACTIVA']);
+            })),
+            'delta_inactivos' => $delta($inactivos, (clone $baseClientes)->where(function ($q) {
+                $q->whereIn('estado', ['INACTIVO', 'SUSPENDIDO', 'BLOQUEADO'])
+                    ->orWhereIn('estado_cuenta', ['INACTIVO', 'SUSPENDIDO', 'BLOQUEADO']);
+            })),
+            'delta_admins' => $delta($admins, User::query()->whereHas('roles', fn ($q) => $q->where('codigo', 'ADMIN')->orWhere('codigo_rol', 'ADMIN'))),
             'virtuales' => Cliente::query()
                 ->where('modalidad', 'VIRTUAL')
                 ->whereHas('usuario.roles', $conRolCliente)

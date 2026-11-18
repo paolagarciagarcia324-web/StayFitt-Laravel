@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EstadisticaController;
 use App\Http\Controllers\Admin\EventoController;
 use App\Http\Controllers\Admin\HorarioPresencialController;
+use App\Http\Controllers\Admin\NovedadController;
 use App\Http\Controllers\Admin\InstitucionController;
 use App\Http\Controllers\Admin\PagoController;
 use App\Http\Controllers\Admin\PasarelaController;
@@ -51,7 +52,12 @@ Route::middleware(['auth', 'role:ADMIN'])->prefix('admin')->name('admin.')->grou
     Route::post('/propuestas/{propuesta}/publicar', [PropuestaPlanController::class, 'publicar'])->name('propuestas.publicar');
     Route::post('/propuestas/{propuesta}/rechazar', [PropuestaPlanController::class, 'rechazar'])->name('propuestas.rechazar');
 
-    Route::redirect('/novedades', '/staff/novedades')->name('novedades.index');
+    Route::get('/novedades', [NovedadController::class, 'index'])->name('novedades.index');
+    Route::get('/novedades/crear', [NovedadController::class, 'create'])->name('novedades.create');
+    Route::post('/novedades', [NovedadController::class, 'store'])->name('novedades.store');
+    Route::get('/novedades/{novedad}/editar', [NovedadController::class, 'edit'])->name('novedades.edit');
+    Route::put('/novedades/{novedad}', [NovedadController::class, 'update'])->name('novedades.update');
+    Route::delete('/novedades/{novedad}', [NovedadController::class, 'destroy'])->name('novedades.destroy');
 
     Route::get('/cupones', [CuponController::class, 'index'])->name('cupones.index');
     Route::post('/cupones', [CuponController::class, 'store'])->name('cupones.store');
@@ -95,6 +101,7 @@ Route::middleware(['auth', 'role:ADMIN'])->prefix('admin')->name('admin.')->grou
     Route::put('/instituciones/{id}', [InstitucionController::class, 'update'])->name('instituciones.update');
     Route::delete('/instituciones/{id}', [InstitucionController::class, 'destroy'])->name('instituciones.destroy');
     Route::post('/instituciones/{id}/vincular', [InstitucionController::class, 'vincularCliente'])->name('instituciones.vincular');
+    Route::post('/instituciones/{id}/desvincular', [InstitucionController::class, 'desvincularCliente'])->name('instituciones.desvincular');
     Route::post('/instituciones/{id}/enlaces', [InstitucionController::class, 'storeEnlace'])->name('instituciones.enlaces');
     Route::delete('/instituciones/{id}/enlaces/{enlaceId}', [InstitucionController::class, 'destroyEnlace'])->name('instituciones.enlaces.destroy');
 

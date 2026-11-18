@@ -191,6 +191,28 @@ body.lg-body {
     line-height: 1.45;
 }
 
+.lg-confirm {
+    display: grid;
+    gap: 14px;
+    margin: 0 0 8px;
+}
+
+.lg-confirm .lg-status {
+    margin: 0;
+}
+
+.lg-confirm-steps {
+    margin: 0;
+    padding: 0 0 0 18px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.lg-confirm-steps li + li {
+    margin-top: 4px;
+}
+
 .lg-form {
     display: grid;
     gap: 18px;
@@ -260,6 +282,98 @@ body.lg-body {
     font: inherit;
     padding: 14px 14px 14px 42px;
     border-radius: 12px;
+}
+
+.lg-input.has-toggle input,
+.lg-input:has(.lg-toggle-password) input {
+    padding-right: 46px;
+}
+
+.lg-input input::-ms-reveal,
+.lg-input input::-ms-clear {
+    display: none;
+}
+
+.lg-toggle-password {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.55);
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: color 0.18s ease, background-color 0.18s ease, transform 0.12s ease;
+}
+
+.lg-toggle-password::after {
+    content: "";
+    position: absolute;
+    top: -6px;
+    bottom: -6px;
+    left: -6px;
+    right: -6px;
+}
+
+.lg-toggle-password:hover {
+    color: var(--cyan);
+    background: rgba(46, 245, 230, 0.1);
+}
+
+.lg-toggle-password:active {
+    transform: translateY(-50%) scale(0.92);
+}
+
+.lg-toggle-password:focus {
+    outline: none;
+}
+
+.lg-toggle-password:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: -1px;
+}
+
+.lg-toggle-password svg {
+    width: 19px;
+    height: 19px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+}
+
+.lg-toggle-password .lg-icon-eye-off {
+    display: none;
+}
+
+.lg-toggle-password.is-visible {
+    color: var(--pink);
+}
+
+.lg-toggle-password.is-visible:hover {
+    color: #ff5c97;
+    background: rgba(255, 45, 120, 0.12);
+}
+
+.lg-toggle-password.is-visible .lg-icon-eye {
+    display: none;
+}
+
+.lg-toggle-password.is-visible .lg-icon-eye-off {
+    display: block;
 }
 
 .lg-input input:-webkit-autofill,

@@ -1,0 +1,1547 @@
+{
+    "summary": {
+        "started_at": "2026-10-29T01:00:39+00:00",
+        "finished_at": "2026-10-29T01:01:48+00:00",
+        "duration_sec": 69.08,
+        "base_url": "http:\/\/127.0.0.1:8000",
+        "total": 145,
+        "aprobados": 135,
+        "fallidos": 10,
+        "bugs": 9
+    },
+    "results": [
+        {
+            "id": "SYS-001",
+            "module": "infra",
+            "role": "SYSTEM",
+            "step": "GET \/up",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width",
+            "at": "2026-10-29T01:00:39+00:00"
+        },
+        {
+            "id": "SYS-002",
+            "module": "infra",
+            "role": "SYSTEM",
+            "step": "GET \/",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:40+00:00"
+        },
+        {
+            "id": "AUTH-ADMIN-BAD",
+            "module": "auth",
+            "role": "ADMIN",
+            "step": "Login incorrecto",
+            "status": "APROBADO",
+            "detail": "Login falló code=302 loc=http:\/\/127.0.0.1:8000\/login",
+            "evidence": "",
+            "at": "2026-10-29T01:00:41+00:00"
+        },
+        {
+            "id": "AUTH-ADMIN-OK",
+            "module": "auth",
+            "role": "ADMIN",
+            "step": "Login correcto",
+            "status": "APROBADO",
+            "detail": "Redirect → http:\/\/127.0.0.1:8000\/admin",
+            "evidence": "http:\/\/127.0.0.1:8000\/admin",
+            "at": "2026-10-29T01:00:42+00:00"
+        },
+        {
+            "id": "NAV-ADMIN-HOME",
+            "module": "nav",
+            "role": "ADMIN",
+            "step": "GET \/admin",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "\n\n\n    \n    \n    \n    Dashboard | FigueFit\n    \n    \n    \n    \n    \n    \n       ",
+            "at": "2026-10-29T01:00:42+00:00"
+        },
+        {
+            "id": "NAV-ADMIN-1",
+            "module": "nav",
+            "role": "ADMIN",
+            "step": "GET \/admin",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:43+00:00"
+        },
+        {
+            "id": "NAV-ADMIN-2",
+            "module": "nav",
+            "role": "ADMIN",
+            "step": "GET \/admin\/planes",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:43+00:00"
+        },
+        {
+            "id": "NAV-ADMIN-3",
+            "module": "nav",
+            "role": "ADMIN",
+            "step": "GET \/admin\/tienda",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:43+00:00"
+        },
+        {
+            "id": "NAV-ADMIN-4",
+            "module": "nav",
+            "role": "ADMIN",
+            "step": "GET \/admin\/clientes",
+            "status": "APROBADO",
+            "detail": "HTTP 302",
+            "evidence": "",
+            "at": "2026-10-29T01:00:44+00:00"
+        },
+        {
+            "id": "NAV-ADMIN-5",
+            "module": "nav",
+            "role": "ADMIN",
+            "step": "GET \/admin\/coaches",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:44+00:00"
+        },
+        {
+            "id": "NAV-ADMIN-6",
+            "module": "nav",
+            "role": "ADMIN",
+            "step": "GET \/admin\/solicitudes",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:44+00:00"
+        },
+        {
+            "id": "NAV-ADMIN-7",
+            "module": "nav",
+            "role": "ADMIN",
+            "step": "GET \/admin\/pagos",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:45+00:00"
+        },
+        {
+            "id": "NAV-ADMIN-8",
+            "module": "nav",
+            "role": "ADMIN",
+            "step": "GET \/admin\/cupones",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:45+00:00"
+        },
+        {
+            "id": "NAV-ADMIN-9",
+            "module": "nav",
+            "role": "ADMIN",
+            "step": "GET \/admin\/usuarios",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:46+00:00"
+        },
+        {
+            "id": "NAV-ADMIN-10",
+            "module": "nav",
+            "role": "ADMIN",
+            "step": "GET \/admin\/instituciones",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:46+00:00"
+        },
+        {
+            "id": "NAV-ADMIN-11",
+            "module": "nav",
+            "role": "ADMIN",
+            "step": "GET \/admin\/whatsapp",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:47+00:00"
+        },
+        {
+            "id": "NAV-ADMIN-12",
+            "module": "nav",
+            "role": "ADMIN",
+            "step": "GET \/admin\/comunidad",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:47+00:00"
+        },
+        {
+            "id": "NAV-ADMIN-13",
+            "module": "nav",
+            "role": "ADMIN",
+            "step": "GET \/admin\/eventos",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:47+00:00"
+        },
+        {
+            "id": "NAV-ADMIN-14",
+            "module": "nav",
+            "role": "ADMIN",
+            "step": "GET \/admin\/analisis",
+            "status": "APROBADO",
+            "detail": "HTTP 302",
+            "evidence": "",
+            "at": "2026-10-29T01:00:48+00:00"
+        },
+        {
+            "id": "NAV-ADMIN-15",
+            "module": "nav",
+            "role": "ADMIN",
+            "step": "GET \/admin\/reportes",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:48+00:00"
+        },
+        {
+            "id": "NAV-ADMIN-16",
+            "module": "nav",
+            "role": "ADMIN",
+            "step": "GET \/admin\/estadisticas",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:48+00:00"
+        },
+        {
+            "id": "NAV-ADMIN-17",
+            "module": "nav",
+            "role": "ADMIN",
+            "step": "GET \/admin\/configuracion",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:49+00:00"
+        },
+        {
+            "id": "NAV-ADMIN-18",
+            "module": "nav",
+            "role": "ADMIN",
+            "step": "GET \/admin\/roles",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:49+00:00"
+        },
+        {
+            "id": "NAV-ADMIN-19",
+            "module": "nav",
+            "role": "ADMIN",
+            "step": "GET \/admin\/asistentes",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:49+00:00"
+        },
+        {
+            "id": "NAV-ADMIN-20",
+            "module": "nav",
+            "role": "ADMIN",
+            "step": "GET \/admin\/horarios",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:50+00:00"
+        },
+        {
+            "id": "NAV-ADMIN-21",
+            "module": "nav",
+            "role": "ADMIN",
+            "step": "GET \/admin\/pasarelas",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:50+00:00"
+        },
+        {
+            "id": "NAV-ADMIN-22",
+            "module": "nav",
+            "role": "ADMIN",
+            "step": "GET \/admin\/propuestas",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:50+00:00"
+        },
+        {
+            "id": "NAV-ADMIN-23",
+            "module": "nav",
+            "role": "ADMIN",
+            "step": "GET \/admin\/calendario",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:51+00:00"
+        },
+        {
+            "id": "AUTH-ADMIN-OUT",
+            "module": "auth",
+            "role": "ADMIN",
+            "step": "Logout",
+            "status": "APROBADO",
+            "detail": "HTTP 302",
+            "evidence": "",
+            "at": "2026-10-29T01:00:51+00:00"
+        },
+        {
+            "id": "AUTH-ADMIN-RELOGIN",
+            "module": "auth",
+            "role": "ADMIN",
+            "step": "Re-login",
+            "status": "APROBADO",
+            "detail": "Redirect → http:\/\/127.0.0.1:8000\/admin",
+            "evidence": "",
+            "at": "2026-10-29T01:00:52+00:00"
+        },
+        {
+            "id": "AUTH-COACH-BAD",
+            "module": "auth",
+            "role": "COACH",
+            "step": "Login incorrecto",
+            "status": "APROBADO",
+            "detail": "Login falló code=302 loc=http:\/\/127.0.0.1:8000\/login",
+            "evidence": "",
+            "at": "2026-10-29T01:00:53+00:00"
+        },
+        {
+            "id": "AUTH-COACH-OK",
+            "module": "auth",
+            "role": "COACH",
+            "step": "Login correcto",
+            "status": "APROBADO",
+            "detail": "Redirect → http:\/\/127.0.0.1:8000\/coach",
+            "evidence": "http:\/\/127.0.0.1:8000\/coach",
+            "at": "2026-10-29T01:00:54+00:00"
+        },
+        {
+            "id": "NAV-COACH-HOME",
+            "module": "nav",
+            "role": "COACH",
+            "step": "GET \/coach",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "\n\n\n    \n    \n    \n    Dashboard | FigueFit\n    \n    \n    \n    \n    \n    \n    \n  ",
+            "at": "2026-10-29T01:00:54+00:00"
+        },
+        {
+            "id": "NAV-COACH-1",
+            "module": "nav",
+            "role": "COACH",
+            "step": "GET \/coach",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:55+00:00"
+        },
+        {
+            "id": "NAV-COACH-2",
+            "module": "nav",
+            "role": "COACH",
+            "step": "GET \/coach\/perfil",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:55+00:00"
+        },
+        {
+            "id": "NAV-COACH-3",
+            "module": "nav",
+            "role": "COACH",
+            "step": "GET \/coach\/clientes",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:55+00:00"
+        },
+        {
+            "id": "NAV-COACH-4",
+            "module": "nav",
+            "role": "COACH",
+            "step": "GET \/coach\/entrenamiento",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:56+00:00"
+        },
+        {
+            "id": "NAV-COACH-5",
+            "module": "nav",
+            "role": "COACH",
+            "step": "GET \/coach\/videos",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:56+00:00"
+        },
+        {
+            "id": "NAV-COACH-6",
+            "module": "nav",
+            "role": "COACH",
+            "step": "GET \/coach\/agenda",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:56+00:00"
+        },
+        {
+            "id": "NAV-COACH-7",
+            "module": "nav",
+            "role": "COACH",
+            "step": "GET \/coach\/comunicacion",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:57+00:00"
+        },
+        {
+            "id": "NAV-COACH-8",
+            "module": "nav",
+            "role": "COACH",
+            "step": "GET \/coach\/reportes\/progreso",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:00:57+00:00"
+        },
+        {
+            "id": "SEC-COACH-1",
+            "module": "security",
+            "role": "COACH",
+            "step": "Bloqueo GET \/admin",
+            "status": "APROBADO",
+            "detail": "HTTP 403",
+            "evidence": "",
+            "at": "2026-10-29T01:00:57+00:00"
+        },
+        {
+            "id": "SEC-COACH-2",
+            "module": "security",
+            "role": "COACH",
+            "step": "Bloqueo GET \/staff",
+            "status": "APROBADO",
+            "detail": "HTTP 403",
+            "evidence": "",
+            "at": "2026-10-29T01:00:57+00:00"
+        },
+        {
+            "id": "AUTH-COACH-OUT",
+            "module": "auth",
+            "role": "COACH",
+            "step": "Logout",
+            "status": "APROBADO",
+            "detail": "HTTP 302",
+            "evidence": "",
+            "at": "2026-10-29T01:00:58+00:00"
+        },
+        {
+            "id": "AUTH-COACH-RELOGIN",
+            "module": "auth",
+            "role": "COACH",
+            "step": "Re-login",
+            "status": "APROBADO",
+            "detail": "Redirect → http:\/\/127.0.0.1:8000\/coach",
+            "evidence": "",
+            "at": "2026-10-29T01:00:59+00:00"
+        },
+        {
+            "id": "AUTH-ASISTENTE_TECNICO-BAD",
+            "module": "auth",
+            "role": "ASISTENTE_TECNICO",
+            "step": "Login incorrecto",
+            "status": "APROBADO",
+            "detail": "Login falló code=302 loc=http:\/\/127.0.0.1:8000\/login",
+            "evidence": "",
+            "at": "2026-10-29T01:01:00+00:00"
+        },
+        {
+            "id": "AUTH-ASISTENTE_TECNICO-OK",
+            "module": "auth",
+            "role": "ASISTENTE_TECNICO",
+            "step": "Login correcto",
+            "status": "APROBADO",
+            "detail": "Redirect → http:\/\/127.0.0.1:8000\/staff",
+            "evidence": "http:\/\/127.0.0.1:8000\/staff",
+            "at": "2026-10-29T01:01:01+00:00"
+        },
+        {
+            "id": "NAV-ASISTENTE_TECNICO-HOME",
+            "module": "nav",
+            "role": "ASISTENTE_TECNICO",
+            "step": "GET \/staff",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "\n\n\n    \n    \n    \n    Centro operativo | FigueFit\n    \n    \n    \n    \n    \n    \n",
+            "at": "2026-10-29T01:01:01+00:00"
+        },
+        {
+            "id": "NAV-ASISTENTE_TECNICO-1",
+            "module": "nav",
+            "role": "ASISTENTE_TECNICO",
+            "step": "GET \/staff",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:01+00:00"
+        },
+        {
+            "id": "NAV-ASISTENTE_TECNICO-2",
+            "module": "nav",
+            "role": "ASISTENTE_TECNICO",
+            "step": "GET \/staff\/perfil",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:02+00:00"
+        },
+        {
+            "id": "NAV-ASISTENTE_TECNICO-3",
+            "module": "nav",
+            "role": "ASISTENTE_TECNICO",
+            "step": "GET \/staff\/clientes",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:02+00:00"
+        },
+        {
+            "id": "NAV-ASISTENTE_TECNICO-4",
+            "module": "nav",
+            "role": "ASISTENTE_TECNICO",
+            "step": "GET \/staff\/rutinas",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:03+00:00"
+        },
+        {
+            "id": "NAV-ASISTENTE_TECNICO-5",
+            "module": "nav",
+            "role": "ASISTENTE_TECNICO",
+            "step": "GET \/staff\/propuestas",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:03+00:00"
+        },
+        {
+            "id": "NAV-ASISTENTE_TECNICO-6",
+            "module": "nav",
+            "role": "ASISTENTE_TECNICO",
+            "step": "GET \/staff\/videos",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:03+00:00"
+        },
+        {
+            "id": "NAV-ASISTENTE_TECNICO-7",
+            "module": "nav",
+            "role": "ASISTENTE_TECNICO",
+            "step": "GET \/staff\/comunicacion",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:04+00:00"
+        },
+        {
+            "id": "NAV-ASISTENTE_TECNICO-8",
+            "module": "nav",
+            "role": "ASISTENTE_TECNICO",
+            "step": "GET \/staff\/novedades",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:04+00:00"
+        },
+        {
+            "id": "SEC-ASISTENTE_TECNICO-1",
+            "module": "security",
+            "role": "ASISTENTE_TECNICO",
+            "step": "Bloqueo GET \/admin",
+            "status": "APROBADO",
+            "detail": "HTTP 403",
+            "evidence": "",
+            "at": "2026-10-29T01:01:04+00:00"
+        },
+        {
+            "id": "AUTH-ASISTENTE_TECNICO-OUT",
+            "module": "auth",
+            "role": "ASISTENTE_TECNICO",
+            "step": "Logout",
+            "status": "APROBADO",
+            "detail": "HTTP 302",
+            "evidence": "",
+            "at": "2026-10-29T01:01:05+00:00"
+        },
+        {
+            "id": "AUTH-ASISTENTE_TECNICO-RELOGIN",
+            "module": "auth",
+            "role": "ASISTENTE_TECNICO",
+            "step": "Re-login",
+            "status": "APROBADO",
+            "detail": "Redirect → http:\/\/127.0.0.1:8000\/staff",
+            "evidence": "",
+            "at": "2026-10-29T01:01:06+00:00"
+        },
+        {
+            "id": "AUTH-CLIENTE_VIRTUAL-BAD",
+            "module": "auth",
+            "role": "CLIENTE_VIRTUAL",
+            "step": "Login incorrecto",
+            "status": "APROBADO",
+            "detail": "Login falló code=302 loc=http:\/\/127.0.0.1:8000\/login",
+            "evidence": "",
+            "at": "2026-10-29T01:01:07+00:00"
+        },
+        {
+            "id": "AUTH-CLIENTE_VIRTUAL-OK",
+            "module": "auth",
+            "role": "CLIENTE_VIRTUAL",
+            "step": "Login correcto",
+            "status": "APROBADO",
+            "detail": "Redirect → http:\/\/127.0.0.1:8000\/cliente",
+            "evidence": "http:\/\/127.0.0.1:8000\/cliente",
+            "at": "2026-10-29T01:01:08+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_VIRTUAL-HOME",
+            "module": "nav",
+            "role": "CLIENTE_VIRTUAL",
+            "step": "GET \/cliente",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "\n\n\n    \n    \n    \n    Inicio | FigueFit\n    \n    \n    \n    \n    \n    \n    \n     ",
+            "at": "2026-10-29T01:01:08+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_VIRTUAL-1",
+            "module": "nav",
+            "role": "CLIENTE_VIRTUAL",
+            "step": "GET \/cliente",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:08+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_VIRTUAL-2",
+            "module": "nav",
+            "role": "CLIENTE_VIRTUAL",
+            "step": "GET \/cliente\/perfil",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:08+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_VIRTUAL-3",
+            "module": "nav",
+            "role": "CLIENTE_VIRTUAL",
+            "step": "GET \/cliente\/mi-plan",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:09+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_VIRTUAL-4",
+            "module": "nav",
+            "role": "CLIENTE_VIRTUAL",
+            "step": "GET \/cliente\/pagos",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:09+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_VIRTUAL-5",
+            "module": "nav",
+            "role": "CLIENTE_VIRTUAL",
+            "step": "GET \/cliente\/comercial\/planes",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:09+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_VIRTUAL-6",
+            "module": "nav",
+            "role": "CLIENTE_VIRTUAL",
+            "step": "GET \/cliente\/entrenamiento",
+            "status": "FALLIDO",
+            "detail": "HTTP 403",
+            "evidence": "",
+            "at": "2026-10-29T01:01:09+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_VIRTUAL-7",
+            "module": "nav",
+            "role": "CLIENTE_VIRTUAL",
+            "step": "GET \/cliente\/nutricion",
+            "status": "FALLIDO",
+            "detail": "HTTP 403",
+            "evidence": "",
+            "at": "2026-10-29T01:01:10+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_VIRTUAL-8",
+            "module": "nav",
+            "role": "CLIENTE_VIRTUAL",
+            "step": "GET \/cliente\/contenido",
+            "status": "FALLIDO",
+            "detail": "HTTP 403",
+            "evidence": "",
+            "at": "2026-10-29T01:01:10+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_VIRTUAL-9",
+            "module": "nav",
+            "role": "CLIENTE_VIRTUAL",
+            "step": "GET \/cliente\/progreso",
+            "status": "FALLIDO",
+            "detail": "HTTP 403",
+            "evidence": "",
+            "at": "2026-10-29T01:01:10+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_VIRTUAL-10",
+            "module": "nav",
+            "role": "CLIENTE_VIRTUAL",
+            "step": "GET \/cliente\/comunicacion",
+            "status": "FALLIDO",
+            "detail": "HTTP 403",
+            "evidence": "",
+            "at": "2026-10-29T01:01:11+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_VIRTUAL-11",
+            "module": "nav",
+            "role": "CLIENTE_VIRTUAL",
+            "step": "GET \/cliente\/notificaciones",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:11+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_VIRTUAL-12",
+            "module": "nav",
+            "role": "CLIENTE_VIRTUAL",
+            "step": "GET \/cliente\/novedades",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:11+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_VIRTUAL-13",
+            "module": "nav",
+            "role": "CLIENTE_VIRTUAL",
+            "step": "GET \/cliente\/analisis",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:12+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_VIRTUAL-14",
+            "module": "nav",
+            "role": "CLIENTE_VIRTUAL",
+            "step": "GET \/cliente\/agenda",
+            "status": "FALLIDO",
+            "detail": "HTTP 403",
+            "evidence": "",
+            "at": "2026-10-29T01:01:12+00:00"
+        },
+        {
+            "id": "SEC-CLIENTE_VIRTUAL-1",
+            "module": "security",
+            "role": "CLIENTE_VIRTUAL",
+            "step": "Bloqueo GET \/admin",
+            "status": "APROBADO",
+            "detail": "HTTP 403",
+            "evidence": "",
+            "at": "2026-10-29T01:01:12+00:00"
+        },
+        {
+            "id": "SEC-CLIENTE_VIRTUAL-2",
+            "module": "security",
+            "role": "CLIENTE_VIRTUAL",
+            "step": "Bloqueo GET \/coach",
+            "status": "APROBADO",
+            "detail": "HTTP 403",
+            "evidence": "",
+            "at": "2026-10-29T01:01:12+00:00"
+        },
+        {
+            "id": "SEC-CLIENTE_VIRTUAL-3",
+            "module": "security",
+            "role": "CLIENTE_VIRTUAL",
+            "step": "Bloqueo GET \/staff",
+            "status": "APROBADO",
+            "detail": "HTTP 403",
+            "evidence": "",
+            "at": "2026-10-29T01:01:13+00:00"
+        },
+        {
+            "id": "SEC-CLIENTE_VIRTUAL-4",
+            "module": "security",
+            "role": "CLIENTE_VIRTUAL",
+            "step": "Bloqueo GET \/institucional",
+            "status": "APROBADO",
+            "detail": "HTTP 403",
+            "evidence": "",
+            "at": "2026-10-29T01:01:13+00:00"
+        },
+        {
+            "id": "AUTH-CLIENTE_VIRTUAL-OUT",
+            "module": "auth",
+            "role": "CLIENTE_VIRTUAL",
+            "step": "Logout",
+            "status": "APROBADO",
+            "detail": "HTTP 302",
+            "evidence": "",
+            "at": "2026-10-29T01:01:13+00:00"
+        },
+        {
+            "id": "AUTH-CLIENTE_VIRTUAL-RELOGIN",
+            "module": "auth",
+            "role": "CLIENTE_VIRTUAL",
+            "step": "Re-login",
+            "status": "APROBADO",
+            "detail": "Redirect → http:\/\/127.0.0.1:8000\/cliente",
+            "evidence": "",
+            "at": "2026-10-29T01:01:14+00:00"
+        },
+        {
+            "id": "AUTH-CLIENTE_PRESENCIAL-BAD",
+            "module": "auth",
+            "role": "CLIENTE_PRESENCIAL",
+            "step": "Login incorrecto",
+            "status": "APROBADO",
+            "detail": "Login falló code=302 loc=http:\/\/127.0.0.1:8000\/login",
+            "evidence": "",
+            "at": "2026-10-29T01:01:15+00:00"
+        },
+        {
+            "id": "AUTH-CLIENTE_PRESENCIAL-OK",
+            "module": "auth",
+            "role": "CLIENTE_PRESENCIAL",
+            "step": "Login correcto",
+            "status": "APROBADO",
+            "detail": "Redirect → http:\/\/127.0.0.1:8000\/staff",
+            "evidence": "http:\/\/127.0.0.1:8000\/staff",
+            "at": "2026-10-29T01:01:16+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_PRESENCIAL-HOME",
+            "module": "nav",
+            "role": "CLIENTE_PRESENCIAL",
+            "step": "GET \/cliente",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "\n\n\n    \n    \n    \n    Inicio | FigueFit\n    \n    \n    \n    \n    \n    \n    \n     ",
+            "at": "2026-10-29T01:01:16+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_PRESENCIAL-1",
+            "module": "nav",
+            "role": "CLIENTE_PRESENCIAL",
+            "step": "GET \/cliente",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:16+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_PRESENCIAL-2",
+            "module": "nav",
+            "role": "CLIENTE_PRESENCIAL",
+            "step": "GET \/cliente\/presencial",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:17+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_PRESENCIAL-3",
+            "module": "nav",
+            "role": "CLIENTE_PRESENCIAL",
+            "step": "GET \/cliente\/perfil",
+            "status": "APROBADO",
+            "detail": "HTTP 302",
+            "evidence": "",
+            "at": "2026-10-29T01:01:17+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_PRESENCIAL-4",
+            "module": "nav",
+            "role": "CLIENTE_PRESENCIAL",
+            "step": "GET \/cliente\/mi-plan",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:17+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_PRESENCIAL-5",
+            "module": "nav",
+            "role": "CLIENTE_PRESENCIAL",
+            "step": "GET \/cliente\/entrenamiento",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:17+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_PRESENCIAL-6",
+            "module": "nav",
+            "role": "CLIENTE_PRESENCIAL",
+            "step": "GET \/cliente\/progreso",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:18+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_PRESENCIAL-7",
+            "module": "nav",
+            "role": "CLIENTE_PRESENCIAL",
+            "step": "GET \/cliente\/tienda",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:18+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_PRESENCIAL-8",
+            "module": "nav",
+            "role": "CLIENTE_PRESENCIAL",
+            "step": "GET \/cliente\/pagos",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:19+00:00"
+        },
+        {
+            "id": "SEC-CLIENTE_PRESENCIAL-1",
+            "module": "security",
+            "role": "CLIENTE_PRESENCIAL",
+            "step": "Bloqueo GET \/admin",
+            "status": "APROBADO",
+            "detail": "HTTP 403",
+            "evidence": "",
+            "at": "2026-10-29T01:01:19+00:00"
+        },
+        {
+            "id": "SEC-CLIENTE_PRESENCIAL-2",
+            "module": "security",
+            "role": "CLIENTE_PRESENCIAL",
+            "step": "Bloqueo GET \/coach",
+            "status": "APROBADO",
+            "detail": "HTTP 403",
+            "evidence": "",
+            "at": "2026-10-29T01:01:19+00:00"
+        },
+        {
+            "id": "AUTH-CLIENTE_PRESENCIAL-OUT",
+            "module": "auth",
+            "role": "CLIENTE_PRESENCIAL",
+            "step": "Logout",
+            "status": "APROBADO",
+            "detail": "HTTP 302",
+            "evidence": "",
+            "at": "2026-10-29T01:01:20+00:00"
+        },
+        {
+            "id": "AUTH-CLIENTE_PRESENCIAL-RELOGIN",
+            "module": "auth",
+            "role": "CLIENTE_PRESENCIAL",
+            "step": "Re-login",
+            "status": "APROBADO",
+            "detail": "Redirect → http:\/\/127.0.0.1:8000\/staff",
+            "evidence": "",
+            "at": "2026-10-29T01:01:21+00:00"
+        },
+        {
+            "id": "AUTH-CLIENTE_INSTITUCIONAL-BAD",
+            "module": "auth",
+            "role": "CLIENTE_INSTITUCIONAL",
+            "step": "Login incorrecto",
+            "status": "APROBADO",
+            "detail": "Login falló code=302 loc=http:\/\/127.0.0.1:8000\/login",
+            "evidence": "",
+            "at": "2026-10-29T01:01:21+00:00"
+        },
+        {
+            "id": "AUTH-CLIENTE_INSTITUCIONAL-OK",
+            "module": "auth",
+            "role": "CLIENTE_INSTITUCIONAL",
+            "step": "Login correcto",
+            "status": "APROBADO",
+            "detail": "Redirect → http:\/\/127.0.0.1:8000\/cliente",
+            "evidence": "http:\/\/127.0.0.1:8000\/cliente",
+            "at": "2026-10-29T01:01:22+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_INSTITUCIONAL-HOME",
+            "module": "nav",
+            "role": "CLIENTE_INSTITUCIONAL",
+            "step": "GET \/cliente",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "\n\n\n    \n    \n    \n    Inicio | FigueFit\n    \n    \n    \n    \n    \n    \n    \n     ",
+            "at": "2026-10-29T01:01:22+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_INSTITUCIONAL-1",
+            "module": "nav",
+            "role": "CLIENTE_INSTITUCIONAL",
+            "step": "GET \/cliente",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:23+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_INSTITUCIONAL-2",
+            "module": "nav",
+            "role": "CLIENTE_INSTITUCIONAL",
+            "step": "GET \/cliente\/perfil",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:23+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_INSTITUCIONAL-3",
+            "module": "nav",
+            "role": "CLIENTE_INSTITUCIONAL",
+            "step": "GET \/cliente\/mi-plan",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:23+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_INSTITUCIONAL-4",
+            "module": "nav",
+            "role": "CLIENTE_INSTITUCIONAL",
+            "step": "GET \/cliente\/entrenamiento",
+            "status": "FALLIDO",
+            "detail": "HTTP 403",
+            "evidence": "",
+            "at": "2026-10-29T01:01:24+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_INSTITUCIONAL-5",
+            "module": "nav",
+            "role": "CLIENTE_INSTITUCIONAL",
+            "step": "GET \/cliente\/progreso",
+            "status": "FALLIDO",
+            "detail": "HTTP 403",
+            "evidence": "",
+            "at": "2026-10-29T01:01:24+00:00"
+        },
+        {
+            "id": "NAV-CLIENTE_INSTITUCIONAL-6",
+            "module": "nav",
+            "role": "CLIENTE_INSTITUCIONAL",
+            "step": "GET \/cliente\/comunicacion",
+            "status": "FALLIDO",
+            "detail": "HTTP 403",
+            "evidence": "",
+            "at": "2026-10-29T01:01:24+00:00"
+        },
+        {
+            "id": "SEC-CLIENTE_INSTITUCIONAL-1",
+            "module": "security",
+            "role": "CLIENTE_INSTITUCIONAL",
+            "step": "Bloqueo GET \/admin",
+            "status": "APROBADO",
+            "detail": "HTTP 403",
+            "evidence": "",
+            "at": "2026-10-29T01:01:24+00:00"
+        },
+        {
+            "id": "SEC-CLIENTE_INSTITUCIONAL-2",
+            "module": "security",
+            "role": "CLIENTE_INSTITUCIONAL",
+            "step": "Bloqueo GET \/institucional",
+            "status": "APROBADO",
+            "detail": "HTTP 403",
+            "evidence": "",
+            "at": "2026-10-29T01:01:25+00:00"
+        },
+        {
+            "id": "AUTH-CLIENTE_INSTITUCIONAL-OUT",
+            "module": "auth",
+            "role": "CLIENTE_INSTITUCIONAL",
+            "step": "Logout",
+            "status": "APROBADO",
+            "detail": "HTTP 302",
+            "evidence": "",
+            "at": "2026-10-29T01:01:25+00:00"
+        },
+        {
+            "id": "AUTH-CLIENTE_INSTITUCIONAL-RELOGIN",
+            "module": "auth",
+            "role": "CLIENTE_INSTITUCIONAL",
+            "step": "Re-login",
+            "status": "APROBADO",
+            "detail": "Redirect → http:\/\/127.0.0.1:8000\/cliente",
+            "evidence": "",
+            "at": "2026-10-29T01:01:26+00:00"
+        },
+        {
+            "id": "AUTH-RESPONSABLE_INSTITUCIONAL-BAD",
+            "module": "auth",
+            "role": "RESPONSABLE_INSTITUCIONAL",
+            "step": "Login incorrecto",
+            "status": "APROBADO",
+            "detail": "Login falló code=302 loc=http:\/\/127.0.0.1:8000\/login",
+            "evidence": "",
+            "at": "2026-10-29T01:01:27+00:00"
+        },
+        {
+            "id": "AUTH-RESPONSABLE_INSTITUCIONAL-OK",
+            "module": "auth",
+            "role": "RESPONSABLE_INSTITUCIONAL",
+            "step": "Login correcto",
+            "status": "APROBADO",
+            "detail": "Redirect → http:\/\/127.0.0.1:8000\/institucional",
+            "evidence": "http:\/\/127.0.0.1:8000\/institucional",
+            "at": "2026-10-29T01:01:28+00:00"
+        },
+        {
+            "id": "NAV-RESPONSABLE_INSTITUCIONAL-HOME",
+            "module": "nav",
+            "role": "RESPONSABLE_INSTITUCIONAL",
+            "step": "GET \/institucional",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "\n\n\n    \n    \n    \n    Dashboard institucional | FigueFit\n    \n    \n    \n    \n   ",
+            "at": "2026-10-29T01:01:28+00:00"
+        },
+        {
+            "id": "NAV-RESPONSABLE_INSTITUCIONAL-1",
+            "module": "nav",
+            "role": "RESPONSABLE_INSTITUCIONAL",
+            "step": "GET \/institucional",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:28+00:00"
+        },
+        {
+            "id": "NAV-RESPONSABLE_INSTITUCIONAL-2",
+            "module": "nav",
+            "role": "RESPONSABLE_INSTITUCIONAL",
+            "step": "GET \/institucional\/perfil",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:28+00:00"
+        },
+        {
+            "id": "NAV-RESPONSABLE_INSTITUCIONAL-3",
+            "module": "nav",
+            "role": "RESPONSABLE_INSTITUCIONAL",
+            "step": "GET \/institucional\/usuarios",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:29+00:00"
+        },
+        {
+            "id": "NAV-RESPONSABLE_INSTITUCIONAL-4",
+            "module": "nav",
+            "role": "RESPONSABLE_INSTITUCIONAL",
+            "step": "GET \/institucional\/invitaciones",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:29+00:00"
+        },
+        {
+            "id": "NAV-RESPONSABLE_INSTITUCIONAL-5",
+            "module": "nav",
+            "role": "RESPONSABLE_INSTITUCIONAL",
+            "step": "GET \/institucional\/plan",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:29+00:00"
+        },
+        {
+            "id": "NAV-RESPONSABLE_INSTITUCIONAL-6",
+            "module": "nav",
+            "role": "RESPONSABLE_INSTITUCIONAL",
+            "step": "GET \/institucional\/reportes",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:30+00:00"
+        },
+        {
+            "id": "NAV-RESPONSABLE_INSTITUCIONAL-7",
+            "module": "nav",
+            "role": "RESPONSABLE_INSTITUCIONAL",
+            "step": "GET \/institucional\/comunicacion",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:30+00:00"
+        },
+        {
+            "id": "SEC-RESPONSABLE_INSTITUCIONAL-1",
+            "module": "security",
+            "role": "RESPONSABLE_INSTITUCIONAL",
+            "step": "Bloqueo GET \/admin",
+            "status": "APROBADO",
+            "detail": "HTTP 403",
+            "evidence": "",
+            "at": "2026-10-29T01:01:31+00:00"
+        },
+        {
+            "id": "SEC-RESPONSABLE_INSTITUCIONAL-2",
+            "module": "security",
+            "role": "RESPONSABLE_INSTITUCIONAL",
+            "step": "Bloqueo GET \/coach",
+            "status": "APROBADO",
+            "detail": "HTTP 403",
+            "evidence": "",
+            "at": "2026-10-29T01:01:31+00:00"
+        },
+        {
+            "id": "AUTH-RESPONSABLE_INSTITUCIONAL-OUT",
+            "module": "auth",
+            "role": "RESPONSABLE_INSTITUCIONAL",
+            "step": "Logout",
+            "status": "APROBADO",
+            "detail": "HTTP 302",
+            "evidence": "",
+            "at": "2026-10-29T01:01:32+00:00"
+        },
+        {
+            "id": "AUTH-RESPONSABLE_INSTITUCIONAL-RELOGIN",
+            "module": "auth",
+            "role": "RESPONSABLE_INSTITUCIONAL",
+            "step": "Re-login",
+            "status": "APROBADO",
+            "detail": "Redirect → http:\/\/127.0.0.1:8000\/institucional",
+            "evidence": "",
+            "at": "2026-10-29T01:01:32+00:00"
+        },
+        {
+            "id": "ADMIN-PLAN-CREATE-PAGE",
+            "module": "planes",
+            "role": "ADMIN",
+            "step": "GET \/admin\/planes?create=1",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:34+00:00"
+        },
+        {
+            "id": "ADMIN-PLAN-STORE",
+            "module": "planes",
+            "role": "ADMIN",
+            "step": "POST crear plan",
+            "status": "APROBADO",
+            "detail": "HTTP 302 loc=http:\/\/127.0.0.1:8000\/admin\/planes",
+            "evidence": "",
+            "at": "2026-10-29T01:01:34+00:00"
+        },
+        {
+            "id": "ADMIN-PLAN-NEG",
+            "module": "planes",
+            "role": "ADMIN",
+            "step": "Validación negativa plan",
+            "status": "APROBADO",
+            "detail": "HTTP 302",
+            "evidence": "",
+            "at": "2026-10-29T01:01:35+00:00"
+        },
+        {
+            "id": "ADMIN-PLAN-LIST",
+            "module": "planes",
+            "role": "ADMIN",
+            "step": "Plan visible en listado",
+            "status": "APROBADO",
+            "detail": "Encontrado en HTML",
+            "evidence": "",
+            "at": "2026-10-29T01:01:35+00:00"
+        },
+        {
+            "id": "ADMIN-TIENDA-PAGE",
+            "module": "tienda",
+            "role": "ADMIN",
+            "step": "GET \/admin\/tienda",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:36+00:00"
+        },
+        {
+            "id": "ADMIN-TIENDA-STORE",
+            "module": "tienda",
+            "role": "ADMIN",
+            "step": "POST crear producto",
+            "status": "APROBADO",
+            "detail": "HTTP 302",
+            "evidence": "",
+            "at": "2026-10-29T01:01:36+00:00"
+        },
+        {
+            "id": "ADMIN-TIENDA-LIST",
+            "module": "tienda",
+            "role": "ADMIN",
+            "step": "Producto en listado",
+            "status": "APROBADO",
+            "detail": "Visible",
+            "evidence": "",
+            "at": "2026-10-29T01:01:37+00:00"
+        },
+        {
+            "id": "SEC-CLIENTE-TIENDA",
+            "module": "security",
+            "role": "CLIENTE_VIRTUAL",
+            "step": "POST \/admin\/tienda bloqueado",
+            "status": "APROBADO",
+            "detail": "HTTP 403",
+            "evidence": "",
+            "at": "2026-10-29T01:01:39+00:00"
+        },
+        {
+            "id": "INST-INV-PAGE",
+            "module": "institucional",
+            "role": "RESPONSABLE_INSTITUCIONAL",
+            "step": "GET invitaciones",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:40+00:00"
+        },
+        {
+            "id": "INST-INV-CREATE",
+            "module": "institucional",
+            "role": "RESPONSABLE_INSTITUCIONAL",
+            "step": "Crear invitación",
+            "status": "APROBADO",
+            "detail": "HTTP 302",
+            "evidence": "",
+            "at": "2026-10-29T01:01:40+00:00"
+        },
+        {
+            "id": "INST-REPORTES",
+            "module": "institucional",
+            "role": "RESPONSABLE_INSTITUCIONAL",
+            "step": "GET reportes",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:40+00:00"
+        },
+        {
+            "id": "INST-COM-SEND",
+            "module": "institucional",
+            "role": "RESPONSABLE_INSTITUCIONAL",
+            "step": "Enviar comunicado",
+            "status": "APROBADO",
+            "detail": "HTTP 302",
+            "evidence": "",
+            "at": "2026-10-29T01:01:41+00:00"
+        },
+        {
+            "id": "COACH-CLIENTES",
+            "module": "coach",
+            "role": "COACH",
+            "step": "GET clientes",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:42+00:00"
+        },
+        {
+            "id": "COACH-ENT",
+            "module": "coach",
+            "role": "COACH",
+            "step": "GET entrenamiento",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:43+00:00"
+        },
+        {
+            "id": "STAFF-CLIENTES",
+            "module": "staff",
+            "role": "ASISTENTE_TECNICO",
+            "step": "GET clientes",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:44+00:00"
+        },
+        {
+            "id": "STAFF-NOV",
+            "module": "staff",
+            "role": "ASISTENTE_TECNICO",
+            "step": "GET novedades",
+            "status": "APROBADO",
+            "detail": "HTTP novedades 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:44+00:00"
+        },
+        {
+            "id": "CV-cc225cd582f65eb6e1d2c559125afb42",
+            "module": "cliente_virtual",
+            "role": "CLIENTE_VIRTUAL",
+            "step": "GET \/cliente\/comercial\/planes",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:45+00:00"
+        },
+        {
+            "id": "CV-a4d66efebfce00bc457dab68a0edb4a9",
+            "module": "cliente_virtual",
+            "role": "CLIENTE_VIRTUAL",
+            "step": "GET \/cliente\/progreso",
+            "status": "FALLIDO",
+            "detail": "HTTP 403",
+            "evidence": "",
+            "at": "2026-10-29T01:01:45+00:00"
+        },
+        {
+            "id": "CV-32b69833cab4acb53d9de033f21eed77",
+            "module": "cliente_virtual",
+            "role": "CLIENTE_VIRTUAL",
+            "step": "GET \/cliente\/notificaciones",
+            "status": "APROBADO",
+            "detail": "HTTP 200",
+            "evidence": "",
+            "at": "2026-10-29T01:01:46+00:00"
+        },
+        {
+            "id": "CV-TIENDA-403-DESIGN",
+            "module": "tienda",
+            "role": "CLIENTE_VIRTUAL",
+            "step": "Tienda presencial bloqueada a virtual (módulo)",
+            "status": "APROBADO",
+            "detail": "HTTP 403 (esperado 403)",
+            "evidence": "",
+            "at": "2026-10-29T01:01:47+00:00"
+        },
+        {
+            "id": "INST-ISO-A",
+            "module": "institucional",
+            "role": "RESPONSABLE_INSTITUCIONAL",
+            "step": "Portal solo institución propia",
+            "status": "APROBADO",
+            "detail": "Sin fuga USCO",
+            "evidence": "",
+            "at": "2026-10-29T01:01:48+00:00"
+        }
+    ],
+    "bugs": [
+        {
+            "id": "BUG-NAV-CLIENTE_VIRTUAL-6",
+            "module": "nav",
+            "role": "CLIENTE_VIRTUAL",
+            "steps": "GET \/cliente\/entrenamiento",
+            "error": "HTTP 403",
+            "status": "ABIERTO",
+            "at": "2026-10-29T01:01:09+00:00"
+        },
+        {
+            "id": "BUG-NAV-CLIENTE_VIRTUAL-7",
+            "module": "nav",
+            "role": "CLIENTE_VIRTUAL",
+            "steps": "GET \/cliente\/nutricion",
+            "error": "HTTP 403",
+            "status": "ABIERTO",
+            "at": "2026-10-29T01:01:10+00:00"
+        },
+        {
+            "id": "BUG-NAV-CLIENTE_VIRTUAL-8",
+            "module": "nav",
+            "role": "CLIENTE_VIRTUAL",
+            "steps": "GET \/cliente\/contenido",
+            "error": "HTTP 403",
+            "status": "ABIERTO",
+            "at": "2026-10-29T01:01:10+00:00"
+        },
+        {
+            "id": "BUG-NAV-CLIENTE_VIRTUAL-9",
+            "module": "nav",
+            "role": "CLIENTE_VIRTUAL",
+            "steps": "GET \/cliente\/progreso",
+            "error": "HTTP 403",
+            "status": "ABIERTO",
+            "at": "2026-10-29T01:01:10+00:00"
+        },
+        {
+            "id": "BUG-NAV-CLIENTE_VIRTUAL-10",
+            "module": "nav",
+            "role": "CLIENTE_VIRTUAL",
+            "steps": "GET \/cliente\/comunicacion",
+            "error": "HTTP 403",
+            "status": "ABIERTO",
+            "at": "2026-10-29T01:01:11+00:00"
+        },
+        {
+            "id": "BUG-NAV-CLIENTE_VIRTUAL-14",
+            "module": "nav",
+            "role": "CLIENTE_VIRTUAL",
+            "steps": "GET \/cliente\/agenda",
+            "error": "HTTP 403",
+            "status": "ABIERTO",
+            "at": "2026-10-29T01:01:12+00:00"
+        },
+        {
+            "id": "BUG-NAV-CLIENTE_INSTITUCIONAL-4",
+            "module": "nav",
+            "role": "CLIENTE_INSTITUCIONAL",
+            "steps": "GET \/cliente\/entrenamiento",
+            "error": "HTTP 403",
+            "status": "ABIERTO",
+            "at": "2026-10-29T01:01:24+00:00"
+        },
+        {
+            "id": "BUG-NAV-CLIENTE_INSTITUCIONAL-5",
+            "module": "nav",
+            "role": "CLIENTE_INSTITUCIONAL",
+            "steps": "GET \/cliente\/progreso",
+            "error": "HTTP 403",
+            "status": "ABIERTO",
+            "at": "2026-10-29T01:01:24+00:00"
+        },
+        {
+            "id": "BUG-NAV-CLIENTE_INSTITUCIONAL-6",
+            "module": "nav",
+            "role": "CLIENTE_INSTITUCIONAL",
+            "steps": "GET \/cliente\/comunicacion",
+            "error": "HTTP 403",
+            "status": "ABIERTO",
+            "at": "2026-10-29T01:01:24+00:00"
+        }
+    ]
+}

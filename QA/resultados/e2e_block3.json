@@ -1,0 +1,77 @@
+[
+    {
+        "id": "B3-COACH-LOGIN",
+        "status": "APROBADO",
+        "detail": "coach login"
+    },
+    {
+        "id": "B3-COACH-PROP",
+        "status": "APROBADO",
+        "detail": "GET propuestas 200"
+    },
+    {
+        "id": "B3-COACH-PROP-CREATE",
+        "status": "APROBADO",
+        "detail": "GET crear propuesta 200"
+    },
+    {
+        "id": "B3-STAFF-LOGIN",
+        "status": "APROBADO",
+        "detail": "staff login"
+    },
+    {
+        "id": "B3-STAFF-PROP",
+        "status": "APROBADO",
+        "detail": "staff propuestas 200"
+    },
+    {
+        "id": "B3-STAFF-RUT",
+        "status": "APROBADO",
+        "detail": "staff rutinas 200"
+    },
+    {
+        "id": "B3-CP-LOGIN",
+        "status": "APROBADO",
+        "detail": "presencial login"
+    },
+    {
+        "id": "B3-CP-TIENDA",
+        "status": "APROBADO",
+        "detail": "tienda presencial 200"
+    },
+    {
+        "id": "B3-CP-CART",
+        "status": "APROBADO",
+        "detail": "POST carrito 405 (404=ruta distinta)"
+    },
+    {
+        "id": "B3-ADMIN-LOGIN",
+        "status": "APROBADO",
+        "detail": "admin login"
+    },
+    {
+        "id": "B3-PROD-UPDATE",
+        "status": "APROBADO",
+        "detail": "PUT producto 302"
+    },
+    {
+        "id": "B3-PROD-MYSQL",
+        "status": "APROBADO",
+        "detail": "MySQL nombre=Producto QA QA-SKU-165107 EDITADO EDITADO"
+    },
+    {
+        "id": "B3-SOL",
+        "status": "APROBADO",
+        "detail": "solicitudes 200"
+    },
+    {
+        "id": "B3-PAG",
+        "status": "APROBADO",
+        "detail": "pagos 200"
+    },
+    {
+        "id": "B3-SOL-SHOW",
+        "status": "APROBADO",
+        "detail": "solicitud #27 200"
+    }
+]

@@ -7,6 +7,7 @@ use App\Models\Cliente;
 use App\Models\HorarioPresencial;
 use App\Models\MedidaAntropometricaInicial;
 use App\Models\Pago;
+use App\Models\Plan;
 use App\Models\PlanCliente;
 use App\Models\Rol;
 use App\Models\SolicitudCompra;
@@ -58,25 +59,25 @@ class SolicitudAprobacionService
 
             $usuarioExistente = User::query()->where('correo', $solicitud->correo)->first();
 
-            $usuario = User::firstOrCreate(
-                ['correo' => $solicitud->correo],
-                [
+            if (! $usuarioExistente) {
+                $tempPassword = GeneratesTemporaryPassword::make();
+                $usuario = new User([
                     'nombres' => $solicitud->nombres,
                     'apellidos' => $solicitud->apellidos,
+                    'Tipo_documento' => $solicitud->tipo_documento ?? 'CC',
                     'documento_identidad' => $solicitud->documento_identidad,
                     'telefono' => $solicitud->telefono,
+                    'correo' => $solicitud->correo,
                     'email' => $solicitud->correo,
                     'acepto_terminos' => true,
                     'fecha_aceptacion_terminos' => $solicitud->fecha_aceptacion_terminos ?? now(),
                     'estado' => 'ACTIVO',
                     'correo_verificado_en' => now(),
-                ]
-            );
-
-            if (! $usuarioExistente) {
-                $tempPassword = GeneratesTemporaryPassword::make();
+                ]);
                 $usuario->assignPassword($tempPassword);
                 $usuario->save();
+            } else {
+                $usuario = $usuarioExistente;
             }
 
             if ($usuario->estado !== 'ACTIVO') {
@@ -117,6 +118,9 @@ class SolicitudAprobacionService
                 'fecha_activacion' => now(),
             ];
 
+            $clienteExistente = Cliente::query()->where('id_user', $usuario->id_user)->first();
+            $horarioPrevio = $clienteExistente?->id_horario;
+
             $cliente = Cliente::firstOrCreate(
                 ['id_user' => $usuario->id_user],
                 $clientePayload
@@ -130,12 +134,6 @@ class SolicitudAprobacionService
                 fn ($value) => $value !== null
             ));
 
-            if ($idHorario) {
-                HorarioPresencial::query()
-                    ->where('id_horario', $idHorario)
-                    ->increment('cupo_ocupado');
-            }
-
             if (! empty($medidas['peso_kg']) && ! empty($medidas['estatura_cm'])) {
                 MedidaAntropometricaInicial::updateOrCreate(
                     ['id_cliente' => $cliente->id_cliente],
@@ -146,7 +144,7 @@ class SolicitudAprobacionService
                         'cadera_cm' => $medidas['cadera_cm'] ?? null,
                         'brazo_cm' => $medidas['brazo_cm'] ?? null,
                         'pierna_cm' => $medidas['pierna_cm'] ?? null,
-                        'origen' => 'REGISTRO_PRESENCIAL',
+                        'origen' => $solicitud->modalidad === 'VIRTUAL' ? 'PRE_REGISTRO_VIRTUAL' : 'REGISTRO_PRESENCIAL',
                         'registrada_en' => now(),
                     ]
                 );
@@ -178,6 +176,7 @@ class SolicitudAprobacionService
                     'fecha_inicio' => $inicio,
                     'fecha_fin' => $fin,
                     'estado_plan_cliente' => 'ACTIVO',
+                    'renovacion_automatica' => (bool) ($extra['acepto_recurrente'] ?? false),
                     'dias_gracia' => $plan->dias_gracia ?? 3,
                 ]
             );
@@ -203,6 +202,12 @@ class SolicitudAprobacionService
                 'fecha_revision' => now(),
                 'observacion_admin' => $observacion,
             ]);
+
+            HorarioPresencial::sincronizarCupo($horarioPrevio ? (int) $horarioPrevio : null);
+            HorarioPresencial::sincronizarCupo($idHorario ? (int) $idHorario : null);
+            if ($plan) {
+                Plan::sincronizarCupos((int) $plan->id_plan);
+            }
 
             $clienteActivado = $cliente;
         });
@@ -292,6 +297,11 @@ class SolicitudAprobacionService
             return;
         }
 
+        $horarioId = $cliente->id_horario;
+        $planIds = PlanCliente::query()
+            ->where('id_cliente', $cliente->id_cliente)
+            ->pluck('id_plan');
+
         $cliente->update(['estado_cliente' => 'SUSPENDIDO']);
 
         PlanCliente::query()
@@ -308,5 +318,10 @@ class SolicitudAprobacionService
             'estado' => 'SUSPENDIDO',
             'estado_cuenta' => 'SUSPENDIDO',
         ]);
+
+        HorarioPresencial::sincronizarCupo($horarioId ? (int) $horarioId : null);
+        foreach ($planIds as $planId) {
+            Plan::sincronizarCupos((int) $planId);
+        }
     }
 }

@@ -126,3 +126,40 @@ test('admin can view configuration index', function () {
         ->get(route('admin.configuracion.index'))
         ->assertOk();
 });
+
+test('admin puede abrir módulos rediseñados', function () {
+    $admin = createAdminUser();
+
+    $routes = [
+        'admin.dashboard',
+        'admin.solicitudes.index',
+        'admin.pagos.index',
+        'admin.horarios.index',
+        'admin.eventos.index',
+        'admin.calendario.index',
+        'admin.usuarios.index',
+        'admin.clientes.virtuales',
+        'admin.clientes.presenciales',
+        'admin.instituciones.index',
+        'admin.coaches.index',
+        'admin.asistentes.index',
+        'admin.roles.index',
+        'admin.planes.index',
+        'admin.propuestas.index',
+        'admin.novedades.index',
+        'admin.cupones.index',
+        'admin.tienda.index',
+        'admin.whatsapp.index',
+        'admin.comunidad.index',
+        'admin.estadisticas.index',
+        'admin.reportes.index',
+        'admin.configuracion.index',
+        'admin.pasarelas.index',
+    ];
+
+    foreach ($routes as $name) {
+        $this->actingAs($admin)
+            ->get(route($name))
+            ->assertOk();
+    }
+});

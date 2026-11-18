@@ -8,6 +8,7 @@ use App\Models\Notificacion;
 use App\Support\ResolvesAdminMedia;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
@@ -17,11 +18,71 @@ class EventoController extends Controller
 {
     use ResolvesAdminMedia;
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $eventos = Evento::query()->orderByDesc('fecha_inicio')->paginate(10)->withQueryString();
+        $now = now();
+        $mesRaw = trim((string) $request->get('mes', $now->format('Y-m')));
+        $mes = preg_match('/^\d{4}-\d{2}$/', $mesRaw) ? $mesRaw : $now->format('Y-m');
+        $mesInicio = Carbon::createFromFormat('Y-m', $mes)->startOfMonth();
+        $mesFin = $mesInicio->copy()->endOfMonth();
 
-        return view('admin.eventos.index', compact('eventos'));
+        $eventos = Evento::query()
+            ->where(function ($q) use ($mesInicio, $mesFin) {
+                $q->whereBetween('fecha_inicio', [$mesInicio, $mesFin])
+                    ->orWhere(function ($inner) use ($mesInicio, $mesFin) {
+                        $inner->whereNotNull('fecha_fin')
+                            ->where('fecha_inicio', '<=', $mesFin)
+                            ->where('fecha_fin', '>=', $mesInicio);
+                    });
+            })
+            ->orderByDesc('fecha_inicio')
+            ->paginate(10)
+            ->withQueryString();
+
+        $enMes = Evento::query()->where(function ($q) use ($mesInicio, $mesFin) {
+            $q->whereBetween('fecha_inicio', [$mesInicio, $mesFin])
+                ->orWhere(function ($inner) use ($mesInicio, $mesFin) {
+                    $inner->whereNotNull('fecha_fin')
+                        ->where('fecha_inicio', '<=', $mesFin)
+                        ->where('fecha_fin', '>=', $mesInicio);
+                });
+        });
+
+        $stats = [
+            'en_curso' => (clone $enMes)
+                ->where('fecha_inicio', '<=', $now)
+                ->where(function ($q) use ($now) {
+                    $q->whereNull('fecha_fin')->orWhere('fecha_fin', '>=', $now);
+                })
+                ->count(),
+            'proximos' => (clone $enMes)->where('fecha_inicio', '>', $now)->count(),
+            'cerrados' => (clone $enMes)->whereNotNull('fecha_fin')->where('fecha_fin', '<', $now)->count(),
+        ];
+
+        $semana = collect(range(0, 6))->map(fn (int $i) => $mesInicio->copy()->startOfWeek()->addDays($i));
+
+        $diasConEvento = (clone $enMes)
+            ->get(['fecha_inicio'])
+            ->map(fn ($e) => optional($e->fecha_inicio)->format('Y-m-d'))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        $mesAnterior = $mesInicio->copy()->subMonth()->format('Y-m');
+        $mesSiguiente = $mesInicio->copy()->addMonth()->format('Y-m');
+        $mesLabel = ucfirst($mesInicio->locale('es')->translatedFormat('F Y'));
+
+        return view('admin.eventos.index', compact(
+            'eventos',
+            'stats',
+            'semana',
+            'diasConEvento',
+            'mes',
+            'mesAnterior',
+            'mesSiguiente',
+            'mesLabel'
+        ));
     }
 
     public function store(Request $request): RedirectResponse
