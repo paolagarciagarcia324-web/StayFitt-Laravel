@@ -12,7 +12,7 @@
 @endsection
 
 @section('actions')
-    <button class="ad-btn ad-btn-add" type="button" data-open-evento-form>+ Crear evento</button>
+    <button class="ad-pend-btn is-fucsia ad-evt-create-btn" type="button" data-open-evento-form>+ Crear evento</button>
 @endsection
 
 @section('content')
@@ -20,6 +20,7 @@
         $stats = $stats ?? ['en_curso' => 0, 'proximos' => 0, 'cerrados' => 0];
         $semana = $semana ?? collect();
         $diasConEvento = $diasConEvento ?? [];
+        $eventosPorDia = $eventosPorDia ?? [];
         $mes = $mes ?? now()->format('Y-m');
         $mesAnterior = $mesAnterior ?? now()->subMonth()->format('Y-m');
         $mesSiguiente = $mesSiguiente ?? now()->addMonth()->format('Y-m');
@@ -42,6 +43,7 @@
             };
         };
         $nowRef = now();
+        $hoy = $nowRef->copy()->startOfDay();
     @endphp
     <div class="ad-evt" data-evt-board>
         <div>
@@ -55,7 +57,8 @@
             </header>
             <div class="ad-date-strip">
                 @foreach ($semana as $dia)
-                    <div class="ad-date-chip {{ $dia->isToday() ? 'is-on' : '' }}">
+                    @php $chipPast = $dia->copy()->startOfDay()->lt($hoy); @endphp
+                    <div class="ad-date-chip {{ $dia->isToday() ? 'is-on' : '' }} {{ $chipPast ? 'is-past' : '' }}">
                         <strong>{{ $dia->format('d') }}</strong>
                         <span>{{ $dia->locale('es')->isoFormat('ddd') }}</span>
                     </div>
@@ -75,13 +78,20 @@
                         $cupo = ((int) $evento->cupo_inscritos).'/'.($evento->cupo_maximo ?: '∞');
                         if ($inicio && $inicio->gt($nowRef)) {
                             $grupo = 'proximos';
-                        } elseif ($evento->fecha_fin && $evento->fecha_fin->lt($nowRef)) {
+                        } elseif ($fin && $fin->lt($nowRef)) {
                             $grupo = 'cerrados';
                         } else {
                             $grupo = 'en_curso';
                         }
+                        $cardPast = $grupo === 'cerrados';
                     @endphp
-                    <article class="ad-evt-card {{ $tone }}" data-evt-card data-grupo="{{ $grupo }}">
+                    <article
+                        id="evt-{{ $evento->id_evento }}"
+                        class="ad-evt-card {{ $tone }} {{ $cardPast ? 'is-past' : '' }}"
+                        data-evt-card
+                        data-evt-id="{{ $evento->id_evento }}"
+                        data-grupo="{{ $grupo }}"
+                    >
                         <aside class="ad-evt-card-date" aria-hidden="true">
                             <em>{{ $cardMes }}</em>
                             <strong>{{ $diaNum }}</strong>
@@ -151,87 +161,109 @@
             </div>
             <section class="ad-glass-card ad-evt-cal">
                 <h3>{{ $mesLabel }}</h3>
-                <div class="ad-tf-mini">
+                <div class="ad-tf-mini" data-evt-cal>
                     @foreach (['L','M','X','J','V','S','D'] as $d)
                         <em>{{ $d }}</em>
                     @endforeach
                     @php
-                        $cursor = $mesCarbon->copy()->startOfWeek();
-                        $finMesCal = $mesCarbon->copy()->endOfMonth()->endOfWeek();
+                        $cursor = $mesCarbon->copy()->startOfWeek(\Illuminate\Support\Carbon::MONDAY);
+                        $finMesCal = $mesCarbon->copy()->endOfMonth()->endOfWeek(\Illuminate\Support\Carbon::SUNDAY);
                     @endphp
                     @while ($cursor->lte($finMesCal))
                         @php
                             $key = $cursor->format('Y-m-d');
-                            $has = in_array($key, $diasConEvento, true);
                             $enMesSel = $cursor->month === $mesCarbon->month;
+                            $diaItems = $eventosPorDia[$key] ?? [];
+                            $has = $enMesSel && count($diaItems) > 0;
+                            $allPast = $has && collect($diaItems)->every(fn ($row) => ! empty($row['vencido']));
+                            $dayPast = $enMesSel && $cursor->copy()->startOfDay()->lt($hoy);
+                            $jumpId = $has ? ($diaItems[0]['id'] ?? null) : null;
                         @endphp
-                        <button
-                            type="button"
-                            class="{{ $cursor->isToday() ? 'is-today' : '' }} {{ $enMesSel ? '' : 'is-muted' }} {{ $has ? 'has-events' : '' }}"
-                            title="{{ $has ? 'Hay evento(s)' : '' }}"
-                        >{{ $cursor->day }}</button>
+                        @if ($enMesSel)
+                            <button
+                                type="button"
+                                class="{{ $cursor->isToday() ? 'is-today' : '' }} {{ $dayPast ? 'is-past' : '' }} {{ $has ? 'has-events' : '' }} {{ $allPast ? 'is-evt-past' : '' }}"
+                                title="{{ $has ? ($allPast ? 'Evento vencido · ver detalle' : 'Ir al evento') : '' }}"
+                                @if ($jumpId) data-evt-jump="{{ $jumpId }}" @endif
+                            >{{ $cursor->day }}</button>
+                        @else
+                            <span class="ad-tf-mini-empty" aria-hidden="true"></span>
+                        @endif
                         @php $cursor->addDay(); @endphp
                     @endwhile
                 </div>
             </section>
             <section class="ad-glass-card ad-evt-legend">
                 <h3>Leyenda</h3>
-                @foreach ($tiposLegend as $cls => $label)
-                    <div class="ad-evt-legend-row">
-                        <span class="ad-evt-legend-pill {{ $cls }}">{{ $label }}</span>
-                    </div>
-                @endforeach
+                <div class="ad-evt-legend-list">
+                    @foreach ($tiposLegend as $cls => $label)
+                        <span class="ad-evt-legend-chip {{ $cls }}">{{ $label }}</span>
+                    @endforeach
+                </div>
             </section>
         </aside>
     </div>
 
-    <div class="ad-modal" data-evento-modal hidden>
-        <div class="ad-modal-card ad-ml-modal">
-            <header class="ad-modal-head">
-                <div><h2>Nuevo evento</h2></div>
+    <div class="ad-modal ad-evt-form-modal" data-evento-modal hidden>
+        <div class="ad-modal-card ad-evt-form-card">
+            <div class="ad-evt-form-glow" aria-hidden="true"></div>
+            <header class="ad-modal-head ad-evt-form-head">
+                <div>
+                    <p class="ad-evt-form-kicker">Operación · Eventos</p>
+                    <h2>Nuevo evento</h2>
+                </div>
                 <button type="button" class="ad-modal-close" data-close-evento-form aria-label="Cerrar">×</button>
             </header>
-            <form class="ad-form" method="POST" action="{{ route('admin.eventos.store') }}" enctype="multipart/form-data">
+            <form class="ad-form ad-evt-form" method="POST" action="{{ route('admin.eventos.store') }}" enctype="multipart/form-data">
                 @csrf
                 @include('admin.eventos._fields', ['evento' => null])
-                <div class="ad-modal-actions">
-                    <button class="ad-btn ad-btn-ghost" type="button" data-close-evento-form>Cancelar</button>
-                    <button class="ad-btn" type="submit">Crear</button>
+                <div class="ad-modal-actions ad-evt-form-actions">
+                    <button class="ad-pend-btn is-menta" type="button" data-close-evento-form>Cancelar</button>
+                    <button class="ad-pend-btn is-fucsia" type="submit">Crear</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div class="ad-modal" data-evento-edit-modal hidden>
-        <div class="ad-modal-card ad-ml-modal">
-            <header class="ad-modal-head">
-                <div><h2>Editar evento</h2></div>
+    <div class="ad-modal ad-evt-form-modal" data-evento-edit-modal hidden>
+        <div class="ad-modal-card ad-evt-form-card">
+            <div class="ad-evt-form-glow" aria-hidden="true"></div>
+            <header class="ad-modal-head ad-evt-form-head">
+                <div>
+                    <p class="ad-evt-form-kicker">Operación · Eventos</p>
+                    <h2>Editar evento</h2>
+                </div>
                 <button type="button" class="ad-modal-close" data-close-evento-edit aria-label="Cerrar">×</button>
             </header>
-            <form class="ad-form" method="POST" data-evento-edit-form enctype="multipart/form-data">
+            <form class="ad-form ad-evt-form" method="POST" data-evento-edit-form enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 @include('admin.eventos._fields', ['evento' => null, 'withDataFields' => true])
-                <div class="ad-modal-actions">
-                    <button class="ad-btn ad-btn-ghost" type="button" data-close-evento-edit>Cancelar</button>
-                    <button class="ad-btn" type="submit">Guardar</button>
+                <div class="ad-modal-actions ad-evt-form-actions">
+                    <button class="ad-pend-btn is-menta" type="button" data-close-evento-edit>Cancelar</button>
+                    <button class="ad-pend-btn is-fucsia" type="submit">Guardar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div class="ad-modal" data-evento-confirm-modal hidden>
-        <div class="ad-modal-card" role="dialog" aria-modal="true" aria-labelledby="ad-evento-del-title">
-            <header class="ad-modal-head">
-                <div>
-                    <h2 id="ad-evento-del-title">Eliminar evento</h2>
-                    <p>Esta acción no se puede deshacer.</p>
+    <div class="ad-modal ad-horario-del-modal" data-evento-confirm-modal hidden>
+        <div class="ad-modal-card ad-horario-del-card" role="dialog" aria-modal="true" aria-labelledby="ad-evento-del-title">
+            <div class="ad-horario-del-glow" aria-hidden="true"></div>
+            <header class="ad-modal-head ad-horario-del-head">
+                <div class="ad-horario-del-who">
+                    <span class="ad-horario-del-orb" aria-hidden="true">@include('partials.admin-icon', ['icon' => 'trash'])</span>
+                    <div>
+                        <p class="ad-horario-del-kicker">Acción permanente</p>
+                        <h2 id="ad-evento-del-title">Eliminar evento</h2>
+                        <p>Esta acción no se puede deshacer.</p>
+                    </div>
                 </div>
                 <button type="button" class="ad-modal-close" data-evento-confirm-cancel aria-label="Cerrar">×</button>
             </header>
-            <div class="ad-modal-actions">
+            <div class="ad-modal-actions ad-horario-del-actions">
                 <button type="button" class="ad-btn ad-btn-ghost" data-evento-confirm-cancel>Cancelar</button>
-                <button type="button" class="ad-btn is-danger" data-evento-confirm-ok>Sí, eliminar</button>
+                <button type="button" class="ad-pend-btn is-menta" data-evento-confirm-ok>Sí, eliminar</button>
             </div>
         </div>
     </div>
@@ -386,8 +418,261 @@
                 syncCoverRequired(root);
             }
             wireCoverRequired(createModal);
+
+            function closeAllSfSelect(except) {
+                document.querySelectorAll('[data-sf-select]').forEach(function (root) {
+                    if (except && root === except) return;
+                    var p = root.querySelector('[data-sf-select-panel]');
+                    if (p) p.hidden = true;
+                    root.classList.remove('is-open');
+                });
+            }
+            function closeAllSfDt(except) {
+                document.querySelectorAll('[data-sf-dt]').forEach(function (root) {
+                    if (except && root === except) return;
+                    var p = root.querySelector('[data-sf-dt-panel]');
+                    if (p) p.hidden = true;
+                    root.classList.remove('is-open');
+                });
+            }
+            function wireSfSelect(root) {
+                var hidden = root.querySelector('input[type="hidden"]');
+                var display = root.querySelector('[data-sf-select-display]');
+                var trigger = root.querySelector('[data-sf-select-trigger]');
+                var panel = root.querySelector('[data-sf-select-panel]');
+                function setVal(v) {
+                    hidden.value = v || '';
+                    display.textContent = v || '—';
+                    root.querySelectorAll('[data-sf-select-opt]').forEach(function (opt) {
+                        opt.classList.toggle('is-on', opt.getAttribute('data-value') === v);
+                    });
+                }
+                root._setSelect = setVal;
+                trigger.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var willOpen = panel.hidden;
+                    closeAllSfSelect();
+                    closeAllSfDt();
+                    if (willOpen) {
+                        panel.hidden = false;
+                        root.classList.add('is-open');
+                    }
+                });
+                root.querySelectorAll('[data-sf-select-opt]').forEach(function (opt) {
+                    opt.addEventListener('click', function () {
+                        setVal(opt.getAttribute('data-value'));
+                        panel.hidden = true;
+                        root.classList.remove('is-open');
+                    });
+                });
+                setVal(hidden.value);
+            }
+            function pad2(n) { return String(n).padStart(2, '0'); }
+            function parseDt(raw) {
+                var s = String(raw || '').replace(' ', 'T');
+                var m = s.match(/^(\d{4})-(\d{2})-(\d{2})T?(\d{2})?:?(\d{2})?/);
+                var now = new Date();
+                if (!m) {
+                    return { y: now.getFullYear(), mo: now.getMonth(), d: now.getDate(), h12: 12, mi: 0, ap: 'am' };
+                }
+                var h24 = m[4] != null ? Number(m[4]) : 12;
+                var mi = m[5] != null ? Number(m[5]) : 0;
+                mi = Math.round(mi / 5) * 5;
+                if (mi >= 60) mi = 55;
+                var ap = h24 >= 12 ? 'pm' : 'am';
+                var h12 = h24 % 12;
+                if (h12 === 0) h12 = 12;
+                return { y: Number(m[1]), mo: Number(m[2]) - 1, d: Number(m[3]), h12: h12, mi: mi, ap: ap };
+            }
+            function partsToLocal(p) {
+                var h = p.h12 % 12;
+                if (p.ap === 'pm') h += 12;
+                return p.y + '-' + pad2(p.mo + 1) + '-' + pad2(p.d) + 'T' + pad2(h) + ':' + pad2(p.mi);
+            }
+            function formatDtDisplay(p) {
+                var h = p.h12 % 12;
+                if (p.ap === 'pm') h += 12;
+                var hh12 = p.h12;
+                return pad2(p.d) + '/' + pad2(p.mo + 1) + '/' + p.y + ' ' + pad2(hh12) + ':' + pad2(p.mi) + ' ' + (p.ap === 'pm' ? 'p. m.' : 'a. m.');
+            }
+            var monthNames = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+            function wireSfDt(root) {
+                var hidden = root.querySelector('input[type="hidden"]');
+                var display = root.querySelector('[data-sf-dt-display]');
+                var trigger = root.querySelector('[data-sf-dt-trigger]');
+                var panel = root.querySelector('[data-sf-dt-panel]');
+                var grid = root.querySelector('[data-sf-dt-grid]');
+                var monthLabel = root.querySelector('[data-sf-dt-month]');
+                var colH = root.querySelector('[data-sf-dt-col="h"]');
+                var colM = root.querySelector('[data-sf-dt-col="m"]');
+                var colAp = root.querySelector('[data-sf-dt-col="ap"]');
+                var state = parseDt(hidden.value || '');
+                var viewY = state.y;
+                var viewMo = state.mo;
+                var timeBuilt = false;
+
+                function sync() {
+                    hidden.value = partsToLocal(state);
+                    display.textContent = formatDtDisplay(state);
+                }
+                function markTime() {
+                    colH.querySelectorAll('[data-val]').forEach(function (b) {
+                        b.classList.toggle('is-on', Number(b.getAttribute('data-val')) === state.h12);
+                    });
+                    colM.querySelectorAll('[data-val]').forEach(function (b) {
+                        b.classList.toggle('is-on', Number(b.getAttribute('data-val')) === state.mi);
+                    });
+                    colAp.querySelectorAll('[data-val]').forEach(function (b) {
+                        b.classList.toggle('is-on', b.getAttribute('data-val') === state.ap);
+                    });
+                }
+                function fillTime() {
+                    if (timeBuilt) { markTime(); return; }
+                    colH.innerHTML = '';
+                    colM.innerHTML = '';
+                    colAp.innerHTML = '';
+                    for (var i = 1; i <= 12; i++) {
+                        (function (v) {
+                            var b = document.createElement('button');
+                            b.type = 'button';
+                            b.className = 'ad-sf-dt-opt';
+                            b.textContent = pad2(v);
+                            b.setAttribute('data-val', v);
+                            b.addEventListener('click', function () { state.h12 = v; sync(); markTime(); });
+                            colH.appendChild(b);
+                        })(i);
+                    }
+                    for (var j = 0; j < 60; j += 5) {
+                        (function (v) {
+                            var b = document.createElement('button');
+                            b.type = 'button';
+                            b.className = 'ad-sf-dt-opt';
+                            b.textContent = pad2(v);
+                            b.setAttribute('data-val', v);
+                            b.addEventListener('click', function () { state.mi = v; sync(); markTime(); });
+                            colM.appendChild(b);
+                        })(j);
+                    }
+                    [['am','a. m.'],['pm','p. m.']].forEach(function (pair) {
+                        var b = document.createElement('button');
+                        b.type = 'button';
+                        b.className = 'ad-sf-dt-opt';
+                        b.textContent = pair[1];
+                        b.setAttribute('data-val', pair[0]);
+                        b.addEventListener('click', function () { state.ap = pair[0]; sync(); markTime(); });
+                        colAp.appendChild(b);
+                    });
+                    timeBuilt = true;
+                    markTime();
+                }
+                function renderCal() {
+                    monthLabel.textContent = monthNames[viewMo] + ' de ' + viewY;
+                    grid.innerHTML = '';
+                    var first = new Date(viewY, viewMo, 1);
+                    var startDow = (first.getDay() + 6) % 7;
+                    var daysIn = new Date(viewY, viewMo + 1, 0).getDate();
+                    var prevDays = new Date(viewY, viewMo, 0).getDate();
+                    for (var i = 0; i < 42; i++) {
+                        var btn = document.createElement('button');
+                        btn.type = 'button';
+                        var dayNum, y = viewY, mo = viewMo, muted = false;
+                        if (i < startDow) {
+                            dayNum = prevDays - startDow + i + 1;
+                            mo = viewMo - 1;
+                            if (mo < 0) { mo = 11; y -= 1; }
+                            muted = true;
+                        } else if (i >= startDow + daysIn) {
+                            dayNum = i - startDow - daysIn + 1;
+                            mo = viewMo + 1;
+                            if (mo > 11) { mo = 0; y += 1; }
+                            muted = true;
+                        } else {
+                            dayNum = i - startDow + 1;
+                        }
+                        btn.textContent = dayNum;
+                        if (muted) btn.classList.add('is-muted');
+                        if (!muted && y === state.y && mo === state.mo && dayNum === state.d) btn.classList.add('is-on');
+                        (function (yy, mm, dd, isMuted) {
+                            btn.addEventListener('click', function () {
+                                if (isMuted) {
+                                    viewY = yy; viewMo = mm;
+                                }
+                                state.y = yy; state.mo = mm; state.d = dd;
+                                viewY = yy; viewMo = mm;
+                                sync();
+                                renderCal();
+                            });
+                        })(y, mo, dayNum, muted);
+                        grid.appendChild(btn);
+                    }
+                }
+                function openPanel() {
+                    fillTime();
+                    viewY = state.y; viewMo = state.mo;
+                    renderCal();
+                    panel.hidden = false;
+                    root.classList.add('is-open');
+                }
+                function closePanel() {
+                    panel.hidden = true;
+                    root.classList.remove('is-open');
+                }
+                root._setDt = function (raw) {
+                    state = parseDt(raw || '');
+                    viewY = state.y; viewMo = state.mo;
+                    sync();
+                    if (timeBuilt) markTime();
+                };
+                root._closeDt = closePanel;
+                trigger.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var willOpen = panel.hidden;
+                    closeAllSfDt();
+                    closeAllSfSelect();
+                    if (willOpen) openPanel();
+                    else closePanel();
+                });
+                root.querySelector('[data-sf-dt-prev]')?.addEventListener('click', function () {
+                    viewMo -= 1;
+                    if (viewMo < 0) { viewMo = 11; viewY -= 1; }
+                    renderCal();
+                });
+                root.querySelector('[data-sf-dt-next]')?.addEventListener('click', function () {
+                    viewMo += 1;
+                    if (viewMo > 11) { viewMo = 0; viewY += 1; }
+                    renderCal();
+                });
+                root.querySelector('[data-sf-dt-today]')?.addEventListener('click', function () {
+                    var n = new Date();
+                    state.y = n.getFullYear(); state.mo = n.getMonth(); state.d = n.getDate();
+                    viewY = state.y; viewMo = state.mo;
+                    sync(); renderCal();
+                });
+                root.querySelector('[data-sf-dt-clear]')?.addEventListener('click', function () {
+                    hidden.value = '';
+                    display.textContent = '— / — / — —:—';
+                });
+                if (hidden.value) sync();
+                else {
+                    state = parseDt('');
+                    sync();
+                }
+            }
+
+            document.querySelectorAll('[data-sf-select]').forEach(wireSfSelect);
+            document.querySelectorAll('[data-sf-dt]').forEach(wireSfDt);
+            document.addEventListener('mousedown', function (e) {
+                if (!e.target.closest('[data-sf-select]')) closeAllSfSelect();
+                if (!e.target.closest('[data-sf-dt]')) closeAllSfDt();
+            });
+
             function open() { if (createModal) { createModal.hidden = false; createModal.classList.add('is-open'); syncCoverRequired(createModal); } }
-            function close() { if (createModal) { createModal.hidden = true; createModal.classList.remove('is-open'); } }
+            function close() {
+                if (createModal) { createModal.hidden = true; createModal.classList.remove('is-open'); }
+                closeAllSfSelect(); closeAllSfDt();
+            }
             document.querySelectorAll('[data-open-evento-form]').forEach(function (b) { b.addEventListener('click', open); });
             document.querySelectorAll('[data-close-evento-form]').forEach(function (b) { b.addEventListener('click', close); });
             createModal?.addEventListener('click', function (e) { if (e.target === createModal) close(); });
@@ -403,6 +688,14 @@
                     var el = editForm.querySelector('[data-field="'+f+'"]');
                     if (el) el.value = btn.getAttribute('data-'+f) || '';
                 });
+                editForm.querySelectorAll('[data-sf-select]').forEach(function (root) {
+                    var hidden = root.querySelector('input[type="hidden"]');
+                    if (root._setSelect && hidden) root._setSelect(hidden.value);
+                });
+                editForm.querySelectorAll('[data-sf-dt]').forEach(function (root) {
+                    var hidden = root.querySelector('input[type="hidden"]');
+                    if (root._setDt && hidden) root._setDt(hidden.value);
+                });
                 if (editShow) editShow(btn.getAttribute('data-imagen_src') || '');
                 var file = editForm.querySelector('[data-field-preview-file]');
                 if (file) file.value = '';
@@ -410,7 +703,10 @@
                 editModal.classList.add('is-open');
                 syncCoverRequired(editModal);
             }
-            function closeEdit() { if (editModal) { editModal.hidden = true; editModal.classList.remove('is-open'); } }
+            function closeEdit() {
+                if (editModal) { editModal.hidden = true; editModal.classList.remove('is-open'); }
+                closeAllSfSelect(); closeAllSfDt();
+            }
             document.querySelectorAll('[data-open-evento-edit]').forEach(function (b) { b.addEventListener('click', function () { openEdit(b); }); });
             document.querySelectorAll('[data-close-evento-edit]').forEach(function (b) { b.addEventListener('click', closeEdit); });
             editModal?.addEventListener('click', function (e) { if (e.target === editModal) closeEdit(); });
@@ -495,6 +791,22 @@
                         var grupo = btn.getAttribute('data-evt-filter');
                         apply(active === grupo ? null : grupo);
                     });
+                });
+            })();
+
+            (function wireEvtCalJump() {
+                var cal = document.querySelector('[data-evt-cal]');
+                if (!cal) return;
+                cal.addEventListener('click', function (e) {
+                    var btn = e.target.closest('[data-evt-jump]');
+                    if (!btn || !cal.contains(btn)) return;
+                    var id = btn.getAttribute('data-evt-jump');
+                    if (!id) return;
+                    var card = document.getElementById('evt-' + id);
+                    if (!card) return;
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    card.classList.add('is-jump');
+                    window.setTimeout(function () { card.classList.remove('is-jump'); }, 1600);
                 });
             })();
         })();

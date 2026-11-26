@@ -443,41 +443,51 @@
         </div>
     </div>
 
-    <div class="ad-modal" data-inst-delete-modal hidden>
-        <div class="ad-modal-card" role="dialog" aria-modal="true" aria-labelledby="ad-inst-del-title">
-            <header class="ad-modal-head">
-                <div>
-                    <h2 id="ad-inst-del-title">Eliminar institución</h2>
-                    <p data-inst-delete-copy>Se borrará de forma permanente. Los miembros quedarán desvinculados. Esta acción no se puede deshacer.</p>
+    <div class="ad-modal ad-horario-del-modal" data-inst-delete-modal hidden>
+        <div class="ad-modal-card ad-del-card" role="dialog" aria-modal="true" aria-labelledby="ad-inst-del-title">
+            <div class="ad-del-glow" aria-hidden="true"></div>
+            <header class="ad-modal-head ad-del-head">
+                <div class="ad-del-who">
+                    <span class="ad-del-orb" aria-hidden="true">@include('partials.admin-icon', ['icon' => 'trash'])</span>
+                    <div>
+                        <p class="ad-del-kicker">Acción permanente</p>
+                        <h2 id="ad-inst-del-title">Eliminar institución</h2>
+                        <p data-inst-delete-copy>Se borrará de forma permanente. Los miembros quedarán desvinculados. Esta acción no se puede deshacer.</p>
+                    </div>
                 </div>
                 <button type="button" class="ad-modal-close" data-close-inst-delete aria-label="Cerrar">×</button>
             </header>
             <form method="POST" data-inst-delete-form>
                 @csrf
                 @method('DELETE')
-                <div class="ad-modal-actions">
+                <div class="ad-modal-actions ad-del-actions">
                     <button type="button" class="ad-btn ad-btn-ghost" data-close-inst-delete>Cancelar</button>
-                    <button type="submit" class="ad-btn is-danger">Sí, eliminar</button>
+                    <button type="submit" class="ad-pend-btn is-menta">Sí, eliminar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div class="ad-modal" data-enlace-delete-modal hidden>
-        <div class="ad-modal-card" role="dialog" aria-modal="true" aria-labelledby="ad-enlace-del-title">
-            <header class="ad-modal-head">
-                <div>
-                    <h2 id="ad-enlace-del-title">Eliminar enlace</h2>
-                    <p data-enlace-delete-copy>Se eliminará este enlace de registro. Esta acción no se puede deshacer.</p>
+    <div class="ad-modal ad-horario-del-modal" data-enlace-delete-modal hidden>
+        <div class="ad-modal-card ad-del-card" role="dialog" aria-modal="true" aria-labelledby="ad-enlace-del-title">
+            <div class="ad-del-glow" aria-hidden="true"></div>
+            <header class="ad-modal-head ad-del-head">
+                <div class="ad-del-who">
+                    <span class="ad-del-orb" aria-hidden="true">@include('partials.admin-icon', ['icon' => 'trash'])</span>
+                    <div>
+                        <p class="ad-del-kicker">Acción permanente</p>
+                        <h2 id="ad-enlace-del-title">Eliminar enlace</h2>
+                        <p data-enlace-delete-copy>Se eliminará este enlace de registro. Esta acción no se puede deshacer.</p>
+                    </div>
                 </div>
                 <button type="button" class="ad-modal-close" data-close-enlace-delete aria-label="Cerrar">×</button>
             </header>
             <form method="POST" data-enlace-delete-form>
                 @csrf
                 @method('DELETE')
-                <div class="ad-modal-actions">
+                <div class="ad-modal-actions ad-del-actions">
                     <button type="button" class="ad-btn ad-btn-ghost" data-close-enlace-delete>Cancelar</button>
-                    <button type="submit" class="ad-btn is-danger">Sí, eliminar</button>
+                    <button type="submit" class="ad-pend-btn is-menta">Sí, eliminar</button>
                 </div>
             </form>
         </div>

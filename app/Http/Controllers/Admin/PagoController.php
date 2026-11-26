@@ -161,7 +161,7 @@ class PagoController extends Controller
     public function show(int $id): View
     {
         $pago = Pago::query()
-            ->with(['solicitud.plan', 'plan', 'planCliente.cliente.usuario'])
+            ->with(['solicitud.plan', 'plan', 'cliente.usuario', 'planCliente.cliente.usuario'])
             ->findOrFail($id);
 
         if ($pago->solicitud && $pago->solicitud->pago) {

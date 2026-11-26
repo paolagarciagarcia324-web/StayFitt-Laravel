@@ -12,13 +12,8 @@
 @endsection
 
 @section('actions')
-    <div class="ad-cal-nav">
-        <a class="ad-btn ad-btn-ghost" href="{{ route('admin.calendario.index', ['mes' => $mesAnterior]) }}" aria-label="Mes anterior">‹</a>
-        <span class="ad-cal-nav-label">{{ $mes->locale('es')->translatedFormat('F Y') }}</span>
-        <a class="ad-btn ad-btn-ghost" href="{{ route('admin.calendario.index', ['mes' => $mesSiguiente]) }}" aria-label="Mes siguiente">›</a>
-    </div>
-    <button class="ad-btn ad-btn-add" type="button" data-open-sesion-form>+ Añadir sesión</button>
-    <a class="ad-btn ad-btn-ghost" href="{{ route('admin.eventos.index') }}">Eventos</a>
+    <button class="ad-pend-btn is-fucsia ad-cal-create-btn" type="button" data-open-sesion-form>+ Añadir sesión</button>
+    <a class="ad-pend-btn is-menta ad-cal-create-btn" href="{{ route('admin.eventos.index') }}">Eventos</a>
 @endsection
 
 @section('content')
@@ -33,14 +28,40 @@
             $f = $s->fecha instanceof \Illuminate\Support\Carbon ? $s->fecha : \Illuminate\Support\Carbon::parse($s->fecha);
             return $f->isToday();
         });
+        // Semanas Lun–Vie que tocan el mes (incluye días adyacentes, como el plan físico)
+        $weekKeys = collect($celdas)
+            ->filter(fn ($c) => $c['enMes'])
+            ->map(fn ($c) => $c['fecha']->copy()->startOfWeek(\Illuminate\Support\Carbon::MONDAY)->toDateString())
+            ->unique()
+            ->values();
+        $boardWeeks = $weekKeys->map(function ($weekStart) use ($celdas) {
+            return collect($celdas)
+                ->filter(function ($c) use ($weekStart) {
+                    $ws = $c['fecha']->copy()->startOfWeek(\Illuminate\Support\Carbon::MONDAY)->toDateString();
+
+                    return $ws === $weekStart && $c['fecha']->dayOfWeekIso <= 5;
+                })
+                ->values();
+        })->filter(fn ($w) => $w->isNotEmpty())->values();
+        $mesLabelCal = ucfirst($mes->locale('es')->translatedFormat('F Y'));
     @endphp
 
-    <div class="ad-k-bot" style="margin-bottom:16px;align-items:center">
-        <div class="ad-seg">
-            <button type="button" data-cal-switch="day">Día</button>
-            <button type="button" class="is-on" data-cal-switch="week">Semana</button>
-            <button type="button" data-cal-switch="month">Mes</button>
+    <header class="ad-evt-month-head ad-cal-evt-month">
+        <a class="ad-evt-month-nav" href="{{ route('admin.calendario.index', ['mes' => $mesAnterior]) }}" aria-label="Mes anterior">‹</a>
+        <div class="ad-evt-month-label">
+            <em>Agenda</em>
+            <strong>{{ $mesLabelCal }}</strong>
         </div>
+        <a class="ad-evt-month-nav" href="{{ route('admin.calendario.index', ['mes' => $mesSiguiente]) }}" aria-label="Mes siguiente">›</a>
+    </header>
+
+    <div class="ad-cal-toolbar">
+        <div class="ad-seg ad-cal-seg" role="tablist" aria-label="Vista del calendario">
+            <button type="button" data-cal-switch="month" class="is-on" role="tab" aria-selected="true">Mes</button>
+            <button type="button" data-cal-switch="week" role="tab" aria-selected="false">Semana</button>
+            <button type="button" data-cal-switch="day" role="tab" aria-selected="false">Día</button>
+        </div>
+        <p class="ad-cal-toolbar-hint" data-cal-hint>Vista mes: sesiones por fecha y ejercicio. Usa Semana o Día para entrar al detalle.</p>
         <div class="ad-dash-hero-metrics">
             <div class="ad-dash-metric">
                 <strong data-count="{{ $sesionesHoy->count() }}">{{ $sesionesHoy->count() }}</strong>
@@ -53,141 +74,95 @@
         </div>
     </div>
 
-    <div class="ad-tf" data-cal-view="week">
-        <aside class="ad-tf-side">
-            <section class="ad-glass-card">
-                <strong>{{ $mes->locale('es')->translatedFormat('F Y') }}</strong>
-                <div class="ad-tf-mini">
-                    @foreach (['L','M','X','J','V','S','D'] as $d)
-                        <em>{{ $d }}</em>
-                    @endforeach
-                    @foreach ($celdas as $celda)
-                        <button type="button"
-                            class="{{ $celda['hoy'] ? 'is-today' : '' }} {{ $celda['enMes'] ? '' : 'is-muted' }} {{ ! empty($celda['hasItems']) ? 'has-events' : '' }}"
-                            data-open-sesion-day
-                            data-fecha="{{ $celda['fecha']->toDateString() }}">
-                            {{ $celda['fecha']->day }}
-                        </button>
-                    @endforeach
+    {{-- MES: tablero fecha + ejercicio --}}
+    <section class="ad-cal-layout ad-cal-board-wrap" data-cal-view="month">
+        <section class="ad-glass-card ad-cal-board-card">
+            <header class="ad-cal-board-head">
+                <div>
+                    <h3>Plan de sesiones</h3>
+                    <p>Cada celda muestra la fecha y el ejercicio / sesión programada.</p>
                 </div>
-            </section>
-            <section class="ad-glass-card">
-                <strong>Hoy en sala</strong>
-                <div class="ad-check-list">
-                    @forelse ($sesionesHoy as $sesion)
-                        <label><input type="checkbox" disabled checked> {{ $sesion->horaInicioCorta() }} · {{ $sesion->titulo }}</label>
-                    @empty
-                        <p class="ad-user-mail">Sin sesiones hoy. Clic en un día para fijar una.</p>
-                    @endforelse
+                <div class="ad-cal-legend">
+                    <span><i class="is-sesion"></i> Sesión</span>
+                    <span><i class="is-evento"></i> Evento</span>
+                    <span><i class="is-cancel"></i> Cancelada</span>
                 </div>
-            </section>
-        </aside>
-        <section class="ad-glass-card ad-tf-week">
-            <header class="ad-tf-week-head">
-                <strong>Semana {{ $semanaCeldas->first()['fecha']->format('d') }} – {{ $semanaCeldas->last()['fecha']->format('d M') }}</strong>
-                <em class="ad-user-mail">Clic en un bloque o en el mini calendario para crear sesión</em>
             </header>
-            <div class="ad-tf-grid">
-                <span></span>
-                @foreach ($semanaCeldas as $dia)
-                    <strong class="{{ $dia['hoy'] ? 'is-today' : '' }}">{{ $dia['fecha']->locale('es')->isoFormat('ddd DD') }}</strong>
-                @endforeach
-                @foreach ($horasTf as $hora)
-                    <em>{{ \App\Models\HorarioPresencial::formatoHora12($hora) }}</em>
-                    @foreach ($semanaCeldas as $dia)
-                        @php
-                            $items = $dia['sesiones']->filter(fn ($s) => substr((string) $s->hora_inicio, 0, 5) === $hora)
-                                ->merge($dia['eventos']->filter(fn ($e) => $e->fecha_inicio && $e->fecha_inicio->format('H:i') === $hora));
-                        @endphp
-                        <button type="button" class="ad-tf-cell {{ $items->isNotEmpty() ? 'has-item' : '' }}"
-                            data-open-sesion-day
-                            data-fecha="{{ $dia['fecha']->toDateString() }}">
-                            @foreach ($items->take(2) as $item)
-                                <span>{{ $item->titulo ?? $item->nombre }}</span>
-                            @endforeach
-                        </button>
+
+            <div class="ad-cal-board">
+                <div class="ad-cal-board-row is-head">
+                    @foreach (['Lunes','Martes','Miércoles','Jueves','Viernes'] as $dow)
+                        <div class="ad-cal-board-dow">{{ $dow }}</div>
                     @endforeach
-                @endforeach
-            </div>
-        </section>
-    </div>
-
-    <div hidden data-cal-view="day" class="ad-glass-card" style="margin-bottom:16px">
-        <h3>Hoy {{ now()->locale('es')->isoFormat('dddd D [de] MMMM') }}</h3>
-        @forelse ($sesionesHoy as $sesion)
-            <div class="ad-up-item">
-                <span>{{ $sesion->horaInicioCorta() }} · {{ $sesion->titulo }}</span>
-                <em>{{ $sesion->modalidad }}</em>
-            </div>
-        @empty
-            <p class="ad-empty">Nada programado hoy.</p>
-        @endforelse
-    </div>
-
-    <section class="ad-cal-layout" style="margin-top:16px" data-cal-view="month" hidden>
-        <section class="ad-card ad-users">
-            <div class="ad-cal-legend">
-                <span><i class="is-evento"></i> Evento</span>
-                <span><i class="is-sesion"></i> Sesión</span>
-                <em>Clic en un día para fijar una sesión en esa fecha</em>
-            </div>
-            <div class="ad-cal">
-                @foreach (['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'] as $dow)
-                    <div class="ad-cal-dow">{{ $dow }}</div>
-                @endforeach
-
-                @foreach ($celdas as $celda)
-                    @php
-                        /** @var \Illuminate\Support\Carbon $fecha */
-                        $fecha = $celda['fecha'];
-                        $evs = $celda['eventos'];
-                        $sess = $celda['sesiones'];
-                    @endphp
-                    <button
-                        type="button"
-                        class="ad-cal-cell {{ $celda['enMes'] ? '' : 'is-muted' }} {{ $celda['hoy'] ? 'is-today' : '' }} {{ ! empty($celda['hasItems']) ? 'has-events' : '' }}"
-                        data-open-sesion-day
-                        data-fecha="{{ $fecha->toDateString() }}"
-                        title="Añadir sesión el {{ $fecha->format('d/m/Y') }}"
-                    >
-                        <span class="ad-cal-day">{{ $fecha->day }}</span>
-                        @foreach ($evs->take(2) as $evento)
+                </div>
+                @forelse ($boardWeeks as $week)
+                    <div class="ad-cal-board-row">
+                        @for ($iso = 1; $iso <= 5; $iso++)
                             @php
-                                $evHora = $evento->fecha_inicio
-                                    ? \App\Models\HorarioPresencial::formatoHora12($evento->fecha_inicio->format('H:i'))
-                                    : '';
+                                $celda = collect($week)->first(fn ($c) => (int) $c['fecha']->dayOfWeekIso === $iso);
                             @endphp
-                            <span class="ad-cal-pill is-evento" title="Evento: {{ $evento->nombre }}">
-                                <i class="ad-cal-pill-bar" aria-hidden="true"></i>
-                                <span class="ad-cal-pill-body">
-                                    @if ($evHora !== '')
-                                        <b>{{ $evHora }}</b>
-                                    @endif
-                                    <em>{{ $evento->nombre }}</em>
-                                </span>
-                            </span>
-                        @endforeach
-                        @foreach ($sess->take(2) as $sesion)
-                            <span class="ad-cal-pill is-sesion" title="Sesión: {{ $sesion->titulo }} · {{ $sesion->rangoHora12() }}">
-                                <i class="ad-cal-pill-bar" aria-hidden="true"></i>
-                                <span class="ad-cal-pill-body">
-                                    <b>{{ $sesion->horaInicioCorta() }}</b>
-                                    <em>{{ $sesion->titulo }}</em>
-                                </span>
-                            </span>
-                        @endforeach
-                        @if ($evs->count() + $sess->count() > 4)
-                            <span class="ad-cal-more">+{{ $evs->count() + $sess->count() - 4 }}</span>
-                        @endif
-                    </button>
-                @endforeach
+                            @if ($celda)
+                                @php
+                                    $fecha = $celda['fecha'];
+                                    $sess = $celda['sesiones'];
+                                    $evs = $celda['eventos'];
+                                    $primera = $sess->first();
+                                    $tituloUp = mb_strtoupper((string) ($primera->titulo ?? ''));
+                                    $cancelada = ($primera && $primera->estado === 'CANCELADA')
+                                        || str_contains($tituloUp, 'NO HAY CLASE');
+                                    $especial = str_contains($tituloUp, 'CIERRE')
+                                        || ($evs->isNotEmpty() && $sess->isEmpty());
+                                @endphp
+                                <button
+                                    type="button"
+                                    class="ad-cal-board-cell {{ $celda['enMes'] ? '' : 'is-out' }} {{ $celda['hoy'] ? 'is-today' : '' }} {{ $cancelada ? 'is-cancel' : '' }} {{ $especial ? 'is-special' : '' }} {{ $sess->isNotEmpty() || $evs->isNotEmpty() ? 'has-item' : '' }}"
+                                    data-cal-day-modal="{{ $fecha->toDateString() }}"
+                                    title="Ver sesión · {{ $fecha->format('d/m/Y') }}"
+                                >
+                                    <span class="ad-cal-board-day">{{ $fecha->day }}</span>
+                                    <div class="ad-cal-board-body">
+                                        @forelse ($sess->take(2) as $sesion)
+                                            @php
+                                                $t = mb_strtoupper((string) $sesion->titulo);
+                                                $isCancelTxt = $sesion->estado === 'CANCELADA' || str_contains($t, 'NO HAY CLASE');
+                                                $isSpecialTxt = str_contains($t, 'CIERRE');
+                                            @endphp
+                                            <strong class="{{ $isCancelTxt ? 'is-cancel-txt' : ($isSpecialTxt ? 'is-special-txt' : '') }}">
+                                                {{ $t }}
+                                            </strong>
+                                            @unless ($isCancelTxt)
+                                                <em>{{ $sesion->horaInicioCorta() }}</em>
+                                            @endunless
+                                        @empty
+                                            @forelse ($evs->take(1) as $evento)
+                                                <strong class="is-special-txt">{{ mb_strtoupper($evento->nombre) }}</strong>
+                                                <em>Evento</em>
+                                            @empty
+                                                <span class="ad-cal-board-empty">Sin sesión</span>
+                                            @endforelse
+                                        @endforelse
+                                        @if ($sess->count() + $evs->count() > 2)
+                                            <span class="ad-cal-board-more">+{{ $sess->count() + $evs->count() - 2 }} más</span>
+                                        @endif
+                                    </div>
+                                </button>
+                            @else
+                                <div class="ad-cal-board-cell is-blank" aria-hidden="true"></div>
+                            @endif
+                        @endfor
+                    </div>
+                @empty
+                    <div class="ad-empty-hero" style="grid-column:1/-1;padding:28px">
+                        <strong>Sin días laborables este mes</strong>
+                    </div>
+                @endforelse
             </div>
 
             @if ($eventos->isEmpty() && $sesiones->isEmpty())
                 <div class="ad-empty-hero">
                     <span class="ad-empty-orb">@include('partials.admin-icon', ['icon' => 'calendario'])</span>
                     <strong>Sin actividad este mes</strong>
-                    <button class="ad-btn" type="button" data-open-sesion-form>Añadir sesión</button>
+                    <button class="ad-pend-btn is-fucsia" type="button" data-open-sesion-form>Añadir sesión</button>
                 </div>
             @endif
         </section>
@@ -237,6 +212,145 @@
             </div>
         </aside>
     </section>
+
+    {{-- SEMANA: detalle horario --}}
+    <div class="ad-tf" data-cal-view="week" hidden>
+        <aside class="ad-tf-side">
+            <section class="ad-glass-card">
+                <strong>{{ ucfirst($mes->locale('es')->translatedFormat('F Y')) }}</strong>
+                <div class="ad-tf-mini">
+                    @foreach (['L','M','X','J','V','S','D'] as $d)
+                        <em>{{ $d }}</em>
+                    @endforeach
+                    @foreach ($celdas as $celda)
+                        <button type="button"
+                            class="{{ $celda['hoy'] ? 'is-today' : '' }} {{ $celda['enMes'] ? '' : 'is-muted' }} {{ ! empty($celda['hasItems']) ? 'has-events' : '' }}"
+                            data-open-sesion-day
+                            data-fecha="{{ $celda['fecha']->toDateString() }}"
+                            data-cal-goto-day="{{ $celda['fecha']->toDateString() }}">
+                            {{ $celda['fecha']->day }}
+                        </button>
+                    @endforeach
+                </div>
+            </section>
+            <section class="ad-glass-card">
+                <strong>Hoy en sala</strong>
+                <div class="ad-check-list">
+                    @forelse ($sesionesHoy as $sesion)
+                        <label><input type="checkbox" disabled checked> {{ $sesion->horaInicioCorta() }} · {{ $sesion->titulo }}</label>
+                    @empty
+                        <p class="ad-user-mail">Sin sesiones hoy. Clic en un día para fijar una.</p>
+                    @endforelse
+                </div>
+            </section>
+        </aside>
+        <section class="ad-glass-card ad-tf-week">
+            <header class="ad-tf-week-head">
+                <strong>Detalle semana {{ $semanaCeldas->first()['fecha']->format('d') }} – {{ $semanaCeldas->last()['fecha']->format('d M') }}</strong>
+                <em class="ad-user-mail">Filtro de detalle · clic en bloque para crear / revisar</em>
+            </header>
+            <div class="ad-tf-grid">
+                <span></span>
+                @foreach ($semanaCeldas as $dia)
+                    <strong class="{{ $dia['hoy'] ? 'is-today' : '' }}">{{ $dia['fecha']->locale('es')->isoFormat('ddd DD') }}</strong>
+                @endforeach
+                @foreach ($horasTf as $hora)
+                    <em>{{ \App\Models\HorarioPresencial::formatoHora12($hora) }}</em>
+                    @foreach ($semanaCeldas as $dia)
+                        @php
+                            $items = $dia['sesiones']->filter(fn ($s) => substr((string) $s->hora_inicio, 0, 5) === $hora)
+                                ->merge($dia['eventos']->filter(fn ($e) => $e->fecha_inicio && $e->fecha_inicio->format('H:i') === $hora));
+                        @endphp
+                        <button type="button" class="ad-tf-cell {{ $items->isNotEmpty() ? 'has-item' : '' }}"
+                            data-open-sesion-day
+                            data-fecha="{{ $dia['fecha']->toDateString() }}">
+                            @foreach ($items->take(2) as $item)
+                                <span>{{ $item->titulo ?? $item->nombre }}</span>
+                            @endforeach
+                        </button>
+                    @endforeach
+                @endforeach
+            </div>
+        </section>
+    </div>
+
+    {{-- DÍA: detalle por fecha --}}
+    <div class="ad-glass-card ad-cal-day-detail" data-cal-view="day" hidden>
+        <header class="ad-cal-day-head">
+            <div>
+                <em class="ad-cal-day-kicker">Detalle del día</em>
+                <h3 data-cal-day-title>{{ $anchor->locale('es')->isoFormat('dddd D [de] MMMM') }}</h3>
+            </div>
+            <button type="button" class="ad-pend-btn is-fucsia" data-open-sesion-form>+ Sesión</button>
+        </header>
+        <div class="ad-cal-day-list" data-cal-day-list>
+            @php
+                $diaAnchorKey = $anchor->toDateString();
+                $celdaDia = collect($celdas)->first(fn ($c) => $c['fecha']->toDateString() === $diaAnchorKey);
+                $sessDia = $celdaDia['sesiones'] ?? collect();
+                $evsDia = $celdaDia['eventos'] ?? collect();
+            @endphp
+            @forelse ($sessDia as $sesion)
+                <article class="ad-cal-day-item {{ $sesion->estado === 'CANCELADA' ? 'is-cancel' : '' }}" data-cal-day-item data-fecha="{{ optional($sesion->fecha)->format('Y-m-d') }}">
+                    <span class="ad-cal-day-time">{{ $sesion->horaInicioCorta() }}</span>
+                    <div>
+                        <strong>{{ mb_strtoupper($sesion->titulo) }}</strong>
+                        <em>{{ $sesion->tipo }} · {{ $sesion->modalidad }} · {{ $sesion->estado }}</em>
+                    </div>
+                </article>
+            @empty
+                @foreach ($evsDia as $evento)
+                    <article class="ad-cal-day-item is-special" data-cal-day-item data-fecha="{{ $diaAnchorKey }}">
+                        <span class="ad-cal-day-time">{{ $evento->fecha_inicio ? \App\Models\HorarioPresencial::formatoHora12($evento->fecha_inicio->format('H:i')) : '—' }}</span>
+                        <div>
+                            <strong>{{ mb_strtoupper($evento->nombre) }}</strong>
+                            <em>Evento · {{ $evento->modalidad }}</em>
+                        </div>
+                    </article>
+                @endforeach
+                @if ($evsDia->isEmpty())
+                    <p class="ad-empty" data-cal-day-empty>Nada programado este día. Clic en + Sesión para fijar una.</p>
+                @endif
+            @endforelse
+        </div>
+        @php
+            $calDayData = [];
+            foreach ($celdas as $c) {
+                $key = $c['fecha']->toDateString();
+                $calDayData[$key] = [
+                    'label' => $c['fecha']->locale('es')->isoFormat('dddd D [de] MMMM'),
+                    'sesiones' => $c['sesiones']->map(static function ($s) {
+                        $fechaVal = optional($s->fecha)->format('Y-m-d') ?: (string) $s->fecha;
+
+                        return [
+                            'id' => (int) $s->id_sesion,
+                            'titulo' => $s->titulo,
+                            'hora' => $s->horaInicioCorta(),
+                            'hora_inicio' => substr((string) $s->hora_inicio, 0, 5),
+                            'hora_fin' => substr((string) $s->hora_fin, 0, 5),
+                            'fecha' => $fechaVal,
+                            'id_coach' => (string) $s->id_coach,
+                            'tipo' => $s->tipo,
+                            'modalidad' => $s->modalidad,
+                            'cupo_maximo' => (string) $s->cupo_maximo,
+                            'estado' => $s->estado,
+                        ];
+                    })->values()->all(),
+                    'eventos' => $c['eventos']->map(static function ($e) {
+                        return [
+                            'id' => (int) $e->id_evento,
+                            'nombre' => $e->nombre,
+                            'hora' => $e->fecha_inicio
+                                ? \App\Models\HorarioPresencial::formatoHora12($e->fecha_inicio->format('H:i'))
+                                : '—',
+                            'modalidad' => $e->modalidad,
+                        ];
+                    })->values()->all(),
+                ];
+            }
+        @endphp
+        <script type="application/json" id="ad-cal-day-data">@json($calDayData)</script>
+    </div>
 
     <section class="ad-card ad-users ad-cal-archive" style="margin-top:16px">
         <div class="ad-card-head">
@@ -328,56 +442,87 @@
         $estados = ['PROGRAMADA', 'EN_CURSO', 'COMPLETADA', 'CANCELADA'];
     @endphp
 
-    <div class="ad-modal" data-sesion-modal hidden>
-        <div class="ad-modal-card ad-ml-modal">
-            <header class="ad-modal-head">
+    <div class="ad-modal ad-cal-day-modal" data-cal-day-info-modal hidden>
+        <div class="ad-modal-card ad-cal-day-modal-card" role="dialog" aria-modal="true" aria-labelledby="ad-cal-day-modal-title">
+            <div class="ad-cal-day-modal-glow" aria-hidden="true"></div>
+            <header class="ad-modal-head ad-cal-day-modal-head">
                 <div>
+                    <p class="ad-cal-day-modal-kicker">Detalle del día</p>
+                    <h2 id="ad-cal-day-modal-title" data-cal-day-modal-title>—</h2>
+                </div>
+                <button type="button" class="ad-modal-close" data-cal-day-modal-close aria-label="Cerrar">×</button>
+            </header>
+            <div class="ad-cal-day-modal-body" data-cal-day-modal-body></div>
+            <div class="ad-modal-actions ad-cal-day-modal-actions">
+                <button type="button" class="ad-pend-btn is-menta" data-cal-day-modal-close>← Regresar al calendario</button>
+                <button type="button" class="ad-pend-btn is-fucsia" data-cal-day-modal-add>+ Sesión</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="ad-modal ad-evt-form-modal" data-sesion-modal hidden>
+        <div class="ad-modal-card ad-evt-form-card ad-sesion-form-card">
+            <div class="ad-evt-form-glow" aria-hidden="true"></div>
+            <header class="ad-modal-head ad-evt-form-head">
+                <div>
+                    <p class="ad-evt-form-kicker">Calendario · Sesión</p>
                     <h2>Nueva sesión</h2>
-                    <p>Completa los datos para fijarla en el calendario.</p>
+                    <p class="ad-sesion-form-note">Misma ficha que edición: título, coach, agenda y estado quedan trazados en el plan.</p>
                 </div>
                 <button type="button" class="ad-modal-close" data-close-sesion-form aria-label="Cerrar">×</button>
             </header>
-            <form class="ad-form" method="POST" action="{{ route('admin.calendario.sesiones.store') }}" data-sesion-create-form>
+            <form class="ad-form ad-evt-form ad-sesion-form" method="POST" action="{{ route('admin.calendario.sesiones.store') }}" data-sesion-create-form>
                 @csrf
                 @include('admin.calendario._fields', compact('coaches', 'tipos', 'modalidades', 'estados'))
-                <div class="ad-modal-actions">
-                    <button class="ad-btn ad-btn-ghost" type="button" data-close-sesion-form>Cancelar</button>
-                    <button class="ad-btn" type="submit">Crear sesión</button>
+                <div class="ad-modal-actions ad-evt-form-actions">
+                    <button class="ad-pend-btn is-menta" type="button" data-close-sesion-form>Cancelar</button>
+                    <button class="ad-pend-btn is-fucsia" type="submit">Crear sesión</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div class="ad-modal" data-sesion-edit-modal hidden>
-        <div class="ad-modal-card ad-ml-modal">
-            <header class="ad-modal-head">
-                <div><h2>Editar sesión</h2></div>
+    <div class="ad-modal ad-evt-form-modal" data-sesion-edit-modal hidden>
+        <div class="ad-modal-card ad-evt-form-card ad-sesion-form-card">
+            <div class="ad-evt-form-glow" aria-hidden="true"></div>
+            <header class="ad-modal-head ad-evt-form-head">
+                <div>
+                    <p class="ad-evt-form-kicker">Calendario · Edición</p>
+                    <h2>Editar sesión</h2>
+                    <p class="ad-sesion-form-note">Actualiza la programación; el cambio se refleja en el tablero del mes.</p>
+                </div>
                 <button type="button" class="ad-modal-close" data-close-sesion-edit aria-label="Cerrar">×</button>
             </header>
-            <form class="ad-form" method="POST" data-sesion-edit-form>
+            <form class="ad-form ad-evt-form ad-sesion-form" method="POST" data-sesion-edit-form>
                 @csrf
                 @method('PUT')
+                <input type="hidden" data-sesion-edit-id value="">
                 @include('admin.calendario._fields', ['coaches' => $coaches, 'tipos' => $tipos, 'modalidades' => $modalidades, 'estados' => $estados, 'withDataFields' => true])
-                <div class="ad-modal-actions">
-                    <button class="ad-btn ad-btn-ghost" type="button" data-close-sesion-edit>Cancelar</button>
-                    <button class="ad-btn" type="submit">Guardar</button>
+                <div class="ad-modal-actions ad-evt-form-actions">
+                    <button class="ad-pend-btn is-menta" type="button" data-close-sesion-edit>Cancelar</button>
+                    <button class="ad-pend-btn is-fucsia" type="submit">Guardar cambios</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div class="ad-modal" data-sesion-confirm-modal hidden>
-        <div class="ad-modal-card" role="dialog" aria-modal="true" aria-labelledby="ad-sesion-del-title">
-            <header class="ad-modal-head">
-                <div>
-                    <h2 id="ad-sesion-del-title">Eliminar sesión</h2>
-                    <p>Esta acción no se puede deshacer.</p>
+    <div class="ad-modal ad-horario-del-modal" data-sesion-confirm-modal hidden>
+        <div class="ad-modal-card ad-del-card" role="dialog" aria-modal="true" aria-labelledby="ad-sesion-del-title">
+            <div class="ad-del-glow" aria-hidden="true"></div>
+            <header class="ad-modal-head ad-del-head">
+                <div class="ad-del-who">
+                    <span class="ad-del-orb" aria-hidden="true">@include('partials.admin-icon', ['icon' => 'trash'])</span>
+                    <div>
+                        <p class="ad-del-kicker">Acción permanente</p>
+                        <h2 id="ad-sesion-del-title">Eliminar sesión</h2>
+                        <p>Esta acción no se puede deshacer.</p>
+                    </div>
                 </div>
                 <button type="button" class="ad-modal-close" data-sesion-confirm-cancel aria-label="Cerrar">×</button>
             </header>
-            <div class="ad-modal-actions">
+            <div class="ad-modal-actions ad-del-actions">
                 <button type="button" class="ad-btn ad-btn-ghost" data-sesion-confirm-cancel>Cancelar</button>
-                <button type="button" class="ad-btn is-danger" data-sesion-confirm-ok>Sí, eliminar</button>
+                <button type="button" class="ad-pend-btn is-menta" data-sesion-confirm-ok>Sí, eliminar</button>
             </div>
         </div>
     </div>
@@ -483,16 +628,34 @@
                 if (e.target === createModal) closeCreate();
             });
 
-            function openEdit(btn) {
-                if (!editModal || !editForm) return;
-                editForm.action = '{{ url('admin/calendario/sesiones') }}/' + btn.getAttribute('data-id');
+            function fillEditForm(payload) {
+                if (!editModal || !editForm || !payload) return;
+                var id = String(payload.id || '');
+                editForm.action = '{{ url('admin/calendario/sesiones') }}/' + id;
+                var idHidden = editForm.querySelector('[data-sesion-edit-id]');
+                if (idHidden) idHidden.value = id;
                 ['titulo','id_coach','tipo','fecha','hora_inicio','hora_fin','modalidad','cupo_maximo','estado'].forEach(function (f) {
                     var el = editForm.querySelector('[data-field="'+f+'"]');
-                    if (el) el.value = btn.getAttribute('data-'+f) || '';
+                    if (el) el.value = payload[f] != null ? String(payload[f]) : '';
                 });
                 editModal.hidden = false;
                 editModal.classList.add('is-open');
                 document.body.style.overflow = 'hidden';
+            }
+            function openEdit(btn) {
+                if (!btn) return;
+                fillEditForm({
+                    id: btn.getAttribute('data-id'),
+                    titulo: btn.getAttribute('data-titulo'),
+                    id_coach: btn.getAttribute('data-id_coach'),
+                    tipo: btn.getAttribute('data-tipo'),
+                    fecha: btn.getAttribute('data-fecha'),
+                    hora_inicio: btn.getAttribute('data-hora_inicio'),
+                    hora_fin: btn.getAttribute('data-hora_fin'),
+                    modalidad: btn.getAttribute('data-modalidad'),
+                    cupo_maximo: btn.getAttribute('data-cupo_maximo'),
+                    estado: btn.getAttribute('data-estado')
+                });
             }
             function closeEdit() {
                 if (!editModal) return;
@@ -503,6 +666,8 @@
             document.querySelectorAll('[data-open-sesion-edit]').forEach(function (b) {
                 b.addEventListener('click', function () { openEdit(b); });
             });
+            window.__stayfitOpenSesionEdit = fillEditForm;
+            window.__stayfitOpenSesionCreate = openCreate;
             document.querySelectorAll('[data-close-sesion-edit]').forEach(function (b) {
                 b.addEventListener('click', closeEdit);
             });
@@ -571,6 +736,159 @@
                 remToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
                 remPanel.hidden = !open;
             });
+
+            (function wireCalViews() {
+                var switches = document.querySelectorAll('[data-cal-switch]');
+                var views = document.querySelectorAll('[data-cal-view]');
+                var hint = document.querySelector('[data-cal-hint]');
+                var dayTitle = document.querySelector('[data-cal-day-title]');
+                var dayList = document.querySelector('[data-cal-day-list]');
+                var dayDataEl = document.getElementById('ad-cal-day-data');
+                var dayModal = document.querySelector('[data-cal-day-info-modal]');
+                var dayModalTitle = document.querySelector('[data-cal-day-modal-title]');
+                var dayModalBody = document.querySelector('[data-cal-day-modal-body]');
+                var dayModalAdd = document.querySelector('[data-cal-day-modal-add]');
+                var dayData = {};
+                var activeDayFecha = null;
+                try { dayData = dayDataEl ? JSON.parse(dayDataEl.textContent || '{}') : {}; } catch (e) { dayData = {}; }
+                var hints = {
+                    month: 'Vista mes: sesiones por fecha y ejercicio. Clic en una celda para ver el detalle.',
+                    week: 'Detalle semanal por franja horaria.',
+                    day: 'Detalle del día seleccionado.'
+                };
+
+                function showView(name) {
+                    views.forEach(function (v) {
+                        var on = v.getAttribute('data-cal-view') === name;
+                        v.hidden = !on;
+                    });
+                    switches.forEach(function (btn) {
+                        var on = btn.getAttribute('data-cal-switch') === name;
+                        btn.classList.toggle('is-on', on);
+                        btn.setAttribute('aria-selected', on ? 'true' : 'false');
+                    });
+                    if (hint) hint.textContent = hints[name] || '';
+                }
+
+                function escAttr(v) {
+                    return String(v == null ? '' : v)
+                        .replace(/&/g, '&amp;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;');
+                }
+                function escText(v) {
+                    return String(v == null ? '' : v)
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;');
+                }
+
+                function buildDayHtml(pack) {
+                    var html = '';
+                    (pack.sesiones || []).forEach(function (s) {
+                        var cancel = s.estado === 'CANCELADA' || String(s.titulo || '').toUpperCase().indexOf('NO HAY CLASE') !== -1;
+                        var special = String(s.titulo || '').toUpperCase().indexOf('CIERRE') !== -1;
+                        html += '<article class="ad-cal-day-item ' + (cancel ? 'is-cancel' : (special ? 'is-special' : '')) + '">' +
+                            '<span class="ad-cal-day-time">' + escText(s.hora || '—') + '</span>' +
+                            '<div class="ad-cal-day-item-main"><strong>' + escText(String(s.titulo || '').toUpperCase()) + '</strong>' +
+                            '<em>' + escText(s.tipo || 'Sesión') + ' · ' + escText(s.modalidad || '') + ' · ' + escText(s.estado || '') + '</em></div>' +
+                            '<button type="button" class="ad-cal-day-edit" title="Editar programación" aria-label="Editar sesión"' +
+                            ' data-cal-day-edit' +
+                            ' data-id="' + escAttr(s.id) + '"' +
+                            ' data-titulo="' + escAttr(s.titulo) + '"' +
+                            ' data-id_coach="' + escAttr(s.id_coach) + '"' +
+                            ' data-tipo="' + escAttr(s.tipo) + '"' +
+                            ' data-fecha="' + escAttr(s.fecha) + '"' +
+                            ' data-hora_inicio="' + escAttr(s.hora_inicio) + '"' +
+                            ' data-hora_fin="' + escAttr(s.hora_fin) + '"' +
+                            ' data-modalidad="' + escAttr(s.modalidad) + '"' +
+                            ' data-cupo_maximo="' + escAttr(s.cupo_maximo) + '"' +
+                            ' data-estado="' + escAttr(s.estado) + '">' +
+                            '<span class="ad-cal-day-edit-ico" aria-hidden="true">✎</span> Editar</button></article>';
+                    });
+                    (pack.eventos || []).forEach(function (e) {
+                        html += '<article class="ad-cal-day-item is-special">' +
+                            '<span class="ad-cal-day-time">' + escText(e.hora || '—') + '</span>' +
+                            '<div class="ad-cal-day-item-main"><strong>' + escText(String(e.nombre || '').toUpperCase()) + '</strong>' +
+                            '<em>Evento · ' + escText(e.modalidad || '') + '</em></div></article>';
+                    });
+                    if (!html) {
+                        html = '<p class="ad-empty">Nada programado este día. Usa + Sesión para fijar una.</p>';
+                    }
+                    return html;
+                }
+
+                function renderDay(fecha) {
+                    var pack = dayData[fecha];
+                    if (!pack || !dayList) return;
+                    if (dayTitle) dayTitle.textContent = pack.label || fecha;
+                    dayList.innerHTML = buildDayHtml(pack);
+                }
+
+                function openDayModal(fecha) {
+                    var pack = dayData[fecha] || { label: fecha, sesiones: [], eventos: [] };
+                    activeDayFecha = fecha;
+                    if (dayModalTitle) dayModalTitle.textContent = pack.label || fecha;
+                    if (dayModalBody) dayModalBody.innerHTML = buildDayHtml(pack);
+                    if (!dayModal) return;
+                    dayModal.hidden = false;
+                    dayModal.classList.add('is-open');
+                    document.body.style.overflow = 'hidden';
+                }
+
+                function closeDayModal() {
+                    activeDayFecha = null;
+                    if (!dayModal) return;
+                    dayModal.hidden = true;
+                    dayModal.classList.remove('is-open');
+                    document.body.style.overflow = '';
+                    showView('month');
+                }
+
+                switches.forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        showView(btn.getAttribute('data-cal-switch'));
+                    });
+                });
+
+                document.querySelectorAll('[data-cal-day-modal]').forEach(function (el) {
+                    el.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        var fecha = el.getAttribute('data-cal-day-modal');
+                        if (fecha) openDayModal(fecha);
+                    });
+                });
+
+                document.querySelectorAll('[data-cal-day-modal-close]').forEach(function (b) {
+                    b.addEventListener('click', closeDayModal);
+                });
+                dayModal?.addEventListener('click', function (e) {
+                    if (e.target === dayModal) closeDayModal();
+                });
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape' && dayModal && !dayModal.hidden) closeDayModal();
+                });
+                dayModalAdd?.addEventListener('click', function () {
+                    var fecha = activeDayFecha;
+                    closeDayModal();
+                    if (typeof window.__stayfitOpenSesionCreate === 'function') {
+                        window.__stayfitOpenSesionCreate(fecha || '');
+                    }
+                });
+
+                dayModalBody?.addEventListener('click', function (e) {
+                    var btn = e.target.closest('[data-cal-day-edit]');
+                    if (!btn || !dayModalBody.contains(btn)) return;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    closeDayModal();
+                    openEdit(btn);
+                });
+
+                showView('month');
+            })();
         })();
     </script>
 @endsection

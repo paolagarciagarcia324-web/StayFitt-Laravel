@@ -273,18 +273,23 @@
         </div>
     </div>
 
-    <div class="ad-modal" data-horario-confirm-modal hidden>
-        <div class="ad-modal-card" role="dialog" aria-modal="true" aria-labelledby="ad-horario-del-title">
-            <header class="ad-modal-head">
-                <div>
-                    <h2 id="ad-horario-del-title">Eliminar horario</h2>
-                    <p>Esta acción no se puede deshacer.</p>
+    <div class="ad-modal ad-horario-del-modal" data-horario-confirm-modal hidden>
+        <div class="ad-modal-card ad-horario-del-card" role="dialog" aria-modal="true" aria-labelledby="ad-horario-del-title">
+            <div class="ad-horario-del-glow" aria-hidden="true"></div>
+            <header class="ad-modal-head ad-horario-del-head">
+                <div class="ad-horario-del-who">
+                    <span class="ad-horario-del-orb" aria-hidden="true">@include('partials.admin-icon', ['icon' => 'trash'])</span>
+                    <div>
+                        <p class="ad-horario-del-kicker">Acción permanente</p>
+                        <h2 id="ad-horario-del-title">Eliminar horario</h2>
+                        <p>Esta acción no se puede deshacer.</p>
+                    </div>
                 </div>
                 <button type="button" class="ad-modal-close" data-horario-confirm-cancel aria-label="Cerrar">×</button>
             </header>
-            <div class="ad-modal-actions">
-                <button type="button" class="ad-btn ad-btn-ghost" data-horario-confirm-cancel>Cancelar</button>
-                <button type="button" class="ad-btn is-danger" data-horario-confirm-ok>Sí, eliminar</button>
+            <div class="ad-modal-actions ad-horario-del-actions">
+                <button type="button" class="ad-pend-btn is-menta" data-horario-confirm-cancel>Cancelar</button>
+                <button type="button" class="ad-pend-btn is-menta" data-horario-confirm-ok>Sí, eliminar</button>
             </div>
         </div>
     </div>
@@ -355,15 +360,7 @@
                 form.querySelectorAll('[data-sf-time]').forEach(function (root) {
                     var p = root.querySelector('[data-sf-time-panel]');
                     if (except && p === except) return;
-                    if (p) {
-                        p.hidden = true;
-                        p.style.position = '';
-                        p.style.left = '';
-                        p.style.top = '';
-                        p.style.bottom = '';
-                        p.style.width = '';
-                        p.style.right = '';
-                    }
+                    if (p) p.hidden = true;
                     root.classList.remove('is-open');
                 });
             }
@@ -430,24 +427,6 @@
                     built = true;
                 }
 
-                function placePanel() {
-                    var r = trigger.getBoundingClientRect();
-                    var panelH = 210;
-                    var spaceBelow = window.innerHeight - r.bottom;
-                    panel.style.position = 'fixed';
-                    panel.style.left = Math.max(12, r.left) + 'px';
-                    panel.style.width = Math.max(220, r.width) + 'px';
-                    panel.style.right = 'auto';
-                    panel.style.zIndex = '120';
-                    if (spaceBelow < panelH + 16) {
-                        panel.style.top = 'auto';
-                        panel.style.bottom = Math.max(12, window.innerHeight - r.top + 8) + 'px';
-                    } else {
-                        panel.style.top = (r.bottom + 8) + 'px';
-                        panel.style.bottom = 'auto';
-                    }
-                }
-
                 function scrollActiveIntoView() {
                     [colH, colM].forEach(function (col) {
                         var on = col.querySelector('.is-on');
@@ -462,20 +441,12 @@
                     markActive();
                     panel.hidden = false;
                     root.classList.add('is-open');
-                    placePanel();
                     requestAnimationFrame(scrollActiveIntoView);
                 }
 
                 function closePanel() {
                     panel.hidden = true;
                     root.classList.remove('is-open');
-                    panel.style.position = '';
-                    panel.style.left = '';
-                    panel.style.top = '';
-                    panel.style.bottom = '';
-                    panel.style.width = '';
-                    panel.style.right = '';
-                    panel.style.zIndex = '';
                 }
 
                 root._setTime = function (hhmm) {
@@ -495,10 +466,6 @@
                     waPick?.classList.remove('is-open');
                     if (willOpen) openPanel();
                     else closePanel();
-                });
-
-                window.addEventListener('resize', function () {
-                    if (!panel.hidden) placePanel();
                 });
 
                 syncHidden();

@@ -59,15 +59,43 @@ class EventoController extends Controller
             'cerrados' => (clone $enMes)->whereNotNull('fecha_fin')->where('fecha_fin', '<', $now)->count(),
         ];
 
-        $semana = collect(range(0, 6))->map(fn (int $i) => $mesInicio->copy()->startOfWeek()->addDays($i));
+        $hoy = $now->copy()->startOfDay();
+        $anclaSemana = $hoy->betweenIncluded($mesInicio, $mesFin)
+            ? $hoy->copy()
+            : $mesInicio->copy();
+        $semanaInicio = $anclaSemana->copy()->startOfWeek(Carbon::MONDAY);
+        if ($semanaInicio->lt($mesInicio)) {
+            $semanaInicio = $mesInicio->copy();
+        }
+        $semana = collect();
+        $cursorSemana = $semanaInicio->copy();
+        while ($semana->count() < 7 && $cursorSemana->lte($mesFin)) {
+            $semana->push($cursorSemana->copy());
+            $cursorSemana->addDay();
+        }
 
-        $diasConEvento = (clone $enMes)
-            ->get(['fecha_inicio'])
+        $eventosDelMes = (clone $enMes)->get(['id_evento', 'fecha_inicio', 'fecha_fin']);
+        $diasConEvento = $eventosDelMes
             ->map(fn ($e) => optional($e->fecha_inicio)->format('Y-m-d'))
             ->filter()
             ->unique()
             ->values()
             ->all();
+
+        $eventosPorDia = [];
+        foreach ($eventosDelMes as $e) {
+            $key = optional($e->fecha_inicio)->format('Y-m-d');
+            if (! $key) {
+                continue;
+            }
+            $fin = $e->fecha_fin ?: $e->fecha_inicio;
+            $vencido = $fin && $fin->lt($now);
+            $eventosPorDia[$key] ??= [];
+            $eventosPorDia[$key][] = [
+                'id' => (int) $e->id_evento,
+                'vencido' => (bool) $vencido,
+            ];
+        }
 
         $mesAnterior = $mesInicio->copy()->subMonth()->format('Y-m');
         $mesSiguiente = $mesInicio->copy()->addMonth()->format('Y-m');
@@ -78,6 +106,7 @@ class EventoController extends Controller
             'stats',
             'semana',
             'diasConEvento',
+            'eventosPorDia',
             'mes',
             'mesAnterior',
             'mesSiguiente',

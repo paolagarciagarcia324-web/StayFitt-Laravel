@@ -43,13 +43,15 @@ class CalendarioController extends Controller
 
         $sesionesMes = collect();
         $sesionesArchivo = collect();
+        $gridInicio = $mes->copy()->startOfWeek(Carbon::MONDAY);
+        $gridFin = $finMes->copy()->endOfWeek(Carbon::SUNDAY);
         if (Schema::hasTable('sesiones')) {
             $sesionesMes = Sesion::query()
                 ->with('coach.usuario')
-                ->whereBetween('fecha', [$mes->toDateString(), $finMes->toDateString()])
+                ->whereBetween('fecha', [$gridInicio->toDateString(), $gridFin->toDateString()])
                 ->orderBy('fecha')
                 ->orderBy('hora_inicio')
-                ->limit(80)
+                ->limit(120)
                 ->get();
 
             $archivoDesde = now()->copy()->subMonths(5)->startOfMonth();

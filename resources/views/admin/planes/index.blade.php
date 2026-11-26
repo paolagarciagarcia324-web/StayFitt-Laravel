@@ -105,12 +105,17 @@
 
     <script type="application/json" id="ad-plans-data">@json($plansData)</script>
 
-    <div class="ad-modal" data-plan-delete-modal hidden>
-        <div class="ad-modal-card" role="dialog" aria-modal="true" aria-labelledby="ad-plan-del-title">
-            <header class="ad-modal-head">
-                <div>
-                    <h2 id="ad-plan-del-title">Eliminar plan</h2>
-                    <p>Si tiene clientes activos, se desactivará del catálogo en lugar de borrarse.</p>
+    <div class="ad-modal ad-horario-del-modal" data-plan-delete-modal hidden>
+        <div class="ad-modal-card ad-del-card" role="dialog" aria-modal="true" aria-labelledby="ad-plan-del-title">
+            <div class="ad-del-glow" aria-hidden="true"></div>
+            <header class="ad-modal-head ad-del-head">
+                <div class="ad-del-who">
+                    <span class="ad-del-orb" aria-hidden="true">@include('partials.admin-icon', ['icon' => 'trash'])</span>
+                    <div>
+                        <p class="ad-del-kicker">Acción permanente</p>
+                        <h2 id="ad-plan-del-title">Eliminar plan</h2>
+                        <p>Si tiene clientes activos, se desactivará del catálogo en lugar de borrarse.</p>
+                    </div>
                 </div>
                 <button type="button" class="ad-modal-close" data-close-plan-delete aria-label="Cerrar">×</button>
             </header>
@@ -118,9 +123,9 @@
             <form method="POST" data-plan-delete-form>
                 @csrf
                 @method('DELETE')
-                <div class="ad-modal-actions">
+                <div class="ad-modal-actions ad-del-actions">
                     <button type="button" class="ad-btn ad-btn-ghost" data-close-plan-delete>Cancelar</button>
-                    <button type="submit" class="ad-btn is-danger">Sí, eliminar</button>
+                    <button type="submit" class="ad-pend-btn is-menta">Sí, eliminar</button>
                 </div>
             </form>
         </div>
